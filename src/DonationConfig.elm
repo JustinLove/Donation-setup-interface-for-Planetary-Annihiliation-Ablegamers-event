@@ -1,11 +1,10 @@
---import Menu exposing (..)
+import View exposing (view)
+import Msg exposing (..)
+import Menu exposing (..)
 
-import Html exposing (Html, button, div, text, ul, li)
 import Html.App
-import Html.Events exposing (onClick)
-import Http
-import Task
 import Regex exposing (regex)
+import String
 
 main : Program (List MenuItem)
 main =
@@ -20,21 +19,17 @@ main =
 
 type alias Model =
   { menu : List MenuItem
-  , selections : List MenuItem
+  , selections : List OrderItem
   }
-
-type alias MenuItem =
-  { donation: Float
-  , code: String
-  , build: List BuildItem
-  }
-type alias BuildItem = (Int, String)
 
 model : List MenuItem -> Model
 model menu =
-  { menu = compress menu
-  , selections = []
-  }
+  let
+    m2 = compress menu
+  in
+    { menu = m2
+    , selections = List.map makeOrder m2
+    }
 
 init : List MenuItem -> (Model, Cmd Msg)
 init menu =
@@ -42,59 +37,35 @@ init menu =
   , Cmd.none
   )
 
-compress : List MenuItem -> List MenuItem
-compress =
-  List.map compressMenuItem
-
-compressMenuItem : MenuItem -> MenuItem
-compressMenuItem item =
-  { item | build = compressBuilds item.build }
-
-compressBuilds : List BuildItem -> List BuildItem
-compressBuilds builds =
-  case builds of
-    (num, spec) :: tl ->
-      case List.partition (\(n,s) -> s == spec) builds of
-        (match, other) ->
-          (List.sum (List.map fst match), spec) :: (compressBuilds other)
-    _ -> builds
-
 -- UPDATE
-
-type Msg
-  = Noop
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Noop ->
-      (model, Cmd.none)
+    EnterAmount code number ->
+      if validNumber number then
+        ((addOrder model (getNumber number) code), Cmd.none)
+      else
+        (model, Cmd.none)
 
--- VIEW
+addOrder : Model -> Int -> String -> Model
+addOrder model number code =
+  { model | selections = List.map (updateQuantity number code) model.selections }
 
-view : Model -> Html Msg
-view model =
-  div []
-    [ ul [] <| List.map displayItem model.menu
-    ]
+updateQuantity : Int -> String -> OrderItem -> OrderItem
+updateQuantity number code item =
+  if item.code == code then
+    { item | quantity = number }
+  else
+    item
 
-displayItem : MenuItem -> Html Msg
-displayItem item =
-  li []
-    [ text "$"
-    , text <| toString item.donation
-    , text " "
-    , text <| item.code
-    , ul [] <| List.map displayBuild item.build
-    ]
+getNumber : String -> Int
+getNumber s =
+  String.toInt s |> Result.withDefault 0
 
-displayBuild : BuildItem -> Html Msg
-displayBuild (n,spec) =
-  li []
-    [ text <| toString n
-    , text " "
-    , text <| spec
-    ]
+validNumber : String -> Bool
+validNumber value =
+  Regex.contains (regex "^\\d+$") value
 
 -- SUBSCRIPTIONS
 

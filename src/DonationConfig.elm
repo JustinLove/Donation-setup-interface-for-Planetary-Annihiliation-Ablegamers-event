@@ -32,7 +32,7 @@ type alias BuildItem = (Int, String)
 
 model : List MenuItem -> Model
 model menu =
-  { menu = menu
+  { menu = compress menu
   , selections = []
   }
 
@@ -42,6 +42,22 @@ init menu =
   , Cmd.none
   )
 
+compress : List MenuItem -> List MenuItem
+compress =
+  List.map compressMenuItem
+
+compressMenuItem : MenuItem -> MenuItem
+compressMenuItem item =
+  { item | build = compressBuilds item.build }
+
+compressBuilds : List BuildItem -> List BuildItem
+compressBuilds builds =
+  case builds of
+    (num, spec) :: tl ->
+      case List.partition (\(n,s) -> s == spec) builds of
+        (match, other) ->
+          (List.sum (List.map fst match), spec) :: (compressBuilds other)
+    _ -> builds
 
 -- UPDATE
 

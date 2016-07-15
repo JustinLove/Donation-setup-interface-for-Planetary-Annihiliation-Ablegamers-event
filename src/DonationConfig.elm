@@ -47,36 +47,35 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     TypeAmount code number ->
-      (saveInput model number code, Cmd.none)
+      (updateOrder (updateInput number) code model, Cmd.none)
     FinishAmount code ->
-      (addOrder model code, Cmd.none)
+      (updateOrder updateQuantity code model, Cmd.none)
+    AddOne code ->
+      (updateOrder addOne code model, Cmd.none)
     SetPlayer name ->
       ({ model | player = name}, Cmd.none)
 
-saveInput : Model -> String -> String -> Model
-saveInput model number code =
-  { model | selections = List.map (updateInput number code) model.selections }
+updateOrder : (OrderItem -> OrderItem) -> String -> Model -> Model
+updateOrder f code model =
+  { model | selections = List.map
+      (\i -> if i.code == code then f i else i)
+      model.selections
+  }
 
-updateInput : String -> String -> OrderItem -> OrderItem
-updateInput number code item =
-  if item.code == code then
-    { item | input = number }
+updateInput : String -> OrderItem -> OrderItem
+updateInput number item =
+  { item | input = number }
+
+updateQuantity : OrderItem -> OrderItem
+updateQuantity item =
+  if validNumber item.input then
+    { item | quantity = getNumber item.input }
   else
-    item
+    { item | quantity = 0, input = "" }
 
-addOrder : Model -> String -> Model
-addOrder model code =
-  { model | selections = List.map (updateQuantity code) model.selections }
-
-updateQuantity : String -> OrderItem -> OrderItem
-updateQuantity code item =
-  if item.code == code then
-    if validNumber item.input then
-      { item | quantity = getNumber item.input }
-    else
-      { item | quantity = 0, input = "" }
-  else
-    item
+addOne : OrderItem -> OrderItem
+addOne item =
+  { item | quantity = item.quantity + 1, input = toString (item.quantity + 1) }
 
 getNumber : String -> Int
 getNumber s =

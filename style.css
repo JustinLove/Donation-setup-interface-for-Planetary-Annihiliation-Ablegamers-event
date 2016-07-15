@@ -1,0 +1,6 @@
+.menu li {
+  display: inline-block;
+  border: solid #222 1px;
+  margin: 0.1em;
+  padding: 0.1em 0.2em;
+}

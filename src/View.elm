@@ -1,11 +1,11 @@
 module View exposing (view)
 
 import Msg exposing (..)
-import Menu exposing (OrderItem, BuildItem)
+import Menu exposing (MenuItem, OrderItem, BuildItem)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onBlur, onCheck)
+import Html.Events exposing (onInput, onBlur, onCheck, onClick)
 import String
 
 -- VIEW
@@ -13,13 +13,14 @@ import String
 --view : Model -> Html Msg
 view model =
   div []
-    [ div []
+    [ ul [ class "players" ] <| List.map (displayPlayer model.player) model.players
+    , ul [ class "menu" ] <| List.map displayMenuItem model.menu
+    , div [ class "total" ]
       [ text "$"
       , text (donationTotal model.selections |> toString)
       ]
-    , pre [] [text (donationText model)]
-    , ul [] <| List.map (displayPlayer model.player) model.players
-    , ul [] <| List.map displayItem model.selections
+    , pre [ class "text" ] [text (donationText model)]
+    , ul [ class "order" ] <| List.map displayOrderItem <| nonZero model.selections
     ]
 
 displayPlayer : String -> String -> Html Msg
@@ -29,8 +30,8 @@ displayPlayer current name =
     , label [] [text name]
     ]
 
-displayItem : OrderItem -> Html Msg
-displayItem item =
+displayOrderItem : OrderItem -> Html Msg
+displayOrderItem item =
   li []
     [ input [ size 5, value (item.input), onInput (TypeAmount item.code), onBlur (FinishAmount item.code)  ] []
     , text " $"
@@ -38,6 +39,16 @@ displayItem item =
     , text " "
     , text <| item.code
     , ul [] <| List.map displayBuild item.build
+    ]
+
+displayMenuItem : MenuItem -> Html Msg
+displayMenuItem item =
+  li [ onClick (AddOne item.code) ]
+    [ text " $"
+    , text <| toString item.donation
+    , text " "
+    , text <| item.code
+    --, ul [] <| List.map displayBuild item.build
     ]
 
 displayBuild : BuildItem -> Html Msg

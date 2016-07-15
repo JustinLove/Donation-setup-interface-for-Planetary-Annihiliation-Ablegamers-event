@@ -6,6 +6,7 @@ import Menu exposing (OrderItem, BuildItem)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
+import String
 
 -- VIEW
 
@@ -14,8 +15,9 @@ view model =
   div []
     [ div []
       [ text "$"
-      , text (List.map (\i -> (toFloat i.quantity) * i.donation) model.selections |> List.sum |> toString)
+      , text (donationTotal model.selections |> toString)
       ]
+    , pre [] [text (donationText <| nonZero model.selections)]
     , ul [] <| List.map displayItem model.selections
     ]
 
@@ -37,3 +39,30 @@ displayBuild (n,spec) =
     , text " "
     , text <| spec
     ]
+
+donationTotal : List OrderItem -> Float
+donationTotal items =
+  List.map (\i -> (toFloat i.quantity) * i.donation) items |> List.sum
+
+donationText : List OrderItem -> String
+donationText items =
+  List.map itemText items |> String.join "\n"
+
+itemText : OrderItem -> String
+itemText item =
+  String.join ""
+    [ item.code
+    , "x"
+    , toString item.quantity
+    , " ("
+    , List.map (buildText item.quantity) item.build |> String.join ", "
+    , ")"
+    ]
+
+buildText : Int -> BuildItem -> String
+buildText quantity (n, spec) =
+  toString (n * quantity) ++ " " ++ spec
+
+nonZero : List OrderItem -> List OrderItem
+nonZero =
+  List.filter (\i -> i.quantity > 0)

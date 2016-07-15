@@ -1,5 +1,6 @@
 module Msg exposing (Msg(..))
 
 type Msg
-  = EnterAmount String String
+  = TypeAmount String String
+  | FinishAmount String
   | SetPlayer String

@@ -46,22 +46,35 @@ init menu =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    EnterAmount code number ->
-      if validNumber number then
-        ((addOrder model (getNumber number) code), Cmd.none)
-      else
-        (model, Cmd.none)
+    TypeAmount code number ->
+      (saveInput model number code, Cmd.none)
+    FinishAmount code ->
+      (addOrder model code, Cmd.none)
     SetPlayer name ->
       ({ model | player = name}, Cmd.none)
 
-addOrder : Model -> Int -> String -> Model
-addOrder model number code =
-  { model | selections = List.map (updateQuantity number code) model.selections }
+saveInput : Model -> String -> String -> Model
+saveInput model number code =
+  { model | selections = List.map (updateInput number code) model.selections }
 
-updateQuantity : Int -> String -> OrderItem -> OrderItem
-updateQuantity number code item =
+updateInput : String -> String -> OrderItem -> OrderItem
+updateInput number code item =
   if item.code == code then
-    { item | quantity = number }
+    { item | input = number }
+  else
+    item
+
+addOrder : Model -> String -> Model
+addOrder model code =
+  { model | selections = List.map (updateQuantity code) model.selections }
+
+updateQuantity : String -> OrderItem -> OrderItem
+updateQuantity code item =
+  if item.code == code then
+    if validNumber item.input then
+      { item | quantity = getNumber item.input }
+    else
+      { item | quantity = 0, input = "" }
   else
     item
 

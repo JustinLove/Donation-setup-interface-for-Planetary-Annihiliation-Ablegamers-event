@@ -5,7 +5,7 @@ import Menu exposing (OrderItem, BuildItem)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onCheck)
+import Html.Events exposing (onInput, onBlur, onCheck)
 import String
 
 -- VIEW
@@ -32,7 +32,7 @@ displayPlayer current name =
 displayItem : OrderItem -> Html Msg
 displayItem item =
   li []
-    [ input [ size 5, value (toString item.quantity), onInput (EnterAmount item.code)  ] []
+    [ input [ size 5, value (item.input), onInput (TypeAmount item.code), onBlur (FinishAmount item.code)  ] []
     , text " $"
     , text <| toString item.donation
     , text " "

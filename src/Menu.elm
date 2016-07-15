@@ -5,6 +5,7 @@ type alias OrderItem =
   , code: String
   , build: List BuildItem
   , quantity: Int
+  , input: String
   }
 
 type alias MenuItem =
@@ -21,6 +22,7 @@ makeOrder item =
   , code = item.code
   , build = item.build
   , quantity = 0
+  , input = ""
   }
 
 compress : List MenuItem -> List MenuItem

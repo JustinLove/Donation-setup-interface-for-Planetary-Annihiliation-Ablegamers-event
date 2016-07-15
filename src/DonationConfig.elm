@@ -20,6 +20,8 @@ main =
 type alias Model =
   { menu : List MenuItem
   , selections : List OrderItem
+  , player: String
+  , players: List String
   }
 
 model : List MenuItem -> Model
@@ -29,6 +31,8 @@ model menu =
   in
     { menu = m2
     , selections = List.map makeOrder m2
+    , player = ""
+    , players = ["Larry", "Moe", "Curly"]
     }
 
 init : List MenuItem -> (Model, Cmd Msg)
@@ -47,6 +51,8 @@ update msg model =
         ((addOrder model (getNumber number) code), Cmd.none)
       else
         (model, Cmd.none)
+    SetPlayer name ->
+      ({ model | player = name}, Cmd.none)
 
 addOrder : Model -> Int -> String -> Model
 addOrder model number code =

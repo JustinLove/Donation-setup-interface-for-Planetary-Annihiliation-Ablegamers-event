@@ -44,12 +44,20 @@ displayOrderItem item =
 displayMenuItem : MenuItem -> Html Msg
 displayMenuItem item =
   li [ onClick (AddOne item.code) ]
-    [ text " $"
+    [ div [] <| List.map buildImage item.build
+    , text " $"
     , text <| toString item.donation
     , text " "
     , text <| item.code
     --, ul [] <| List.map displayBuild item.build
     ]
+
+buildImage : BuildItem -> Html Msg
+buildImage build =
+  if String.isEmpty build.image then
+    text ""
+  else
+    img [ src build.image ] []
 
 displayBuild : BuildItem -> Html Msg
 displayBuild build =

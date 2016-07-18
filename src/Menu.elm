@@ -1,6 +1,7 @@
 module Menu exposing (OrderItem, RawMenuItem, RawBuildItem, MenuItem, BuildItem, UnitInfo, cook, makeOrder)
 
 import Regex exposing (regex)
+import String
 
 type alias OrderItem =
   { donation: Float
@@ -87,7 +88,7 @@ cookBuildItem info (n, spec) =
     Just unit ->
       { spec = spec
       , display_name = unit.display_name
-      , image = Regex.replace Regex.All (regex "\\.json") (\_ -> ".png") spec
+      , image = imagePath spec
       , quantity = n
       }
     Nothing ->
@@ -96,3 +97,8 @@ cookBuildItem info (n, spec) =
       , image = ""
       , quantity = n
       }
+
+imagePath : String -> String
+imagePath s =
+  Regex.replace Regex.All (regex "\\.json") (\_ -> "_icon_buildbar.png") s
+  |> String.dropLeft 1

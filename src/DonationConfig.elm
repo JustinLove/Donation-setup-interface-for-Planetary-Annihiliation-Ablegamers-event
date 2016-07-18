@@ -9,7 +9,7 @@ import Dict exposing (Dict)
 import Json.Encode
 
 type alias Arguments =
-  { menu: List MenuItem
+  { menu: List RawMenuItem
   , info: List UnitInfo
   }
 
@@ -32,10 +32,10 @@ type alias Model =
   , unitInfo: List UnitInfo
   }
 
-model : List MenuItem -> List UnitInfo -> Model
+model : List RawMenuItem -> List UnitInfo -> Model
 model menu info =
   let
-    m2 = compress menu
+    m2 = cook info menu
   in
     { menu = m2
     , selections = List.map makeOrder m2

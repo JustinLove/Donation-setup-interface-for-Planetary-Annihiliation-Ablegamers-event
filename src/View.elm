@@ -52,11 +52,11 @@ displayMenuItem item =
     ]
 
 displayBuild : BuildItem -> Html Msg
-displayBuild (n,spec) =
+displayBuild build =
   li []
-    [ text <| toString n
+    [ text <| toString build.quantity
     , text " "
-    , text <| spec
+    , text <| build.display_name
     ]
 
 donationTotal : List OrderItem -> Float
@@ -87,8 +87,8 @@ itemText item =
     ]
 
 buildText : Int -> BuildItem -> String
-buildText quantity (n, spec) =
-  toString (n * quantity) ++ " " ++ spec
+buildText quantity build =
+  toString (build.quantity * quantity) ++ " " ++ build.display_name
 
 nonZero : List OrderItem -> List OrderItem
 nonZero =

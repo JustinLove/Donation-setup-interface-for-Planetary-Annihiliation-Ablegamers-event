@@ -19,7 +19,9 @@ view model =
       [ text "$"
       , text (donationTotal model.selections |> toString)
       ]
-    , pre [ class "text" ] [text (donationText model)]
+    , textarea
+      [ class "text", readonly True, rows 7, cols 40 ]
+      [text (donationText model)]
     , ul [ class "order" ] <| List.map displayOrderItem <| nonZero model.selections
     ]
 
@@ -60,6 +62,7 @@ buildImage build =
     img [ src build.image ] []
 
 displayBuild : BuildItem -> Html Msg
+
 displayBuild build =
   li []
     [ text <| toString build.quantity
@@ -87,7 +90,7 @@ itemText : OrderItem -> String
 itemText item =
   String.join ""
     [ item.code
-    , "x"
+    , " x"
     , toString item.quantity
     , " ("
     , List.map (buildText item.quantity) item.build |> String.join ", "

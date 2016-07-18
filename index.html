@@ -12,8 +12,11 @@
 </body>
 
 <script type="text/javascript">
-require(["src/menu", "elm"], function(menu, Elm) {
-  var app = Elm.Main.fullscreen(menu)
+require(["src/menu", "src/unit_info", "elm"], function(menu, info, Elm) {
+  var app = Elm.Main.fullscreen({
+    menu: menu,
+    info: info
+  })
 })
 </script>
 

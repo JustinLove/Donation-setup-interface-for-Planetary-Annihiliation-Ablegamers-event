@@ -1,4 +1,4 @@
-module Menu exposing (OrderItem, MenuItem, BuildItem, compress, makeOrder)
+module Menu exposing (OrderItem, MenuItem, BuildItem, UnitInfo, compress, makeOrder)
 
 type alias OrderItem =
   { donation: Float
@@ -15,6 +15,11 @@ type alias MenuItem =
   }
 
 type alias BuildItem = (Int, String)
+
+type alias UnitInfo = 
+  { spec: String
+  , display_name: String
+  }
 
 makeOrder : MenuItem -> OrderItem
 makeOrder item =

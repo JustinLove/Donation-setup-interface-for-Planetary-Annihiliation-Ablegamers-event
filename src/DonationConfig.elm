@@ -5,8 +5,15 @@ import Menu exposing (..)
 import Html.App
 import Regex exposing (regex)
 import String
+import Dict exposing (Dict)
+import Json.Encode
 
-main : Program (List MenuItem)
+type alias Arguments =
+  { menu: List MenuItem
+  , info: List UnitInfo
+  }
+
+main : Program Arguments
 main =
   Html.App.programWithFlags
     { init = init
@@ -22,10 +29,11 @@ type alias Model =
   , selections : List OrderItem
   , player: String
   , players: List String
+  , unitInfo: List UnitInfo
   }
 
-model : List MenuItem -> Model
-model menu =
+model : List MenuItem -> List UnitInfo -> Model
+model menu info =
   let
     m2 = compress menu
   in
@@ -33,11 +41,12 @@ model menu =
     , selections = List.map makeOrder m2
     , player = ""
     , players = ["Larry", "Moe", "Curly"]
+    , unitInfo = info
     }
 
-init : List MenuItem -> (Model, Cmd Msg)
-init menu =
-  ( model menu
+init : Arguments -> (Model, Cmd Msg)
+init args =
+  ( model args.menu args.info
   , Cmd.none
   )
 

@@ -1,0 +1,11 @@
+{
+  "players": [
+    "Larry",
+    "Moe",
+    "Curly"
+  ],
+  "planets": [
+    "Earth",
+    "Moon"
+  ]
+}

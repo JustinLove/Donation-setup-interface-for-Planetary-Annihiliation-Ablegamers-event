@@ -1,8 +1,11 @@
 import View exposing (view)
 import Msg exposing (..)
 import Menu exposing (..)
+import GameInfo exposing (GameInfo) 
 
 import Html.App
+import Http
+import Task
 import Regex exposing (regex)
 import String
 import Dict exposing (Dict)
@@ -29,6 +32,8 @@ type alias Model =
   , selections : List OrderItem
   , player: String
   , players: List String
+  , planet: String
+  , planets: List String
   , unitInfo: List UnitInfo
   }
 
@@ -40,15 +45,21 @@ model menu info =
     { menu = m2
     , selections = List.map makeOrder m2
     , player = ""
-    , players = ["Larry", "Moe", "Curly"]
+    , players = []
+    , planet = ""
+    , planets = []
     , unitInfo = info
     }
 
 init : Arguments -> (Model, Cmd Msg)
 init args =
   ( model args.menu args.info
-  , Cmd.none
+  , fetchGame
   )
+
+fetchGame : Cmd Msg
+fetchGame =
+  Task.perform FetchError GotGameInfo (Http.get GameInfo.info "http://localhost:3000/options.json")
 
 -- UPDATE
 
@@ -63,6 +74,11 @@ update msg model =
       (updateOrder addOne code model, Cmd.none)
     SetPlayer name ->
       ({ model | player = name}, Cmd.none)
+    GotGameInfo info ->
+      ({ model | players = info.players, planets = info.planets}, Cmd.none)
+    FetchError msg ->
+      let _ = Debug.log "error" msg in
+      (model, Cmd.none)
 
 updateOrder : (OrderItem -> OrderItem) -> String -> Model -> Model
 updateOrder f code model =

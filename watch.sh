@@ -1,1 +1,1 @@
-watch "elm-make src/DonationConfig.elm --output elm.js" src
+watch "elm-make src/DonationConfig.elm --output public/elm.js" src

@@ -5,14 +5,10 @@ redis.on('error', function(err) {
 })
 
 var fetchOptions = function() {
-  console.log('fetch')
   return new Promise(function(resolve, reject) {
-    console.log('promise')
     redis.smembers('games', function(err, games) {
-      console.log(games)
       if (games) {
         redis.mget(games, function(err2, replies) {
-          console.log(replies)
           if (replies) {
             resolve({games: replies.map(JSON.parse)})
           } else {

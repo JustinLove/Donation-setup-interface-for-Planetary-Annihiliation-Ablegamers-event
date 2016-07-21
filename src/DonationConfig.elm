@@ -31,6 +31,7 @@ type alias Model =
   { menu : List MenuItem
   , unitInfo: List UnitInfo
   , rounds: List GameInfo
+  , round: String
   , player: String
   , planet: String
   , selections : List OrderItem
@@ -44,6 +45,7 @@ model menu info =
     { menu = m2
     , unitInfo = info
     , rounds = []
+    , round = ""
     , player = ""
     , planet = ""
     , selections = List.map makeOrder m2
@@ -72,6 +74,8 @@ update msg model =
       (updateOrder addOne code model, Cmd.none)
     SetPlayer name ->
       ({ model | player = name}, Cmd.none)
+    ChooseRound id ->
+      ({ model | round = id}, Cmd.none)
     GotGameInfo rounds ->
       ({ model | rounds = rounds}, Cmd.none)
     FetchError msg ->

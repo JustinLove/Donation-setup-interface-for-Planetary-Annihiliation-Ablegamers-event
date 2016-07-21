@@ -2,6 +2,7 @@ module View exposing (view)
 
 import Msg exposing (..)
 import Menu exposing (MenuItem, OrderItem, BuildItem)
+import GameInfo exposing (GameInfo)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -13,7 +14,8 @@ import String
 --view : Model -> Html Msg
 view model =
   div []
-    [ ul [ class "rounds" ] <| List.map (displayRound model) <| (List.sortBy .name) model.rounds
+    [ ul [ class "rounds-header" ] <| List.map tabHeader <| (List.sortBy .name) model.rounds
+    , ul [ class "rounds-body" ] <| List.map (displayRound model) model.rounds
     , ul [ class "menu" ] <| List.map displayMenuItem model.menu
     , div [ class "total" ]
       [ text "$"
@@ -25,11 +27,19 @@ view model =
     , ul [ class "order" ] <| List.map displayOrderItem <| nonZero model.selections
     ]
 
-displayRound model round =
+tabHeader : GameInfo -> Html Msg
+tabHeader round =
   li []
-    [ div [] [text round.name]
-    , ul [ class "players" ] <| List.map (displayPlayer round.id model.player) round.players
+    [ span [ id round.id, onClick (ChooseRound round.id) ] [ text round.name ]
     ]
+
+displayRound model round =
+  if model.round == round.id then
+    li []
+      [ ul [ class "players" ] <| List.map (displayPlayer round.id model.player) round.players
+      ]
+  else
+    text ""
 
 displayPlayer : String -> String -> String -> Html Msg
 displayPlayer context current name =

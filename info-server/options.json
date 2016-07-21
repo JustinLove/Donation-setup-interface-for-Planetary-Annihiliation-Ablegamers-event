@@ -1,7 +1,7 @@
 {
   "games": [
     {
-      "name": "round 1",
+      "name": "Round 1",
       "id": "round1",
       "players": [
         "Larry",
@@ -14,16 +14,15 @@
       ]
     },
     {
-      "name": "round 2",
+      "name": "Round 2",
       "id": "round2",
       "players": [
-        "Larry",
-        "Moe",
-        "Curly"
+        "Billy",
+        "Bob",
+        "Jane"
       ],
       "planets": [
-        "Earth",
-        "Moon"
+        "Mars"
       ]
     }
   ]

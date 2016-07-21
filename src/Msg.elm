@@ -10,3 +10,4 @@ type Msg
   | SetPlayer String
   | GotGameInfo (List GameInfo)
   | FetchError Http.Error
+  | ChooseRound String

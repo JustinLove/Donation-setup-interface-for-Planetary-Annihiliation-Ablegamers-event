@@ -4,6 +4,28 @@ redis.on('error', function(err) {
   console.log('Redis error', err)
 })
 
+var fetchOptions = function() {
+  console.log('fetch')
+  return new Promise(function(resolve, reject) {
+    console.log('promise')
+    redis.smembers('games', function(err, games) {
+      console.log(games)
+      if (games) {
+        redis.mget(games, function(err2, replies) {
+          console.log(replies)
+          if (replies) {
+            resolve({games: replies.map(JSON.parse)})
+          } else {
+            reject(err2)
+          }
+        })
+      } else {
+        reject(err)
+      }
+    })
+  })
+}
+
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser')
@@ -16,12 +38,10 @@ app.use(function(req, res, next) {
 });
 
 app.get('/options.json', function(req, res){
-  redis.get('game', function(err, reply) {
-    if (reply) {
-      res.json(JSON.parse(reply))
-    } else {
-      res.sendStatus(404)
-    }
+  fetchOptions().then(function(data) {
+    res.json(data)
+  }, function() {
+    res.sendStatus(404)
   })
 });
 

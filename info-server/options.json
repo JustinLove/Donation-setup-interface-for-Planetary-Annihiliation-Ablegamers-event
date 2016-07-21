@@ -1,11 +1,30 @@
 {
-  "players": [
-    "Larry",
-    "Moe",
-    "Curly"
-  ],
-  "planets": [
-    "Earth",
-    "Moon"
+  "games": [
+    {
+      "name": "round 1",
+      "id": "round1",
+      "players": [
+        "Larry",
+        "Moe",
+        "Curly"
+      ],
+      "planets": [
+        "Earth",
+        "Moon"
+      ]
+    },
+    {
+      "name": "round 2",
+      "id": "round2",
+      "players": [
+        "Larry",
+        "Moe",
+        "Curly"
+      ],
+      "planets": [
+        "Earth",
+        "Moon"
+      ]
+    }
   ]
 }

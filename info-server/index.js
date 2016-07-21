@@ -45,9 +45,11 @@ app.get('/options.json', function(req, res){
   })
 });
 
-app.put('/options.json', jsonParser, function(req, res){
-  redis.set('game', JSON.stringify(req.body), function(err, reply) {
+app.put('/games/:id', jsonParser, function(req, res){
+  req.body.id = req.params.id
+  redis.set(req.params.id, JSON.stringify(req.body), function(err, reply) {
     if (reply == 'OK') {
+      redis.sadd('games', req.params.id)
       res.sendStatus(200)
     } else {
       res.sendStatus(500)

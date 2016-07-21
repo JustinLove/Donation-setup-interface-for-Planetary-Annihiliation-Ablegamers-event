@@ -8,5 +8,5 @@ type Msg
   | FinishAmount String
   | AddOne String
   | SetPlayer String
-  | GotGameInfo GameInfo
+  | GotGameInfo (List GameInfo)
   | FetchError Http.Error

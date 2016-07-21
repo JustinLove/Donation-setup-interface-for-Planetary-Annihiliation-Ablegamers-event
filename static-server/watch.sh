@@ -1,1 +1,1 @@
-supervisor index.js
+supervisor static-server/index.js

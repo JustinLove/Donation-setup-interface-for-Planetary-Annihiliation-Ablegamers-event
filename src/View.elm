@@ -13,7 +13,7 @@ import String
 --view : Model -> Html Msg
 view model =
   div []
-    [ ul [ class "players" ] <| List.map (displayPlayer model.player) model.players
+    [ ul [ class "rounds" ] <| List.map (displayRound model) <| (List.sortBy .name) model.rounds
     , ul [ class "menu" ] <| List.map displayMenuItem model.menu
     , div [ class "total" ]
       [ text "$"
@@ -25,10 +25,16 @@ view model =
     , ul [ class "order" ] <| List.map displayOrderItem <| nonZero model.selections
     ]
 
-displayPlayer : String -> String -> Html Msg
-displayPlayer current name =
+displayRound model round =
   li []
-    [ input [type' "radio", Html.Attributes.name "player", value name, onCheck (\_ -> SetPlayer name), checked (name == current)] []
+    [ div [] [text round.name]
+    , ul [ class "players" ] <| List.map (displayPlayer round.id model.player) round.players
+    ]
+
+displayPlayer : String -> String -> String -> Html Msg
+displayPlayer context current name =
+  li []
+    [ input [type' "radio", Html.Attributes.name (context ++ "-player"), value name, onCheck (\_ -> SetPlayer name), checked (name == current)] []
     , label [] [text name]
     ]
 

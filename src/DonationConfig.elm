@@ -29,12 +29,11 @@ main =
 
 type alias Model =
   { menu : List MenuItem
-  , selections : List OrderItem
-  , player: String
-  , players: List String
-  , planet: String
-  , planets: List String
   , unitInfo: List UnitInfo
+  , rounds: List GameInfo
+  , player: String
+  , planet: String
+  , selections : List OrderItem
   }
 
 model : List RawMenuItem -> List UnitInfo -> Model
@@ -43,12 +42,11 @@ model menu info =
     m2 = cook info menu
   in
     { menu = m2
-    , selections = List.map makeOrder m2
-    , player = ""
-    , players = []
-    , planet = ""
-    , planets = []
     , unitInfo = info
+    , rounds = []
+    , player = ""
+    , planet = ""
+    , selections = List.map makeOrder m2
     }
 
 init : Arguments -> (Model, Cmd Msg)
@@ -59,7 +57,7 @@ init args =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Task.perform FetchError GotGameInfo (Http.get GameInfo.info "http://localhost:3000/options.json")
+  Task.perform FetchError GotGameInfo (Http.get GameInfo.rounds "http://localhost:3000/options.json")
 
 -- UPDATE
 
@@ -74,8 +72,8 @@ update msg model =
       (updateOrder addOne code model, Cmd.none)
     SetPlayer name ->
       ({ model | player = name}, Cmd.none)
-    GotGameInfo info ->
-      ({ model | players = info.players, planets = info.planets}, Cmd.none)
+    GotGameInfo rounds ->
+      ({ model | rounds = rounds}, Cmd.none)
     FetchError msg ->
       let _ = Debug.log "error" msg in
       (model, Cmd.none)

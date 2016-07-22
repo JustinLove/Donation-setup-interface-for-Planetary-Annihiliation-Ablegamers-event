@@ -74,6 +74,8 @@ update msg model =
       (updateOrder addOne code model, Cmd.none)
     SetPlayer name ->
       ({ model | player = name}, Cmd.none)
+    SetPlanet name ->
+      ({ model | planet = name}, Cmd.none)
     ChooseRound id ->
       ({ model | round = id}, Cmd.none)
     GotGameInfo rounds ->

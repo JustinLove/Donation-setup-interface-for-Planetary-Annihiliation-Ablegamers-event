@@ -8,6 +8,7 @@ type Msg
   | FinishAmount String
   | AddOne String
   | SetPlayer String
+  | SetPlanet String
   | GotGameInfo (List GameInfo)
   | FetchError Http.Error
   | ChooseRound String

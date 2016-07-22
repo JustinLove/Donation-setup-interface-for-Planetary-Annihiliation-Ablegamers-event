@@ -36,7 +36,10 @@ tabHeader round =
 displayRound model round =
   if model.round == round.id then
     li []
-      [ ul [ class "players" ] <| List.map (displayPlayer round.id model.player) round.players
+      [ h3 [] [ text "Players" ]
+      , ul [ class "players" ] <| List.map (displayPlayer round.id model.player) round.players
+      , h3 [] [ text "Planets" ]
+      , ul [ class "planets" ] <| List.map (displayPlanet round.id model.planet) round.planets
       ]
   else
     text ""
@@ -45,6 +48,13 @@ displayPlayer : String -> String -> String -> Html Msg
 displayPlayer context current name =
   li []
     [ input [type' "radio", Html.Attributes.name (context ++ "-player"), value name, onCheck (\_ -> SetPlayer name), checked (name == current)] []
+    , label [] [text name]
+    ]
+
+displayPlanet : String -> String -> String -> Html Msg
+displayPlanet context current name =
+  li []
+    [ input [type' "radio", Html.Attributes.name (context ++ "-planet"), value name, onCheck (\_ -> SetPlanet name), checked (name == current)] []
     , label [] [text name]
     ]
 
@@ -93,7 +103,7 @@ donationTotal items =
 --donationText : Model -> String
 donationText model =
   String.join ""
-    [ model.player
+    [ String.join ", " <| List.filter (not << String.isEmpty) [ model.player, model.planet ]
     , "\n"
     , orderText <| nonZero model.selections
     ]

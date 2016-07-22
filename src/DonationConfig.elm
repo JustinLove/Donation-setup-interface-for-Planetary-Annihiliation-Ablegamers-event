@@ -2,6 +2,7 @@ import View exposing (view)
 import Msg exposing (..)
 import Menu exposing (..)
 import GameInfo exposing (GameInfo) 
+import Config exposing (config) 
 
 import Html.App
 import Http
@@ -59,7 +60,7 @@ init args =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Task.perform FetchError GotGameInfo (Http.get GameInfo.rounds "/options.json")
+  Task.perform FetchError GotGameInfo (Http.get GameInfo.rounds (config.server ++ "options.json"))
 
 -- UPDATE
 

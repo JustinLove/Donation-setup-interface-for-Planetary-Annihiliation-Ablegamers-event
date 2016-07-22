@@ -3,7 +3,7 @@ var data = fs.readFileSync(__dirname+'/options.json')
 var json = JSON.parse(data)
 
 var Redis = require('redis')
-var redis = Redis.createClient()
+var redis = Redis.createClient(process.env.REDIS_URL)
 redis.on('error', function(err) {
   console.log('Redis error', err)
 })

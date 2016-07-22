@@ -33,6 +33,8 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.use(express.static('public'));
+
 app.get('/options.json', function(req, res){
   fetchOptions().then(function(data) {
     res.json(data)

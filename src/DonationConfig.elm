@@ -59,7 +59,7 @@ init args =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Task.perform FetchError GotGameInfo (Http.get GameInfo.rounds "http://localhost:3000/options.json")
+  Task.perform FetchError GotGameInfo (Http.get GameInfo.rounds "/options.json")
 
 -- UPDATE
 

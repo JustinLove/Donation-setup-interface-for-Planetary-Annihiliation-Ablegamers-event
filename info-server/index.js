@@ -4,6 +4,15 @@ redis.on('error', function(err) {
   console.log('Redis error', err)
 })
 
+var nacl
+var signpk
+require('js-nacl').instantiate(function(n) {
+  nacl = n
+  if (process.env.SIGNPK) {
+    signpk = nacl.from_hex(process.env.SIGNPK)
+  }
+})
+
 var fetchOptions = function() {
   return new Promise(function(resolve, reject) {
     redis.smembers('games', function(err, games) {
@@ -44,13 +53,34 @@ app.get('/options.json', function(req, res){
 });
 
 app.put('/games/:id', jsonParser, function(req, res){
-  req.body.id = req.params.id
-  redis.set(req.params.id, JSON.stringify(req.body), function(err, reply) {
+  if (!signpk) {
+    console.log('no public key')
+    res.sendStatus(500)
+    return
+  }
+  var signed = nacl.from_hex(req.body.data)
+  try {
+  var binfo = nacl.crypto_sign_open(signed, signpk)
+  } catch (e) {
+    console.log('nacl exception', e)
+    res.sendStatus(500)
+    return
+  }
+  if (!binfo) {
+    console.log('no binfo')
+    res.sendStatus(401)
+    return
+  }
+  var sinfo = nacl.decode_utf8(binfo)
+  var info = JSON.parse(sinfo)
+  console.log('info', info)
+  info.id = req.params.id
+  redis.set(req.params.id, JSON.stringify(info), function(err, reply) {
     if (reply == 'OK') {
       redis.sadd('games', req.params.id)
       res.sendStatus(200)
     } else {
-      res.sendStatus(500)
+      res.sendStatus(507)
     }
   })
 });

@@ -6,57 +6,101 @@ import GameInfo exposing (GameInfo)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onBlur, onCheck, onClick)
+import Html.Events exposing (onInput, onBlur, onCheck, onClick, onSubmit)
 import String
 
 -- VIEW
 
 --view : Model -> Html Msg
 view model =
-  div []
-    [ ul [ class "rounds-header" ] <| List.map tabHeader <| (List.sortBy .name) model.rounds
-    , ul [ class "rounds-body" ] <| List.map (displayRound model) model.rounds
-    , ul [ class "menu" ] <| List.map displayMenuItem model.menu
-    , div [ class "total" ]
-      [ text "$"
-      , text (donationTotal model.selections |> toString)
+  Html.form [ onSubmit Msg.None ]
+    [ div [ class "targeting-section col" ]
+      [ div [ class "row" ]
+        [ div [ class "rounds-header col" ]
+          [ h2 [] [ text "Games" ]
+          , ul [ class "" ] <| List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds
+          ]
+        , div [ class "rounds-body col" ] <| List.map (displayRound model) model.rounds
+        ]
       ]
-    , textarea
-      [ class "text", readonly True, rows 7, cols 40 ]
-      [text (donationText model)]
-    , ul [ class "order" ] <| List.map displayOrderItem <| nonZero model.selections
+    , div [ class "menu-section col" ]
+      [ h2 [] [ text "Add Items" ]
+      , ul [ class "menu" ] <| List.map displayMenuItem model.menu
+      ]
+    , div [ class "bottom col" ]
+      [ div [ class "row" ]
+        [ div [ class "orders col" ]
+          [ h2 [] [ text "Adjust Quantities" ]
+          , displayOrders model.selections
+          ]
+        , div [ class "results col" ]
+          [ h2 [] [ text "Submit This" ]
+          , p []
+            [ small [] [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]
+            ]
+          , p [ class "total" ]
+            [ text "Total $"
+            , text (donationTotal model.selections |> toString)
+            ]
+          , div [ class "message-section" ]
+            [ textarea
+              [ class "text", readonly True, rows 7, cols 40 ]
+              [text (donationText model)]
+            , br [] []
+            ]
+          , h2 []
+            [ a [ target "_blank", href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007" ] [ text "Donate" ]
+            ]
+          ]
+        ]
+      ]
     ]
 
-tabHeader : GameInfo -> Html Msg
-tabHeader round =
-  li []
-    [ span [ id round.id, onClick (ChooseRound round.id) ] [ text round.name ]
+tabHeader : String -> GameInfo -> Html Msg
+tabHeader current round =
+  li [ onClick (ChooseRound round.id) ]
+    [ input [type' "radio", Html.Attributes.name "game", value round.id, onCheck (\_ -> ChooseRound round.id), checked (round.id == current)] []
+    , label [] [text round.name]
     ]
 
 displayRound model round =
   if model.round == round.id then
-    li []
-      [ h3 [] [ text "Players" ]
-      , ul [ class "players" ] <| List.map (displayPlayer round.id model.player) round.players
-      , h3 [] [ text "Planets" ]
-      , ul [ class "planets" ] <| List.map (displayPlanet round.id model.planet) round.planets
+    div [ class "row" ]
+      [ div [ class "players col" ]
+        [ h3 [] [ text "Players" ]
+        , ul [] <| List.map (displayPlayer round.id model.player) round.players
+        ]
+      , div [ class "planets col" ]
+        [ h3 [] [ text "Planets" ]
+        , ul [] <| List.map (displayPlanet round.id model.planet) round.planets
+        ]
       ]
   else
     text ""
 
 displayPlayer : String -> String -> String -> Html Msg
 displayPlayer context current name =
-  li []
+  li [ onClick (SetPlayer name) ]
     [ input [type' "radio", Html.Attributes.name (context ++ "-player"), value name, onCheck (\_ -> SetPlayer name), checked (name == current)] []
     , label [] [text name]
     ]
 
 displayPlanet : String -> String -> String -> Html Msg
 displayPlanet context current name =
-  li []
+  li [ onClick (SetPlanet name)]
     [ input [type' "radio", Html.Attributes.name (context ++ "-planet"), value name, onCheck (\_ -> SetPlanet name), checked (name == current)] []
     , label [] [text name]
     ]
+
+displayOrders : List OrderItem -> Html Msg
+displayOrders selections =
+  let
+    visible = nonZero selections
+  in 
+    if List.isEmpty visible then
+      p [] [ text "Make selections above" ]
+    else
+      ul [] <| List.map displayOrderItem visible
 
 displayOrderItem : OrderItem -> Html Msg
 displayOrderItem item =
@@ -71,13 +115,15 @@ displayOrderItem item =
 
 displayMenuItem : MenuItem -> Html Msg
 displayMenuItem item =
-  li [ onClick (AddOne item.code) ]
-    [ div [] <| List.map buildImage item.build
-    , text " $"
-    , text <| toString item.donation
-    , text " "
-    , text <| item.code
-    --, ul [] <| List.map displayBuild item.build
+  li []
+    [ button [ onClick (AddOne item.code) ]
+      [ div [] <| List.map buildImage item.build
+      , text " $"
+      , text <| toString item.donation
+      , text " "
+      , text <| item.code
+      --, ul [] <| List.map displayBuild item.build
+      ]
     ]
 
 buildImage : BuildItem -> Html Msg
@@ -103,7 +149,7 @@ donationTotal items =
 --donationText : Model -> String
 donationText model =
   String.join ""
-    [ String.join ", " <| List.filter (not << String.isEmpty) [ model.player, model.planet ]
+    [ String.join ", " <| List.filter (not << String.isEmpty) [ model.player, model.planet, model.round ]
     , "\n"
     , orderText <| nonZero model.selections
     ]

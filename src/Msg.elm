@@ -12,3 +12,4 @@ type Msg
   | GotGameInfo (List GameInfo)
   | FetchError Http.Error
   | ChooseRound String
+  | None

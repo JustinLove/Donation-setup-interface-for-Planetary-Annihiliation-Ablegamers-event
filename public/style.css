@@ -1,6 +1,55 @@
+/* Dead Simple Grid (c) 2015 Vladimir Agafonkin */
+
+.row .row { margin:  0 -1.5em; }
+.col      { padding: 0  1.5em; }
+
+.row:after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+@media only screen { .col {
+    float: left;
+    width: 100%;
+    box-sizing: border-box;
+}}
+/* End DSG */
+
+.form { max-width: 90em; }
+.results { max-width: 40em; }
+
+@media only screen and (min-width: 34em) {
+  .players, .planets { width: 50%; }
+}
+
+@media only screen and (min-width: 54em) {
+  .rounds-header { width: 33.33%; }
+  .rounds-body { width: 66.66%; }
+  .orders, .results { width: 50%; }
+}
+
+@media only screen and (min-width: 76em) {
+  .targeting-section { width: 20%; }
+  .menu-section { width: 40%; }
+  .bottom { width: 40%; }
+  .rounds-header { width: 100%; }
+  .rounds-body { width: 100%; }
+  .players, .planets { width: 100%; }
+  .orders, .results { width: 100%; }
+}
+
+ul {
+  padding-left: 0;
+}
+
+li {
+  list-style-type: none;
+
+}
+
 .menu li {
   display: inline-block;
-  border: solid #222 1px;
   margin: 0.1em;
   padding: 0.1em 0.2em;
 }

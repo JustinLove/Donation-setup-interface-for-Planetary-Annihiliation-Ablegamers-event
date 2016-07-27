@@ -84,6 +84,8 @@ update msg model =
     FetchError msg ->
       let _ = Debug.log "error" msg in
       (model, Cmd.none)
+    None ->
+      (model, Cmd.none)
 
 updateOrder : (OrderItem -> OrderItem) -> String -> Model -> Model
 updateOrder f code model =

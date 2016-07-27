@@ -54,6 +54,27 @@ li {
   padding: 0.1em 0.2em;
 }
 
+.menu-item button {
+  position: relative;
+  font-size: 13px;
+}
+
+.menu-code {
+  position: absolute;
+  bottom: 0.2em;
+  left: 0.2em;
+  padding: 0.2em 0.4em;
+  background-color: #0FF;
+}
+
+.menu-donation {
+  position: absolute;
+  bottom: 0.2em;
+  right: 0.2em;
+  padding: 0.2em 0.4em;
+  background-color: #0F0;
+}
+
 .order-item ul {
   display: inline-block;
   margin: 0;

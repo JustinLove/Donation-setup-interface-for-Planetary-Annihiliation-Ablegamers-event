@@ -19,9 +19,11 @@ require(["menu", "unit_info", "elm"], function(menu, info, Elm) {
   })
 
   app.ports.select.subscribe(function(id) {
-    var el = document.getElementById(id)
-    el.focus()
-    el.select()
+    setTimeout(function() {
+      var el = document.getElementById(id)
+      el.focus()
+      el.select()
+    }, 500)
   })
 })
 </script>

@@ -137,13 +137,11 @@ displayOrderItem item =
 
 displayMenuItem : MenuItem -> Html Msg
 displayMenuItem item =
-  li []
+  li [ class "menu-item" ]
     [ button [ onClick (AddOne item.code) ]
       [ div [] <| List.map buildImage item.build
-      , text " "
-      , text <| dollars item.donation
-      , text " "
-      , text <| item.code
+      , span [ class "menu-code" ] [ text item.code ]
+      , span [ class "menu-donation" ] [ text <| dollars item.donation ]
       --, ul [] <| List.map displayBuild item.build
       ]
     ]
@@ -153,7 +151,7 @@ buildImage build =
   if String.isEmpty build.image then
     text ""
   else
-    img [ src build.image ] []
+    img [ src build.image, alt build.display_name, title ((toString build.quantity)++" "++build.display_name) ] []
 
 displayBuild : BuildItem -> Html Msg
 displayBuild build =

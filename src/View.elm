@@ -6,7 +6,7 @@ import GameInfo exposing (GameInfo)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onBlur, onCheck, onClick, onSubmit)
+import Html.Events exposing (onInput, onFocus, onBlur, onCheck, onClick, onSubmit)
 import String
 
 -- VIEW
@@ -51,7 +51,7 @@ bottomSection model =
         ]
       , div [ class "message-section" ]
         [ textarea
-          [ class "text", readonly True, rows 7, cols 40 ]
+          [ id "output-message", class "text", readonly True, rows 7, cols 40, onFocus (Select "output-message") ]
           [text (donationText model)]
         , br [] []
         ]

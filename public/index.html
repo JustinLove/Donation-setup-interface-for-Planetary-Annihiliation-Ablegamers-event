@@ -17,6 +17,12 @@ require(["menu", "unit_info", "elm"], function(menu, info, Elm) {
     menu: menu,
     info: info
   })
+
+  app.ports.select.subscribe(function(id) {
+    var el = document.getElementById(id)
+    el.focus()
+    el.select()
+  })
 })
 </script>
 

@@ -3,6 +3,7 @@ import Msg exposing (..)
 import Menu exposing (..)
 import GameInfo exposing (GameInfo) 
 import Config exposing (config) 
+import Harbor exposing (..) 
 
 import Html.App
 import Http
@@ -84,6 +85,8 @@ update msg model =
     FetchError msg ->
       let _ = Debug.log "error" msg in
       (model, Cmd.none)
+    Select id ->
+      (model, select id)
     None ->
       (model, Cmd.none)
 

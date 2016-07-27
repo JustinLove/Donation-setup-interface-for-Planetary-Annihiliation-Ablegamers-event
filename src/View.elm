@@ -14,47 +14,53 @@ import String
 --view : Model -> Html Msg
 view model =
   Html.form [ onSubmit Msg.None ]
-    [ div [ class "targeting-section col" ]
-      [ div [ class "row" ]
-        [ div [ class "rounds-header col" ]
-          [ h2 [] [ text "Games" ]
-          , ul [ class "" ] <| List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds
-          ]
-        , div [ class "rounds-body col" ] <| List.map (displayRound model) model.rounds
+    [ div [ class "targeting-section col" ] <| targetingSection model
+    , div [ class "menu-section col" ] <| menuSection model
+    , div [ class "bottom-section col" ] <| bottomSection model
+    ]
+
+targetingSection model =
+  [ div [ class "row" ]
+    [ div [ class "rounds-header col" ]
+      [ h2 [] [ text "Games" ]
+      , ul [ class "" ] <| List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds
+      ]
+    , div [ class "rounds-body col" ] <| List.map (displayRound model) model.rounds
+    ]
+  ]
+
+menuSection model =
+  [ h2 [] [ text "Add Items" ]
+  , ul [ class "menu" ] <| List.map displayMenuItem model.menu
+  ]
+
+bottomSection model =
+  [ div [ class "row" ]
+    [ div [ class "orders col" ]
+      [ h2 [] [ text "Adjust Quantities" ]
+      , displayOrders model.selections
+      ]
+    , div [ class "results col" ]
+      [ h2 [] [ text "Submit This" ]
+      , p []
+        [ small [] [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]
         ]
-      ]
-    , div [ class "menu-section col" ]
-      [ h2 [] [ text "Add Items" ]
-      , ul [ class "menu" ] <| List.map displayMenuItem model.menu
-      ]
-    , div [ class "bottom col" ]
-      [ div [ class "row" ]
-        [ div [ class "orders col" ]
-          [ h2 [] [ text "Adjust Quantities" ]
-          , displayOrders model.selections
-          ]
-        , div [ class "results col" ]
-          [ h2 [] [ text "Submit This" ]
-          , p []
-            [ small [] [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]
-            ]
-          , p [ class "total" ]
-            [ text "Total $"
-            , text (donationTotal model.selections |> toString)
-            ]
-          , div [ class "message-section" ]
-            [ textarea
-              [ class "text", readonly True, rows 7, cols 40 ]
-              [text (donationText model)]
-            , br [] []
-            ]
-          , h2 []
-            [ a [ target "_blank", href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007" ] [ text "Donate" ]
-            ]
-          ]
+      , p [ class "total" ]
+        [ text "Total "
+        , text (donationTotal model.selections |> dollars)
+        ]
+      , div [ class "message-section" ]
+        [ textarea
+          [ class "text", readonly True, rows 7, cols 40 ]
+          [text (donationText model)]
+        , br [] []
+        ]
+      , h2 []
+        [ a [ target "_blank", href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007" ] [ text "Donate" ]
         ]
       ]
     ]
+  ]
 
 tabHeader : String -> GameInfo -> Html Msg
 tabHeader current round =
@@ -97,20 +103,36 @@ displayOrders selections =
   let
     visible = nonZero selections
   in 
-    if List.isEmpty visible then
+    if (List.isEmpty visible) then
       p [] [ text "Make selections above" ]
     else
-      ul [] <| List.map displayOrderItem visible
+      table []
+        [ thead []
+          [ th [ class "line-total" ] [ text "$line" ]
+          , th [ class "donation" ] [ text "$ea" ]
+          , th [ class "quantity" ] [ text "qty" ]
+          , th [ class "code" ] [ text "code" ]
+          , th [ class "builds" ] [ text "units each" ]
+          ]
+        , tbody [] <| List.map displayOrderItem visible
+        , tfoot []
+          [ th [ class "line-total" ]
+            [ text <| dollars <| donationTotal visible ]
+          ]
+        ]
 
 displayOrderItem : OrderItem -> Html Msg
 displayOrderItem item =
-  li []
-    [ input [ size 5, value (item.input), onInput (TypeAmount item.code), onBlur (FinishAmount item.code)  ] []
-    , text " $"
-    , text <| toString item.donation
-    , text " "
-    , text <| item.code
-    , ul [] <| List.map displayBuild item.build
+  tr [ class "order-item" ]
+    [ td [ class "line-total" ]
+      [ text <| dollars (item.donation * (toFloat item.quantity))
+      ]
+    , td [ class "donation" ]
+      [ text <| dollars item.donation
+      ]
+    , td [ class "quantity" ] [ input [ size 5, value (item.input), onInput (TypeAmount item.code), onBlur (FinishAmount item.code)  ] [] ]
+    , td [ class "code" ] [ text item.code ]
+    , td [ class "builds" ] [ ul [] <| List.map displayBuild item.build ]
     ]
 
 displayMenuItem : MenuItem -> Html Msg
@@ -118,8 +140,8 @@ displayMenuItem item =
   li []
     [ button [ onClick (AddOne item.code) ]
       [ div [] <| List.map buildImage item.build
-      , text " $"
-      , text <| toString item.donation
+      , text " "
+      , text <| dollars item.donation
       , text " "
       , text <| item.code
       --, ul [] <| List.map displayBuild item.build
@@ -134,9 +156,8 @@ buildImage build =
     img [ src build.image ] []
 
 displayBuild : BuildItem -> Html Msg
-
 displayBuild build =
-  li []
+  li [ class "build" ]
     [ text <| toString build.quantity
     , text " "
     , text <| build.display_name
@@ -176,3 +197,7 @@ buildText quantity build =
 nonZero : List OrderItem -> List OrderItem
 nonZero =
   List.filter (\i -> i.quantity > 0)
+
+dollars : Float -> String
+dollars n =
+  "$"++(toString n)

@@ -32,7 +32,7 @@
 @media only screen and (min-width: 76em) {
   .targeting-section { width: 20%; }
   .menu-section { width: 40%; }
-  .bottom { width: 40%; }
+  .bottom-section { width: 40%; }
   .rounds-header { width: 100%; }
   .rounds-body { width: 100%; }
   .players, .planets { width: 100%; }
@@ -52,4 +52,37 @@ li {
   display: inline-block;
   margin: 0.1em;
   padding: 0.1em 0.2em;
+}
+
+.order-item ul {
+  display: inline-block;
+  margin: 0;
+}
+
+.code {
+  width: 3em;
+  text-align: left;
+  padding-left: 0.5em;
+}
+
+.line-total {
+  text-align: right;
+}
+
+.donation {
+  width: 2em;
+  text-align: right;
+  padding-right: 0.5em;
+}
+
+.quantity {
+  text-align: left;
+}
+
+.builds {
+  text-align: left;
+}
+
+.build {
+  display: inline-block;
 }

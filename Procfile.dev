@@ -1,4 +1,4 @@
-web: supervisor info-server/index.js
-static: supervisor static-server/index.js
+web: supervisor -w info-server info-server/index.js 
+static: supervisor -w static-server static-server/index.js
 elm: watch "elm-make src/DonationConfig.elm --output public/elm.js" src
 db: redis-server info-server/db/dev.conf

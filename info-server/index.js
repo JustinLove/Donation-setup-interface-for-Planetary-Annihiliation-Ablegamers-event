@@ -60,7 +60,7 @@ app.put('/games/:id', jsonParser, function(req, res){
   }
   var signed = nacl.from_hex(req.body.data)
   try {
-  var binfo = nacl.crypto_sign_open(signed, signpk)
+    var binfo = nacl.crypto_sign_open(signed, signpk)
   } catch (e) {
     console.log('nacl exception', e)
     res.sendStatus(500)
@@ -89,6 +89,25 @@ app.delete('/games/:id', jsonParser, function(req, res){
   if (!signpk) {
     console.log('no public key')
     res.sendStatus(500)
+    return
+  }
+  var signed = nacl.from_hex(req.body.data)
+  try {
+    var bid = nacl.crypto_sign_open(signed, signpk)
+  } catch (e) {
+    console.log('nacl exception', e)
+    res.sendStatus(500)
+    return
+  }
+  if (!bid) {
+    console.log('no bid')
+    res.sendStatus(401)
+    return
+  }
+  var sid = nacl.decode_utf8(bid)
+  if (sid != req.params.id) {
+    console.log('target id mismatch')
+    res.sendStatus(401)
     return
   }
   redis.del(req.params.id, function(err, reply) {

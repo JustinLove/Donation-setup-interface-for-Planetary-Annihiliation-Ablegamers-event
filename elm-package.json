@@ -7,6 +7,7 @@
         "src",
         "test"
     ],
+    "native-modules": true,
     "exposed-modules": [],
     "dependencies": {
         "elm-community/elm-test": "1.1.0 <= v < 2.0.0",

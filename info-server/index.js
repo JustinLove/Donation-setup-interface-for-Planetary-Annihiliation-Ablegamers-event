@@ -85,6 +85,22 @@ app.put('/games/:id', jsonParser, function(req, res){
   })
 });
 
+app.delete('/games/:id', jsonParser, function(req, res){
+  if (!signpk) {
+    console.log('no public key')
+    res.sendStatus(500)
+    return
+  }
+  redis.del(req.params.id, function(err, reply) {
+    if (reply == 1) {
+      redis.srem('games', req.params.id)
+      res.sendStatus(204)
+    } else {
+      res.sendStatus(507)
+    }
+  })
+});
+
 app.set('port', (process.env.PORT || 5000));
 
 app.listen(app.get('port'), function(){

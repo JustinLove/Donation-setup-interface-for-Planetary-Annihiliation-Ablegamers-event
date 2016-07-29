@@ -62,13 +62,6 @@ bottomSection model =
     ]
   ]
 
-tabHeader : String -> GameInfo -> Html Msg
-tabHeader current round =
-  li [ onClick (ChooseRound round.id) ]
-    [ input [type' "radio", Html.Attributes.name "game", value round.id, onCheck (\_ -> ChooseRound round.id), checked (round.id == current)] []
-    , label [] [text round.name]
-    ]
-
 displayRound model round =
   if model.round == round.id then
     div [ class "row" ]
@@ -84,19 +77,24 @@ displayRound model round =
   else
     text ""
 
+radioChoice : (String -> Msg) -> String -> String -> String -> String -> Html Msg
+radioChoice msg name current val lab =
+  li []
+    [ input [type' "radio", Html.Attributes.name name, id name, value val, onCheck (\_ -> msg val), checked (val == current)] []
+    , label [ for name ] [text lab]
+    ]
+
+tabHeader : String -> GameInfo -> Html Msg
+tabHeader current round =
+  radioChoice ChooseRound "game" current round.id round.name
+
 displayPlayer : String -> String -> String -> Html Msg
 displayPlayer context current name =
-  li [ onClick (SetPlayer name) ]
-    [ input [type' "radio", Html.Attributes.name (context ++ "-player"), value name, onCheck (\_ -> SetPlayer name), checked (name == current)] []
-    , label [] [text name]
-    ]
+  radioChoice SetPlayer (context ++ "-player") current name name
 
 displayPlanet : String -> String -> String -> Html Msg
 displayPlanet context current name =
-  li [ onClick (SetPlanet name)]
-    [ input [type' "radio", Html.Attributes.name (context ++ "-planet"), value name, onCheck (\_ -> SetPlanet name), checked (name == current)] []
-    , label [] [text name]
-    ]
+  radioChoice SetPlanet (context ++ "-planet") current name name
 
 displayOrders : List OrderItem -> Html Msg
 displayOrders selections =

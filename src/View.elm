@@ -41,7 +41,9 @@ bottomSection model =
       , displayOrders model.selections
       ]
     , div [ class "results col" ]
-      [ h2 [] [ text "Submit This" ]
+      [ h2 []
+        [ label [ for "output-message" ] [ text "Submit This" ]
+        ]
       , p []
         [ small [] [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]
         ]
@@ -51,7 +53,14 @@ bottomSection model =
         ]
       , div [ class "message-section" ]
         [ textarea
-          [ id "output-message", class "text", readonly True, rows 7, cols 40, onFocus (Select "output-message") ]
+          [ id "output-message"
+          , class "text"
+          , Html.Attributes.name "output-message"
+          , readonly True
+          , rows 7
+          , cols 40
+          , onFocus (Select "output-message")
+          ]
           [text (donationText model)]
         , br [] []
         ]
@@ -137,7 +146,7 @@ displayMenuItem : MenuItem -> Html Msg
 displayMenuItem item =
   li [ class "menu-item" ]
     [ button [ onClick (AddOne item.code) ]
-      [ div [] <| List.map buildImage item.build
+      [ span [] <| List.map buildImage item.build
       , span [ class "menu-code" ] [ text item.code ]
       , span [ class "menu-donation" ] [ text <| dollars item.donation ]
       --, ul [] <| List.map displayBuild item.build
@@ -147,17 +156,21 @@ displayMenuItem item =
 buildImage : BuildItem -> Html Msg
 buildImage build =
   if String.isEmpty build.image then
-    text ""
+    text <| quantityName build
   else
-    img [ src build.image, alt build.display_name, title ((toString build.quantity)++" "++build.display_name) ] []
+    img
+      [ src build.image
+      , alt <| quantityName build
+      , title <| quantityName build
+      ] []
 
 displayBuild : BuildItem -> Html Msg
 displayBuild build =
-  li [ class "build" ]
-    [ text <| toString build.quantity
-    , text " "
-    , text <| build.display_name
-    ]
+  li [ class "build" ] [ text <| quantityName build ]
+
+quantityName : BuildItem -> String
+quantityName build =
+  (toString build.quantity)++" "++build.display_name
 
 donationTotal : List OrderItem -> Float
 donationTotal items =

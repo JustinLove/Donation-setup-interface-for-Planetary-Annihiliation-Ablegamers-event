@@ -13,7 +13,7 @@ import String
 
 --view : Model -> Html Msg
 view model =
-  Html.form [ onSubmit Msg.None ]
+  Html.form [ onSubmit Msg.None, class "row" ]
     [ div [ class "targeting-section col" ] <| targetingSection model
     , div [ class "menu-section col" ] <| menuSection model
     , div [ class "bottom-section col" ] <| bottomSection model
@@ -22,50 +22,60 @@ view model =
 targetingSection model =
   [ div [ class "row" ]
     [ div [ class "rounds-header col" ]
-      [ h2 [] [ text "Games" ]
-      , ul [ class "" ] <| List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds
+      [ fieldset []
+        [ legend [] [ text "Games" ]
+        , ul [] <| List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds
+        ]
       ]
     , div [ class "rounds-body col" ] <| List.map (displayRound model) model.rounds
     ]
   ]
 
 menuSection model =
-  [ h2 [] [ text "Add Items" ]
-  , ul [ class "menu" ] <| List.map displayMenuItem model.menu
+  [ div [ class "row col" ]
+    [ fieldset []
+      [ legend [] [ text "Add Items" ]
+      , ul [ class "menu" ] <| List.map displayMenuItem model.menu
+      ]
+    ]
   ]
 
 bottomSection model =
   [ div [ class "row" ]
     [ div [ class "orders col" ]
-      [ h2 [] [ text "Adjust Quantities" ]
-      , displayOrders model.selections
+      [ fieldset []
+        [ legend [] [ text "Adjust Quantities" ]
+        , displayOrders model.selections
+        ]
       ]
     , div [ class "results col" ]
-      [ h2 []
-        [ label [ for "output-message" ] [ text "Submit This" ]
-        ]
-      , p []
-        [ small [] [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]
-        ]
-      , p [ class "total" ]
-        [ text "Total "
-        , text (donationTotal model.selections |> dollars)
-        ]
-      , div [ class "message-section" ]
-        [ textarea
-          [ id "output-message"
-          , class "text"
-          , Html.Attributes.name "output-message"
-          , readonly True
-          , rows 7
-          , cols 40
-          , onFocus (Select "output-message")
+      [ fieldset []
+        [ legend []
+          [ label [ for "output-message" ] [ text "Submit This" ]
           ]
-          [text (donationText model)]
-        , br [] []
-        ]
-      , h2 []
-        [ a [ target "_blank", href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007" ] [ text "Donate" ]
+        , p []
+          [ small [] [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]
+          ]
+        , p [ class "total" ]
+          [ text "Total "
+          , text (donationTotal model.selections |> dollars)
+          ]
+        , div [ class "message-section" ]
+          [ textarea
+            [ id "output-message"
+            , class "text"
+            , Html.Attributes.name "output-message"
+            , readonly True
+            , rows 7
+            , cols 40
+            , onFocus (Select "output-message")
+            ]
+            [text (donationText model)]
+          , br [] []
+          ]
+        , h2 []
+          [ a [ target "_blank", href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007" ] [ text "Donate" ]
+          ]
         ]
       ]
     ]
@@ -75,12 +85,16 @@ displayRound model round =
   if model.round == round.id then
     div [ class "row" ]
       [ div [ class "players col" ]
-        [ h3 [] [ text "Players" ]
-        , ul [] <| List.map (displayPlayer round.id model.player) round.players
+        [ fieldset []
+          [ legend [] [ text "Players" ]
+          , ul [] <| List.map (displayPlayer round.id model.player) round.players
+          ]
         ]
       , div [ class "planets col" ]
-        [ h3 [] [ text "Planets" ]
-        , ul [] <| List.map (displayPlanet round.id model.planet) round.planets
+        [ fieldset []
+          [ legend [] [ text "Planets" ]
+          , ul [] <| List.map (displayPlanet round.id model.planet) round.planets
+          ]
         ]
       ]
   else

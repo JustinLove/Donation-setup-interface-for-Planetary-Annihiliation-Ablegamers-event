@@ -39,6 +39,15 @@
   .orders, .results { width: 100%; }
 }
 
+fieldset {
+  border: none;
+}
+
+legend {
+  font-size: 150%;
+  font-weight: bold;
+}
+
 ul {
   padding-left: 0;
 }

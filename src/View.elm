@@ -14,10 +14,25 @@ import String
 
 --view : Model -> Html Msg
 view model =
-  Html.form [ onSubmit Msg.None, class "row" ]
-    [ div [ class "targeting-section col" ] <| targetingSection model
-    , div [ class "menu-section col" ] <| menuSection model
-    , div [ class "bottom-section col" ] <| bottomSection model
+  div []
+    [ header [ class "row col" ]
+      [ a
+        [ href "http://ablegamers.donordrive.com/"
+        , class "logo"
+        ]
+        [ img
+          [ src "logoHeader.png"
+          , width 242
+          , height 63
+          ]
+          []
+        ]
+      ]
+    , Html.form [ onSubmit Msg.None, class "row" ]
+      [ div [ class "targeting-section col" ] <| targetingSection model
+      , div [ class "menu-section col" ] <| menuSection model
+      , div [ class "bottom-section col" ] <| bottomSection model
+      ]
     ]
 
 targetingSection model =
@@ -78,7 +93,11 @@ bottomSection model =
           , br [] []
           ]
         , h2 []
-          [ a [ target "_blank", href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007" ] [ text "Donate" ]
+          [ a
+            [ target "_blank"
+            , href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007"
+            , class "button"
+            ] [ text "Donate" ]
           ]
         ]
       ]

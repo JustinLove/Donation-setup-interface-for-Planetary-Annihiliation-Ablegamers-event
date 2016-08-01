@@ -38,6 +38,37 @@
   .orders, .results { width: 100%; }
 }
 
+body {
+  font-family: "Helvetica Neue", helvetica, arial, sans-serif;
+}
+
+.button {
+  margin: 0 0 5px 10px;
+  font-size: 15px;
+  border-radius: 5px;
+  padding: 16px 20px;
+  background-color: #f79521;
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fff;
+  margin: 0 10px 5px 0;
+  padding: 9px 11px;
+}
+
+.button:hover {
+  background-color: black;
+}
+
+.menu-section button {
+  background-color: #333;
+  border: none;
+}
+
+.menu-section button:hover {
+  background-color: #088;
+}
+
 fieldset {
   border: none;
 }
@@ -114,4 +145,8 @@ li {
 
 .build {
   display: inline-block;
+}
+
+.text {
+  background-color: #eee;
 }

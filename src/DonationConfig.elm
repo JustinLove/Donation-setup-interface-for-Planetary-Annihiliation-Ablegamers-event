@@ -10,8 +10,6 @@ import Http
 import Task
 import Regex exposing (regex)
 import String
-import Dict exposing (Dict)
-import Json.Encode
 
 type alias Arguments =
   { menu: List RawMenuItem

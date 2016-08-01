@@ -6,6 +6,7 @@ import GameInfo exposing (GameInfo)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Attributes.Aria exposing (..)
 import Html.Events exposing (onInput, onFocus, onBlur, onCheck, onClick, onSubmit)
 import String
 
@@ -54,7 +55,9 @@ bottomSection model =
           [ label [ for "output-message" ] [ text "Submit This" ]
           ]
         , p []
-          [ small [] [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]
+          [ small
+            [ id "message-instructions" ]
+            [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]
           ]
         , p [ class "total" ]
           [ text "Total "
@@ -63,8 +66,9 @@ bottomSection model =
         , div [ class "message-section" ]
           [ textarea
             [ id "output-message"
-            , class "text"
             , Html.Attributes.name "output-message"
+            , ariaDescribedby "message-instructions"
+            , class "text"
             , readonly True
             , rows 7
             , cols 40
@@ -129,11 +133,11 @@ displayOrders selections =
     else
       table []
         [ thead []
-          [ th [ class "line-total" ] [ text "$line" ]
-          , th [ class "donation" ] [ text "$ea" ]
-          , th [ class "quantity" ] [ text "qty" ]
-          , th [ class "code" ] [ text "code" ]
-          , th [ class "builds" ] [ text "units each" ]
+          [ th [ class "line-total", id "order-line-total" ] [ text "$line" ]
+          , th [ class "donation", id "order-donation" ] [ text "$ea" ]
+          , th [ class "quantity", id "order-quantity" ] [ text "qty" ]
+          , th [ class "code", id "order-code" ] [ text "code" ]
+          , th [ class "builds", id "order-builds" ] [ text "units each" ]
           ]
         , tbody [] <| List.map displayOrderItem visible
         , tfoot []
@@ -145,15 +149,24 @@ displayOrders selections =
 displayOrderItem : OrderItem -> Html Msg
 displayOrderItem item =
   tr [ class "order-item" ]
-    [ td [ class "line-total" ]
-      [ text <| dollars (item.donation * (toFloat item.quantity))
+    [ td [ class "line-total", ariaLabelledby "order-line-total" ]
+      [ text <| dollars (item.donation * (toFloat item.quantity)) ]
+    , td [ class "donation", ariaLabelledby "order-donation" ]
+      [ text <| dollars item.donation ]
+    , td [ class "quantity" ]
+      [ input
+        [ size 5
+        , value (item.input)
+        , ariaLabelledby "order-quantity"
+        , onInput (TypeAmount item.code)
+        , onBlur (FinishAmount item.code)
+        ] []
       ]
-    , td [ class "donation" ]
-      [ text <| dollars item.donation
-      ]
-    , td [ class "quantity" ] [ input [ size 5, value (item.input), onInput (TypeAmount item.code), onBlur (FinishAmount item.code)  ] [] ]
-    , td [ class "code" ] [ text item.code ]
-    , td [ class "builds" ] [ ul [] <| List.map displayBuild item.build ]
+    , td [ class "code", ariaLabelledby "order-code" ]
+      [ text item.code ]
+    , td [ class "builds", ariaLabelledby "order-builds" ]
+      [ ul [] <| List.map displayBuild item.build ]
+
     ]
 
 displayMenuItem : MenuItem -> Html Msg
@@ -163,7 +176,6 @@ displayMenuItem item =
       [ span [] <| List.map buildImage item.build
       , span [ class "menu-code" ] [ text item.code ]
       , span [ class "menu-donation" ] [ text <| dollars item.donation ]
-      --, ul [] <| List.map displayBuild item.build
       ]
     ]
 
@@ -176,6 +188,8 @@ buildImage build =
       [ src build.image
       , alt <| quantityName build
       , title <| quantityName build
+      , width 60
+      , height 60
       ] []
 
 displayBuild : BuildItem -> Html Msg

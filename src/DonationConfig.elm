@@ -35,6 +35,7 @@ type alias Model =
   , player: String
   , planet: String
   , selections : List OrderItem
+  , instructionsOpen: Bool
   }
 
 model : List RawMenuItem -> List UnitInfo -> Model
@@ -49,6 +50,7 @@ model menu info =
     , player = ""
     , planet = ""
     , selections = List.map makeOrder m2
+    , instructionsOpen = True
     }
 
 init : Arguments -> (Model, Cmd Msg)
@@ -85,6 +87,8 @@ update msg model =
       (model, Cmd.none)
     Select id ->
       (model, select id)
+    Instructions open ->
+      ({model | instructionsOpen = open}, Cmd.none)
     None ->
       (model, Cmd.none)
 

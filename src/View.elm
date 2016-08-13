@@ -15,23 +15,58 @@ import String
 --view : Model -> Html Msg
 view model =
   div []
-    [ header [ class "row col" ]
-      [ a
-        [ href "http://ablegamers.donordrive.com/"
-        , class "logo"
-        ]
-        [ img
-          [ src "logoHeader.png"
-          , width 242
-          , height 63
+    [ div [ ariaHidden model.instructionsOpen ]
+      [ header [ class "row col" ]
+        [ a
+          [ href "http://ablegamers.donordrive.com/"
+          , class "logo"
           ]
-          []
+          [ img
+            [ src "logoHeader.png"
+            , width 242
+            , height 63
+            ]
+            []
+          ]
+        ]
+      , Html.form [ onSubmit Msg.None, class "row" ]
+        [ div [ class "targeting-section col" ] <| targetingSection model
+        , div [ class "menu-section col" ] <| menuSection model
+        , div [ class "bottom-section col" ] <| bottomSection model
         ]
       ]
-    , Html.form [ onSubmit Msg.None, class "row" ]
-      [ div [ class "targeting-section col" ] <| targetingSection model
-      , div [ class "menu-section col" ] <| menuSection model
-      , div [ class "bottom-section col" ] <| bottomSection model
+    , if model.instructionsOpen then instructions else text ""
+    ]
+
+instructions : Html Msg
+instructions =
+   div [ id "instruction-frame" ]
+    [ div
+      [ id "instruction-dialog"
+      , role "dialog"
+      , ariaDescribedby "instruction-title"
+      ]
+      [ h1 [ id "instruction-title" ] [text "Donation Instructions"]
+      , img
+        [ id "instructions"
+        , src "instructions.png"
+        , alt "On the upcoming donation page: Choose 'Other' and then enter amount. Paste message into the message box, and add placement suggestions or comments. (Leave message and amount public.)"
+        , width 716
+        , height 768
+        ] []
+      , footer []
+        [ a
+          [ target "_blank"
+          , href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007"
+          , class "primary button"
+          , id "navigate-donation"
+          ] [ text "Take Me There" ]
+        , a
+          [ onClick (Instructions False)
+          , href "#"
+          , class "cancel"
+          ] [ text "cancel" ]
+        ]
       ]
     ]
 
@@ -93,10 +128,10 @@ bottomSection model =
           , br [] []
           ]
         , h2 []
-          [ a
-            [ target "_blank"
-            , href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007"
-            , class "button"
+          [ span
+            [ onClick (Instructions True)
+            , class "primary button"
+            , id "open-instructions"
             ] [ text "Donate" ]
           ]
         ]

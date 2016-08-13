@@ -13,4 +13,5 @@ type Msg
   | FetchError Http.Error
   | ChooseRound String
   | Select String
+  | Instructions Bool
   | None

@@ -9,6 +9,7 @@ import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
 import Html.Events exposing (onInput, onFocus, onBlur, onCheck, onClick, onSubmit)
 import String
+import Json.Decode
 
 -- VIEW
 
@@ -40,7 +41,7 @@ view model =
 
 instructions : Html Msg
 instructions =
-   div [ id "instruction-frame" ]
+   div [ id "instruction-frame", onKeydown (onKey 27 (Instructions False)) ]
     [ div
       [ id "instruction-dialog"
       , role "dialog"
@@ -69,6 +70,17 @@ instructions =
         ]
       ]
     ]
+
+onKeydown : (Int -> msg) -> Attribute msg
+onKeydown tagger =
+  Html.Events.on "keydown" (Json.Decode.map tagger Html.Events.keyCode)
+
+onKey : Int -> Msg -> Int -> Msg
+onKey trigger msg keycode =
+  if keycode == trigger then
+    msg
+  else
+    Msg.None
 
 targetingSection model =
   [ div [ class "row" ]

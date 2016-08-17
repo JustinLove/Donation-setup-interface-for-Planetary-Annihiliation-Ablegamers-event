@@ -128,7 +128,7 @@ bottomSection model =
           , br [] []
           ]
         , h2 []
-          [ span
+          [ button
             [ onClick (Instructions True)
             , class "primary button"
             , id "open-instructions"

@@ -9,6 +9,15 @@ require(["menu", "unit_info", "donate"], function(menu, info, Elm) {
       var el = document.getElementById(id)
       el.focus()
       el.select()
-    }, 500)
+    }, 50)
   })
+
+  app.ports.focus.subscribe(function(selector) {
+    setTimeout(function() {
+      var nodes = document.querySelectorAll(selector);
+      if (nodes.length === 1 && document.activeElement !== nodes[0]) {
+        nodes[0].focus();
+      }
+    }, 50);
+  });
 })

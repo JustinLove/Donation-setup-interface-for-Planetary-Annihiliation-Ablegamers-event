@@ -50,7 +50,7 @@ model menu info =
     , player = ""
     , planet = ""
     , selections = List.map makeOrder m2
-    , instructionsOpen = True
+    , instructionsOpen = False
     }
 
 init : Arguments -> (Model, Cmd Msg)
@@ -88,7 +88,7 @@ update msg model =
     Select id ->
       (model, select id)
     Instructions open ->
-      ({model | instructionsOpen = open}, Cmd.none)
+      ({model | instructionsOpen = open}, focus <| instructionFocus open)
     None ->
       (model, Cmd.none)
 
@@ -121,6 +121,13 @@ getNumber s =
 validNumber : String -> Bool
 validNumber value =
   Regex.contains (regex "^\\d+$") value
+
+instructionFocus : Bool -> String
+instructionFocus open =
+  if open then
+    "#navigate-donation"
+  else
+    "#open-instructions"
 
 -- SUBSCRIPTIONS
 

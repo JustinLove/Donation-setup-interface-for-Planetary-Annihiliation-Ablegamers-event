@@ -25,23 +25,23 @@ define([], function() {
       [1, "/pa/units/land/land_mine/land_mine.json"],
       [1, "/pa/units/land/land_mine/land_mine.json"],
     ]},
-    { donation: 1, code: 'A3B', build: [
-      [1, "/pa/units/land/bot_factory/bot_factory.json"],
-    ]},
-    { donation: 1, code: 'A3V', build: [
-      [1, "/pa/units/land/vehicle_factory/vehicle_factory.json"],
-    ]},
-    { donation: 1, code: 'A3A', build: [
-      [1, "/pa/units/air/air_factory/air_factory.json"],
-    ]},
-    { donation: 1, code: 'A4', build: [
+    { donation: 1, code: 'A3', build: [
       [3, "/pa/units/air/solar_drone/solar_drone.json"],
     ]},
-    { donation: 1, code: 'A5', build: [
+    { donation: 1, code: 'A4', build: [
       [1, "/pa/units/orbital/orbital_probe/orbital_probe.json"],
     ]},
-    { donation: 1, code: 'A6', build: [
+    { donation: 1, code: 'A5', build: [
       [5, "/pa/units/air/transport/transport.json"],
+    ]},
+    { donation: 1, code: 'A6B', build: [
+      [1, "/pa/units/land/bot_factory/bot_factory.json"],
+    ]},
+    { donation: 1, code: 'A6V', build: [
+      [1, "/pa/units/land/vehicle_factory/vehicle_factory.json"],
+    ]},
+    { donation: 1, code: 'A6A', build: [
+      [1, "/pa/units/air/air_factory/air_factory.json"],
     ]},
     { donation: 3, code: 'B1', build: [
       [1, "/pa/units/land/tank_heavy_armor/tank_heavy_armor.json"],
@@ -106,10 +106,10 @@ define([], function() {
       [1, "/pa/units/air/titan_air/titan_air.json"],
     ]},
     { donation: 25, code: 'G5', build: [
-      [1, "/pa/units/orbital/titan_orbital/titan_orbital.json"],
+      [1, "/pa/units/land/titan_vehicle/titan_vehicle.json"],
     ]},
     { donation: 25, code: 'G6', build: [
-      [1, "/pa/units/land/titan_vehicle/titan_vehicle.json"],
+      [1, "/pa/units/orbital/titan_orbital/titan_orbital.json"],
     ]},
     { donation: 40, code: 'G7', build: [
       [1, "/pa/units/land/titan_structure/titan_structure.json"],

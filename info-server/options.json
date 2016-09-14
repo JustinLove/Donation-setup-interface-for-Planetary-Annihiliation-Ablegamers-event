@@ -1,72 +1,79 @@
 {
   "games": [
     {
-      "name": "AbleGamers FFA1",
-      "id": "FFA1",
+      "name": "AbleGamers Match 1",
+      "id": "match1",
       "players": [
-        "Larry",
-        "Moe",
-        "Curly",
-        "Jerry"
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4"
       ],
       "planets": [
-        "Earth",
-        "Moon"
+        "Amalgam",
+        "Ascendance",
+        "Gaia Haven"
       ]
     },
     {
-      "name": "AbleGamers FFA2",
-      "id": "FFA2",
+      "name": "AbleGamers Match 2",
+      "id": "match2",
       "players": [
-        "Billy",
-        "Bob",
-        "Jane",
-        "Daryl"
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4"
       ],
       "planets": [
-        "Mars"
+        "Amalgam",
+        "Ascendance",
+        "Gaia Haven"
       ]
     },
     {
-      "name": "AbleGamers FFA3",
-      "id": "FFA3",
+      "name": "AbleGamers Match 3",
+      "id": "match3",
       "players": [
-        "Larry",
-        "Moe",
-        "Curly",
-        "Jerry"
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4"
       ],
       "planets": [
-        "Earth",
-        "Moon"
+        "Amalgam",
+        "Ascendance",
+        "Gaia Haven"
       ]
     },
     {
-      "name": "AbleGamers FFA4",
-      "id": "FFA4",
+      "name": "AbleGamers Match 4",
+      "id": "match4",
       "players": [
-        "Billy",
-        "Bob",
-        "Jane",
-        "Daryl"
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4"
       ],
       "planets": [
-        "Mars"
+        "Amalgam",
+        "Ascendance",
+        "Gaia Haven"
       ]
     },
     {
-      "name": "AbleGamers FFA5",
-      "id": "FFA5",
+      "name": "AbleGamers Finals",
+      "id": "finals",
       "players": [
-        "Billy",
-        "Bob",
-        "Jane",
-        "Daryl"
+        "Player 1",
+        "Player 2",
+        "Player 3",
+        "Player 4"
       ],
       "planets": [
-        "Alpha",
-        "Beta",
-        "Gamma"
+        "Tomato Soup",
+        "Rusty Barbeque",
+        "Crusty Bread",
+        "Sweet Surprise"
       ]
     }
   ]

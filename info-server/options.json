@@ -4,10 +4,10 @@
       "name": "AbleGamers Match 1",
       "id": "match1",
       "players": [
-        "Player 1",
-        "Player 2",
-        "Player 3",
-        "Player 4"
+        "ljfed",
+        "cdrkf",
+        "killerkiwijuice",
+        "clopse"
       ],
       "planets": [
         "Amalgam",
@@ -19,10 +19,10 @@
       "name": "AbleGamers Match 2",
       "id": "match2",
       "players": [
-        "Player 1",
-        "Player 2",
-        "Player 3",
-        "Player 4"
+        "elodea",
+        "theiban",
+        "Bobiscool",
+        "Alpha2546"
       ],
       "planets": [
         "Amalgam",
@@ -34,10 +34,10 @@
       "name": "AbleGamers Match 3",
       "id": "match3",
       "players": [
-        "Player 1",
-        "Player 2",
-        "Player 3",
-        "Player 4"
+        "Admiral",
+        "Flubb",
+        "Furballman",
+        "Alfredo"
       ],
       "planets": [
         "Amalgam",
@@ -49,10 +49,10 @@
       "name": "AbleGamers Match 4",
       "id": "match4",
       "players": [
-        "Player 1",
-        "Player 2",
-        "Player 3",
-        "Player 4"
+        "cola_colin",
+        "River",
+        "stuart98",
+        "zaphodx"
       ],
       "planets": [
         "Amalgam",
@@ -64,10 +64,22 @@
       "name": "AbleGamers Finals",
       "id": "finals",
       "players": [
-        "Player 1",
-        "Player 2",
-        "Player 3",
-        "Player 4"
+        "ljfed",
+        "cdrkf",
+        "killerkiwijuice",
+        "clopse",
+        "elodea",
+        "theiban",
+        "Bobiscool",
+        "Alpha2546",
+        "Admiral",
+        "Flubb",
+        "Furballman",
+        "Alfredo",
+        "cola_colin",
+        "River",
+        "stuart98",
+        "zaphodx"
       ],
       "planets": [
         "Tomato Soup",

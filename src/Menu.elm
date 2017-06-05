@@ -2,6 +2,7 @@ module Menu exposing (OrderItem, RawMenuItem, RawBuildItem, MenuItem, BuildItem,
 
 import Regex exposing (regex)
 import String
+import Tuple exposing (first)
 
 type alias OrderItem =
   { donation: Float
@@ -60,7 +61,7 @@ compressBuilds builds =
     (num, spec) :: tl ->
       case List.partition (\(n,s) -> s == spec) builds of
         (match, other) ->
-          (List.sum (List.map fst match), spec) :: (compressBuilds other)
+          (List.sum (List.map first match), spec) :: (compressBuilds other)
     _ -> builds
 
 unitFor : List UnitInfo -> String -> Maybe UnitInfo

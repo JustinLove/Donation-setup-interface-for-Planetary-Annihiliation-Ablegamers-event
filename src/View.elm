@@ -173,7 +173,7 @@ displayRound model round =
 radioChoice : (String -> Msg) -> String -> String -> String -> String -> Html Msg
 radioChoice msg name current val lab =
   li []
-    [ input [type' "radio", Html.Attributes.name name, id val, value val, onCheck (\_ -> msg val), checked (val == current)] []
+    [ input [type_ "radio", Html.Attributes.name name, id val, value val, onCheck (\_ -> msg val), checked (val == current)] []
     , label [ for val ] [text lab]
     ]
 

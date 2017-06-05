@@ -5,9 +5,8 @@ import GameInfo exposing (GameInfo)
 import Config exposing (config) 
 import Harbor exposing (..) 
 
-import Html.App
+import Html
 import Http
-import Task
 import Regex exposing (regex)
 import String
 
@@ -16,9 +15,9 @@ type alias Arguments =
   , info: List UnitInfo
   }
 
-main : Program Arguments
+main : Program Arguments Model Msg
 main =
-  Html.App.programWithFlags
+  Html.programWithFlags
     { init = init
     , view = view
     , update = update
@@ -61,7 +60,7 @@ init args =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Task.perform FetchError GotGameInfo (Http.get GameInfo.rounds (config.server ++ "options.json"))
+  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.rounds)
 
 -- UPDATE
 
@@ -80,9 +79,9 @@ update msg model =
       ({ model | planet = name}, Cmd.none)
     ChooseRound id ->
       ({ model | round = id}, Cmd.none)
-    GotGameInfo rounds ->
+    GotGameInfo (Ok rounds) ->
       ({ model | rounds = rounds}, Cmd.none)
-    FetchError msg ->
+    GotGameInfo (Err msg) ->
       let _ = Debug.log "error" msg in
       (model, Cmd.none)
     Select id ->

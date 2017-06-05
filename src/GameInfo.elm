@@ -11,12 +11,12 @@ type alias GameInfo =
 
 rounds : Decoder (List GameInfo)
 rounds =
-  ("games" := list games)
+  (field "games" (list games))
 
 games : Decoder GameInfo
 games =
-  object4 GameInfo
-    ("name" := string)
-    ("id" := string)
-    ("players" := list string)
-    ("planets" := list string)
+  map4 GameInfo
+    (field "name" string)
+    (field "id" string)
+    (field "players" (list string))
+    (field "planets" (list string))

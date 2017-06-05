@@ -9,8 +9,7 @@ type Msg
   | AddOne String
   | SetPlayer String
   | SetPlanet String
-  | GotGameInfo (List GameInfo)
-  | FetchError Http.Error
+  | GotGameInfo (Result Http.Error (List GameInfo))
   | ChooseRound String
   | Select String
   | Instructions Bool

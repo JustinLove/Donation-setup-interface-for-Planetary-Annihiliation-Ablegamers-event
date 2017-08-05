@@ -121,6 +121,19 @@ app.delete('/games/:id', jsonParser, function(req, res){
   })
 });
 
+var requirejs = require('requirejs');
+
+requirejs.config({
+    nodeRequire: require
+});
+
+requirejs(['donation_panel/feed'],
+function (feed) {
+  feed['donordrive_test'].update().then(function() {
+    console.log(arguments)
+  })
+});
+
 app.set('port', (process.env.PORT || 5000));
 
 app.listen(app.get('port'), function(){

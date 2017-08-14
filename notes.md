@@ -12,7 +12,7 @@
   - add or correct match number
   - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
 
-- Multiple puppemasters - coordination? central feed tracking executions?
+- Multiple puppetmasters - coordination? central feed tracking executions?
 
 ### Ingame Mod
 

@@ -9,7 +9,11 @@ define([], function() {
     //console.log([html, $donors])
     return $donors.map(function(i, donor) {
       var donorAmount = $(donor).find('strong.block').text().split('donated')
-      var amount = parseInt(donorAmount[1].match(/\d+(\.\d+)?/)[0], 10)
+      if (donorAmount.length >= 2) {
+        var amount = parseInt(donorAmount[1].match(/\d+(\.\d+)?/)[0], 10)
+      } else {
+        var amount = 0
+      } 
       var donor_name = donorAmount[0].trim()
       var donor_image = $(donor).find('ximg.member-avatar').attr('src').replace(/^\/\//, 'http://')
       var comment = $(donor).find('em').html() || ''

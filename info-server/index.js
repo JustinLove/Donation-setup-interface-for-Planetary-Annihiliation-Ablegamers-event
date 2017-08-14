@@ -127,11 +127,18 @@ requirejs.config({
     nodeRequire: require
 });
 
-requirejs(['donation_panel/feed'],
-function (feed) {
-  feed['donordrive_test'].update().then(function() {
-    console.log(arguments)
-  })
+requirejs(['donation_panel/feed'], function (feed) {
+  var update = function() {
+    feed['donordrive_test'].update().then(function(donations) {
+      console.log(arguments)
+    })
+  }
+
+  var autoUpdate = function() {
+    update()
+    setTimeout(autoUpdate, 10000)
+  }
+  autoUpdate()
 });
 
 app.set('port', (process.env.PORT || 5000));

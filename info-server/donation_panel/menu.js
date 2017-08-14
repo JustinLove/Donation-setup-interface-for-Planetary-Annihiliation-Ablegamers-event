@@ -33,7 +33,7 @@ define(function() {
     codes: /alsfjdlskfjlkdsjflksajf/
   }
 
-  require(['sandbox_unit_menu/menu'], function(loadedMenu) {
+  require(['../public/menu'], function(loadedMenu) {
     menu.menu = loadedMenu
 
     loadedMenu.forEach(function(item) {

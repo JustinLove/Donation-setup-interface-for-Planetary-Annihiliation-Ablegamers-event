@@ -127,18 +127,35 @@ requirejs.config({
     nodeRequire: require
 });
 
-requirejs(['donation_panel/feed'], function (feed) {
-  var update = function() {
-    feed['donordrive_test'].update().then(function(donations) {
-      console.log(arguments)
+requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
+  var knownDonations = {}
+  var donations = []
+
+  var integrateDonations = function(incoming) {
+    incoming.forEach(function(d) {
+      if (!knownDonations[d.id]) {
+        var dm = Donation(d)
+        //dm.matchMatches(config.match_tags(), config.current_match())
+        knownDonations[d.id] = dm
+        donations.push(dm)
+        console.log(donations.length)
+      }
     })
+  }
+
+  var update = function() {
+    feed['donordrive_test'].update().then(integrateDonations)
   }
 
   var autoUpdate = function() {
     update()
     setTimeout(autoUpdate, 10000)
   }
-  autoUpdate()
+  //autoUpdate()
+  update()
+  update()
+  update()
+  update()
 });
 
 app.set('port', (process.env.PORT || 5000));

@@ -5,11 +5,11 @@ define(['donation_panel/menu'], function(menu) {
       if (!words) return
 
       var re = new RegExp(words.join('|'), 'i')
-      this.matchingPlayers(players.filter(function(player) {
+      this.matchingPlayers = players.filter(function(player) {
         return player.match(re)
-      }))
-      if (this.matchingPlayers().length == 1) {
-        this.matchingPlayerIndex = players.indexOf(this.matchingPlayers()[0])
+      })
+      if (this.matchingPlayers.length == 1) {
+        this.matchingPlayerIndex = players.indexOf(this.matchingPlayers[0])
       }
     },
     matchPlanets: function(planets) {
@@ -17,11 +17,11 @@ define(['donation_panel/menu'], function(menu) {
       if (!words) return
 
       var re = new RegExp(words.join('|'), 'i')
-      this.matchingPlanets(planets.filter(function(planet) {
+      this.matchingPlanets = planets.filter(function(planet) {
         return planet && planet.match(re)
-      }))
-      if (this.matchingPlanets().length == 1) {
-        this.matchingPlanetIndex = planets.indexOf(this.matchingPlanets()[0])
+      })
+      if (this.matchingPlanets.length == 1) {
+        this.matchingPlanetIndex = planets.indexOf(this.matchingPlanets[0])
       }
     },
     matchMatches: function(matchTags, currentMatch) {
@@ -29,12 +29,10 @@ define(['donation_panel/menu'], function(menu) {
       if (!words) return
 
       var re = new RegExp(words.join('|'), 'i')
-      this.matchingMatches(matchTags.filter(function(match) {
+      this.matchingMatches = matchTags.filter(function(match) {
         return match && match.match(re)
-      }))
-      if (this.matchingMatches().length > 0 && this.matchingMatches().indexOf(currentMatch) == -1) {
-        this.finished(true)
-        this.unexecutedOrders([])
+      })
+      if (this.matchingMatches.length > 0 && this.matchingMatches.indexOf(currentMatch) == -1) {
       }
     },
   }
@@ -55,7 +53,6 @@ define(['donation_panel/menu'], function(menu) {
         while (credit >= item.donation) {
           credit -= item.donation
           model.minimum += item.donation
-          model.unexecutedOrders.push(item)
         }
       }
     }
@@ -80,35 +77,32 @@ define(['donation_panel/menu'], function(menu) {
 
   var constructor = function(donation) {
     var model = Object.create(prototype)
-    $.extend(model, donation)
+    Object.assign(model, donation)
     model.amount = model.amount || 0
     model.donor_name = model.donor_name || 'anonymous'
     model.donor_image = model.donor_image || ''
     model.comment = model.comment || ''
     model.comment = (model.comment || '').replace(/^\s+|\s+$/gm, '')
-    model.selected = ko.observable(false)
-    model.finished = ko.observable(false)
 
     model.codes = menu.match(model.comment)
     model.orders = menu.orders(model.codes)
 
     compressBulkMultiples(model)
 
-    model.unexecutedOrders = ko.observableArray(model.orders.concat())
     model.minimum = model.orders
       .map(function(o) {return o.donation})
       .reduce(function(a, b) {return a + b}, 0)
-    model.insufficient = ko.observable(model.minimum > model.amount)
+    model.insufficient = model.minimum > model.amount
 
     expandSimpleMultiples(model)
 
-    model.unaccounted = ko.observable(model.minimum < model.amount)
+    model.unaccounted = model.minimum < model.amount
 
-    model.matchingPlayers = ko.observable()
+    model.matchingPlayers = []
     model.matchingPlayerIndex = -1
-    model.matchingPlanets = ko.observable()
+    model.matchingPlanets = []
     model.matchingPlanetIndex = -1
-    model.matchingMatches = ko.observable()
+    model.matchingMatches = []
 
     return model
   }

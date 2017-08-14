@@ -138,7 +138,7 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
         //dm.matchMatches(config.match_tags(), config.current_match())
         knownDonations[d.id] = dm
         donations.push(dm)
-        console.log(donations.length)
+        //console.log(donations.length)
       }
     })
   }
@@ -151,11 +151,7 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
     update()
     setTimeout(autoUpdate, 10000)
   }
-  //autoUpdate()
-  update()
-  update()
-  update()
-  update()
+  autoUpdate()
 });
 
 app.set('port', (process.env.PORT || 5000));

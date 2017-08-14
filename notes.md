@@ -4,7 +4,7 @@
   - extract page scrapers from game mod into server
     - x load test feed
     - x fetch real data
-    - update data
+    - x update data
     - store data
   - configuration (ENV?)
   - adding uniques ids

@@ -171,8 +171,8 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
 
   // goal: find alignment of sequences
   // previous:        1234567
-  // incoming:          56789
-  // incomingWithinPre--^
+  // incoming:        56789
+  // incomingWithinPre^
   //
   // previous:        1234567
   // incoming:            56789
@@ -181,14 +181,21 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
   // previous:            567
   // incoming:            56789
   // incomingWithinPre    ^
+  //
+  // previous:            12
+  // incoming:            1
+  // incomingWithinPre    ^
   var newItems = function(previous, incoming) {
     if (incoming.length < 1) return []
     if (previous.length < 1) return incoming
-    var incomingWithinPrevious = Math.max(0, previous.length - incoming.length)
-      var index = 0
+    var index = 0
+    var incomingWithinPrevious = 0
     while (incomingWithinPrevious < previous.length) {
       if (index + incomingWithinPrevious >= previous.length) {
         return incoming.slice(index, incoming.length)
+      }
+      if (index >= incoming.length) {
+        return []
       }
       if (previous[index + incomingWithinPrevious].id == incoming[index].id) {
         index++
@@ -223,6 +230,9 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
     assert.deepEqual(newItems([{id: '1'}, {id: '2'}],
                               [{id: '2'}, {id: '3'}]),
                               [{id: '3'}])
+    assert.deepEqual(newItems([{id: '1'}, {id: '2'}],
+                              [{id: '1'}]),
+                              [])
     require('process').exit()
   }
 

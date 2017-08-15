@@ -8,6 +8,16 @@
     - store data
   - configuration (ENV?)
   - adding uniques ids
+
+1234567
+  3456789
+
+1234567
+  345678779
+
+end of know list a moving pointer into sample
+walk sample until the remainder of sample matches known item
+
   - filter by match, match ids
   - add or correct match number
   - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.

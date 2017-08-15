@@ -131,14 +131,25 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
   var knownDonations = {}
   var donations = []
 
+  var insertDonation = function(d) {
+    var dm = Donation(d)
+    //dm.matchMatches(config.match_tags(), config.current_match())
+    knownDonations[d.id] = dm
+    donations.push(dm)
+    //console.log(donations.length)
+  }
+
   var integrateDonations = function(incoming) {
+    /*
+    if (incoming.length == 0) return
+    for (var incomingMatchRight = incoming.length - 1;incomingMatchRight > 0;incomingMatchRight--) { var matchLength = 0
+      var incomingIndex = incomingMatchRight - matchLength
+      var donationIndex = donations.length - matchLength
+    }
+    */
     incoming.forEach(function(d) {
       if (!knownDonations[d.id]) {
-        var dm = Donation(d)
-        //dm.matchMatches(config.match_tags(), config.current_match())
-        knownDonations[d.id] = dm
-        donations.push(dm)
-        //console.log(donations.length)
+        insertDonation(d)
       }
     })
   }
@@ -151,11 +162,78 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
     update()
     setTimeout(autoUpdate, 10000)
   }
-  autoUpdate()
+
+  var syncTest = function() {
+    update()
+    update()
+    require('process').exit()
+  }
+
+  // goal: find alignment of sequences
+  // previous:        1234567
+  // incoming:          56789
+  // incomingWithinPre--^
+  //
+  // previous:        1234567
+  // incoming:            56789
+  // incomingWithinPre----^
+  //
+  // previous:            567
+  // incoming:            56789
+  // incomingWithinPre    ^
+  var newItems = function(previous, incoming) {
+    if (incoming.length < 1) return []
+    if (previous.length < 1) return incoming
+    var incomingWithinPrevious = Math.max(0, previous.length - incoming.length)
+      var index = 0
+    while (incomingWithinPrevious < previous.length) {
+      if (index + incomingWithinPrevious >= previous.length) {
+        return incoming.slice(index, incoming.length)
+      }
+      if (previous[index + incomingWithinPrevious].id == incoming[index].id) {
+        index++
+      } else {
+        index = 0
+        incomingWithinPrevious++
+      }
+    }
+    return incoming
+  }
+
+  var test = function() {
+    var assert = require('assert')
+    assert.deepEqual(newItems([],
+                              []),
+                              [])
+    assert.deepEqual(newItems([{id: '1'}],
+                              []),
+                              [])
+    assert.deepEqual(newItems([],
+                              [{id: '2'}]),
+                              [{id: '2'}])
+    assert.deepEqual(newItems([{id: '1'}],
+                              [{id: '2'}]),
+                              [{id: '2'}])
+    assert.deepEqual(newItems([{id: '1'}],
+                              [{id: '1'}, {id: '2'}]),
+                              [{id: '2'}])
+    assert.deepEqual(newItems([{id: '1'}],
+                              [{id: '1'}, {id: '2'}, {id: '3'}]),
+                              [{id: '2'}, {id: '3'}])
+    assert.deepEqual(newItems([{id: '1'}, {id: '2'}],
+                              [{id: '2'}, {id: '3'}]),
+                              [{id: '3'}])
+    require('process').exit()
+  }
+
+  //autoUpdate()
+  test()
 });
 
 app.set('port', (process.env.PORT || 5000));
 
+/*
 app.listen(app.get('port'), function(){
   console.log('listening on *:', app.get('port'));
 });
+*/

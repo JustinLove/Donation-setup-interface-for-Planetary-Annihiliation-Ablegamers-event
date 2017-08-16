@@ -6,7 +6,8 @@
     - x fetch real data
     - x update data
     - store data
-  - configuration (ENV?)
+  - x configuration (ENV?)
+    - x feed selection
   - x adding uniques ids
   - filter by match, match ids
   - add or correct match number

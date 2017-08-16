@@ -13,6 +13,8 @@ require('js-nacl').instantiate(function(n) {
   }
 })
 
+var feedName = process.env.FEED
+
 var fetchOptions = function() {
   return new Promise(function(resolve, reject) {
     redis.smembers('games', function(err, games) {
@@ -139,7 +141,7 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
     }
     donations.push(dm)
     //console.log(donations.length)
-    console.log(dm.id)
+    //console.log(dm.id)
   }
 
   var integrateDonations = function(incoming) {
@@ -149,7 +151,7 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
   }
 
   var update = function() {
-    feed['donordrive_test'].update().then(integrateDonations)
+    feed[feedName].update().then(integrateDonations)
   }
 
   var autoUpdate = function() {
@@ -230,8 +232,8 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
 
 app.set('port', (process.env.PORT || 5000));
 
-/*
+
 app.listen(app.get('port'), function(){
   console.log('listening on *:', app.get('port'));
 });
-*/
+

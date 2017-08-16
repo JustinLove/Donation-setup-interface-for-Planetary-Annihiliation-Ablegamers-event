@@ -133,11 +133,17 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
   var insertDonation = function(d) {
     var dm = Donation(d)
     //dm.matchMatches(config.match_tags(), config.current_match())
+    dm.id = 1
+    if (donations.length > 0) {
+      dm.id = donations[donations.length - 1].id + 1
+    }
     donations.push(dm)
     //console.log(donations.length)
+    console.log(dm.id)
   }
 
   var integrateDonations = function(incoming) {
+    incoming.forEach(function(d) {d.content = d.id})
     var fresh = newItems(donations, incoming)
     fresh.forEach(insertDonation)
   }
@@ -179,7 +185,7 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
       if (index >= incoming.length) {
         return []
       }
-      if (previous[index + incomingWithinPrevious].id == incoming[index].id) {
+      if (previous[index + incomingWithinPrevious].content == incoming[index].content) {
         index++
       } else {
         index = 0
@@ -194,26 +200,26 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
     assert.deepEqual(newItems([],
                               []),
                               [])
-    assert.deepEqual(newItems([{id: '1'}],
+    assert.deepEqual(newItems([{content: '1'}],
                               []),
                               [])
     assert.deepEqual(newItems([],
-                              [{id: '2'}]),
-                              [{id: '2'}])
-    assert.deepEqual(newItems([{id: '1'}],
-                              [{id: '2'}]),
-                              [{id: '2'}])
-    assert.deepEqual(newItems([{id: '1'}],
-                              [{id: '1'}, {id: '2'}]),
-                              [{id: '2'}])
-    assert.deepEqual(newItems([{id: '1'}],
-                              [{id: '1'}, {id: '2'}, {id: '3'}]),
-                              [{id: '2'}, {id: '3'}])
-    assert.deepEqual(newItems([{id: '1'}, {id: '2'}],
-                              [{id: '2'}, {id: '3'}]),
-                              [{id: '3'}])
-    assert.deepEqual(newItems([{id: '1'}, {id: '2'}],
-                              [{id: '1'}]),
+                              [{content: '2'}]),
+                              [{content: '2'}])
+    assert.deepEqual(newItems([{content: '1'}],
+                              [{content: '2'}]),
+                              [{content: '2'}])
+    assert.deepEqual(newItems([{content: '1'}],
+                              [{content: '1'}, {content: '2'}]),
+                              [{content: '2'}])
+    assert.deepEqual(newItems([{content: '1'}],
+                              [{content: '1'}, {content: '2'}, {content: '3'}]),
+                              [{content: '2'}, {content: '3'}])
+    assert.deepEqual(newItems([{content: '1'}, {content: '2'}],
+                              [{content: '2'}, {content: '3'}]),
+                              [{content: '3'}])
+    assert.deepEqual(newItems([{content: '1'}, {content: '2'}],
+                              [{content: '1'}]),
                               [])
     require('process').exit()
   }

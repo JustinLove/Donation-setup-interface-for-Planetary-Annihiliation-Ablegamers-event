@@ -128,30 +128,18 @@ requirejs.config({
 });
 
 requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
-  var knownDonations = {}
   var donations = []
 
   var insertDonation = function(d) {
     var dm = Donation(d)
     //dm.matchMatches(config.match_tags(), config.current_match())
-    knownDonations[d.id] = dm
     donations.push(dm)
     //console.log(donations.length)
   }
 
   var integrateDonations = function(incoming) {
-    /*
-    if (incoming.length == 0) return
-    for (var incomingMatchRight = incoming.length - 1;incomingMatchRight > 0;incomingMatchRight--) { var matchLength = 0
-      var incomingIndex = incomingMatchRight - matchLength
-      var donationIndex = donations.length - matchLength
-    }
-    */
-    incoming.forEach(function(d) {
-      if (!knownDonations[d.id]) {
-        insertDonation(d)
-      }
-    })
+    var fresh = newItems(donations, incoming)
+    fresh.forEach(insertDonation)
   }
 
   var update = function() {
@@ -161,12 +149,6 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
   var autoUpdate = function() {
     update()
     setTimeout(autoUpdate, 10000)
-  }
-
-  var syncTest = function() {
-    update()
-    update()
-    require('process').exit()
   }
 
   // goal: find alignment of sequences
@@ -236,8 +218,8 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
     require('process').exit()
   }
 
-  //autoUpdate()
-  test()
+  autoUpdate()
+  //test()
 });
 
 app.set('port', (process.env.PORT || 5000));

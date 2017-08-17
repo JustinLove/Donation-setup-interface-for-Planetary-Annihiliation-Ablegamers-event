@@ -117,6 +117,9 @@ bottomSection model =
           [ label [ for "output-message" ] [ text "Submit This" ]
           ]
         , p []
+          [ span [ id "not-enough" ] [ text "This page is not enough!" ]
+          , text " Units are added based on the donation feed at donordrive.com." ]
+        , p []
           [ small
             [ id "message-instructions" ]
             [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]

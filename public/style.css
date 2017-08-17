@@ -203,6 +203,10 @@ li {
   display: inline-block;
 }
 
+#not-enough {
+  background-color: yellow;
+}
+
 .text {
   background-color: #eee;
 }

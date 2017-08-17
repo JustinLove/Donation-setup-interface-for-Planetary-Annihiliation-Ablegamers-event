@@ -24,5 +24,5 @@
 
 ### Donation Config UI
 
-- More explicit instructions. I could try adding some large type to the donation app pointing out that it isn't enough.
-- Unspecified planet. App likely biased to specifying planet. Should add explicit option for unspecified planet (in base) (re: 50 air facs after player left planet)
+- x More explicit instructions. I could try adding some large type to the donation app pointing out that it isn't enough.
+- x Unspecified planet. App likely biased to specifying planet. Should add explicit option for unspecified planet (in base) (re: 50 air facs after player left planet)

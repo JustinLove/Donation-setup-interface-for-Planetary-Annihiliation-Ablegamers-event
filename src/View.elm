@@ -166,7 +166,7 @@ displayRound model round =
       , div [ class "planets col" ]
         [ fieldset []
           [ legend [] [ text "Planets" ]
-          , ul [] <| List.map (displayPlanet round.id model.planet) round.planets
+          , ul [] <| List.map (displayPlanet round.id model.planet) ("(main base)" :: round.planets)
           ]
         ]
       ]

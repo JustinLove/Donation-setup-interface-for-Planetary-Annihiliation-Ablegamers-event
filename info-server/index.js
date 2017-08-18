@@ -123,15 +123,27 @@ app.delete('/games/:id', jsonParser, function(req, res){
   })
 });
 
+app.get('/donations', function(req, res){
+  res.json({donations: donations.map(function(dm) {
+    return {
+      amount: dm.amount,
+      comment: dm.comment,
+      donor_name: dm.donor_name,
+      donor_image: dm.donor_image,
+      id: dm.id,
+    }
+  })})
+});
+
 var requirejs = require('requirejs');
 
 requirejs.config({
     nodeRequire: require
 });
 
-requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
-  var donations = []
+var donations = []
 
+requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
   var loadDonationHistory = function() {
     return new Promise(function(resolve, reject) {
       redis.get('lastDonationId', function(err, id) {

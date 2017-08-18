@@ -129,19 +129,54 @@ requirejs.config({
     nodeRequire: require
 });
 
-redis.set('lastDonationId', '0')
-
 requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
   var donations = []
 
+  var loadDonationHistory = function() {
+    return new Promise(function(resolve, reject) {
+      redis.get('lastDonationId', function(err, id) {
+        if (err) {
+          reject(err)
+        } else if (id === null) {
+          redis.set('lastDonationId', 0)
+          resolve([])
+        } else {
+          loadDonationsUpTo(parseInt(id, 10))
+        }
+      })
+
+      var loadDonationsUpTo = function(lastDonationId) {
+        console.log('last donation id', lastDonationId)
+        if (lastDonationId < 1) return resolve([])
+
+        var idsToLoad = new Array(lastDonationId)
+        for (var id = 1;id <= lastDonationId;id++) {
+          idsToLoad[id-1] = 'donation'+id.toString()
+        }
+        redis.mget(idsToLoad, function(err, replies) {
+          if (replies) {
+            history = replies.map(function(d) {
+              return Donation(JSON.parse(d))
+            })
+            console.log('loaded history', history.length)
+            resolve(history)
+          } else {
+            Redis.print(err, replies)
+            reject(err)
+          }
+        })
+      }
+    })
+  }
+
   var persistDonation = function(dm) {
     var persist = {
-        amount: dm.amount,
-        comment: dm.comment,
-        donor_name: dm.donor_name,
-        donor_image: dm.donor_image,
-        id: dm.id,
-        raw: dm.raw,
+      amount: dm.amount,
+      comment: dm.comment,
+      donor_name: dm.donor_name,
+      donor_image: dm.donor_image,
+      id: dm.id,
+      raw: dm.raw,
     }
     redis.set('donation'+persist.id, JSON.stringify(persist), function(err, ok) {
       if (err) {
@@ -162,13 +197,16 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
         Redis.print(err, ok)
       } else {
         dm.id = lastDonationId
-        insertDonation(dm)
+        persistDonation(dm)
       }
     })
   }
 
   var integrateDonations = function(incoming) {
     var fresh = newItems(donations, incoming)
+    if (fresh.length > 1) {
+      console.log('new donations', fresh.length)
+    }
     fresh.forEach(insertDonation)
   }
 
@@ -248,8 +286,13 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
     require('process').exit()
   }
 
-  autoUpdate()
-  //test()
+  loadDonationHistory().then(function(history) {
+    donations = history
+    autoUpdate()
+    //test()
+  }, function(err) {
+    console.log(err)
+  })
 });
 
 app.set('port', (process.env.PORT || 5000));

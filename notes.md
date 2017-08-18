@@ -5,7 +5,7 @@
     - x load test feed
     - x fetch real data
     - x update data
-    - store data
+    - x store data
   - x configuration (ENV?)
     - x feed selection
   - x adding uniques ids

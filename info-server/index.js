@@ -131,14 +131,13 @@ requirejs.config({
 
 requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
   var donations = []
+  var lastDonationId = 0
 
   var insertDonation = function(d) {
     var dm = Donation(d)
     //dm.matchMatches(config.match_tags(), config.current_match())
-    dm.id = 1
-    if (donations.length > 0) {
-      dm.id = donations[donations.length - 1].id + 1
-    }
+    lastDonationId += 1
+    dm.id = lastDonationId
     donations.push(dm)
     //console.log(donations.length)
     //console.log(dm.id)

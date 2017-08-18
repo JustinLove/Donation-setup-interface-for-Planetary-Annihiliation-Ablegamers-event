@@ -145,20 +145,23 @@ var donations = []
 
 requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
   var loadDonationHistory = function() {
-    return new Promise(function(resolve, reject) {
-      redis.get('lastDonationId', function(err, id) {
-        if (err) {
-          reject(err)
-        } else if (id === null) {
-          redis.set('lastDonationId', 0)
-          resolve([])
-        } else {
-          loadDonationsUpTo(parseInt(id, 10))
-        }
+    var loadLastDonationid = function() {
+      return new Promise(function(resolve, reject) {
+        redis.get('lastDonationId', function(err, id) {
+          if (err) {
+            reject(err)
+          } else if (id === null) {
+            redis.set('lastDonationId', 0)
+            resolve(0)
+          } else {
+            console.log('last donation id', id)
+            resolve(parseInt(id, 10))
+          }
+        })
       })
-
-      var loadDonationsUpTo = function(lastDonationId) {
-        console.log('last donation id', lastDonationId)
+    }
+    var loadDonationsUpTo = function(lastDonationId) {
+      return new Promise(function(resolve, reject) {
         if (lastDonationId < 1) return resolve([])
 
         var idsToLoad = new Array(lastDonationId)
@@ -177,8 +180,10 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
             reject(err)
           }
         })
-      }
-    })
+      })
+    }
+
+    return loadLastDonationid().then(loadDonationsUpTo)
   }
 
   var persistDonation = function(dm) {

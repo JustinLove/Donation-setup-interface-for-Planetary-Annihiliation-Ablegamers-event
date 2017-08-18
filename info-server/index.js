@@ -129,18 +129,42 @@ requirejs.config({
     nodeRequire: require
 });
 
+redis.set('lastDonationId', '0')
+
 requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
   var donations = []
-  var lastDonationId = 0
+
+  var persistDonation = function(dm) {
+    var persist = {
+        amount: dm.amount,
+        comment: dm.comment,
+        donor_name: dm.donor_name,
+        donor_image: dm.donor_image,
+        id: dm.id,
+        raw: dm.raw,
+    }
+    redis.set('donation'+persist.id, JSON.stringify(persist), function(err, ok) {
+      if (err) {
+        Redis.print(err, ok)
+      } else {
+        donations.push(dm)
+        //console.log(donations.length)
+        //console.log(dm.id)
+      }
+    })
+  }
 
   var insertDonation = function(d) {
     var dm = Donation(d)
     //dm.matchMatches(config.match_tags(), config.current_match())
-    lastDonationId += 1
-    dm.id = lastDonationId
-    donations.push(dm)
-    //console.log(donations.length)
-    //console.log(dm.id)
+    redis.incr('lastDonationId', function(err, lastDonationId) {
+      if (err) {
+        Redis.print(err, ok)
+      } else {
+        dm.id = lastDonationId
+        insertDonation(dm)
+      }
+    })
   }
 
   var integrateDonations = function(incoming) {

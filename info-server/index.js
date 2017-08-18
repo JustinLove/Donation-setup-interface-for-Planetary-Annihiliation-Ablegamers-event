@@ -160,7 +160,19 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
         })
       })
     }
-    var loadDonationsUpTo = function(lastDonationId) {
+    var loadGameIds = function() {
+      return new Promise(function(resolve, reject) {
+        redis.smembers('games', function(err, games) {
+          if (games) {
+            console.log('loaded games', games)
+            resolve(games)
+          } else {
+            reject(err)
+          }
+        })
+      })
+    }
+    var loadDonationsUpTo = function(lastDonationId, games) {
       return new Promise(function(resolve, reject) {
         if (lastDonationId < 1) return resolve([])
 
@@ -171,7 +183,9 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
         redis.mget(idsToLoad, function(err, replies) {
           if (replies) {
             history = replies.map(function(d) {
-              return Donation(JSON.parse(d))
+              var dm = Donation(JSON.parse(d))
+              dm.matchMatches(games, '')
+              return dm
             })
             console.log('loaded history', history.length)
             resolve(history)
@@ -183,7 +197,10 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
       })
     }
 
-    return loadLastDonationid().then(loadDonationsUpTo)
+    return Promise.all([loadLastDonationid(), loadGameIds()])
+      .then(function(args) {
+        return loadDonationsUpTo(args[0], args[1])
+      })
   }
 
   var persistDonation = function(dm) {

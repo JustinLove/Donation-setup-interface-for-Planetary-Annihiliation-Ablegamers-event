@@ -25,6 +25,7 @@ define([], function() {
         donor_name: donor_name,
         donor_image: donor_image,
         id: donor_name + amount.toString() + comment,
+        raw: $(donor).html(),
       }
     }).get().reverse()
   }

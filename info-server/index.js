@@ -145,7 +145,6 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
   }
 
   var integrateDonations = function(incoming) {
-    incoming.forEach(function(d) {d.content = d.id})
     var fresh = newItems(donations, incoming)
     fresh.forEach(insertDonation)
   }
@@ -187,7 +186,7 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
       if (index >= incoming.length) {
         return []
       }
-      if (previous[index + incomingWithinPrevious].content == incoming[index].content) {
+      if (previous[index + incomingWithinPrevious].raw == incoming[index].raw) {
         index++
       } else {
         index = 0
@@ -202,26 +201,26 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
     assert.deepEqual(newItems([],
                               []),
                               [])
-    assert.deepEqual(newItems([{content: '1'}],
+    assert.deepEqual(newItems([{raw: '1'}],
                               []),
                               [])
     assert.deepEqual(newItems([],
-                              [{content: '2'}]),
-                              [{content: '2'}])
-    assert.deepEqual(newItems([{content: '1'}],
-                              [{content: '2'}]),
-                              [{content: '2'}])
-    assert.deepEqual(newItems([{content: '1'}],
-                              [{content: '1'}, {content: '2'}]),
-                              [{content: '2'}])
-    assert.deepEqual(newItems([{content: '1'}],
-                              [{content: '1'}, {content: '2'}, {content: '3'}]),
-                              [{content: '2'}, {content: '3'}])
-    assert.deepEqual(newItems([{content: '1'}, {content: '2'}],
-                              [{content: '2'}, {content: '3'}]),
-                              [{content: '3'}])
-    assert.deepEqual(newItems([{content: '1'}, {content: '2'}],
-                              [{content: '1'}]),
+                              [{raw: '2'}]),
+                              [{raw: '2'}])
+    assert.deepEqual(newItems([{raw: '1'}],
+                              [{raw: '2'}]),
+                              [{raw: '2'}])
+    assert.deepEqual(newItems([{raw: '1'}],
+                              [{raw: '1'}, {raw: '2'}]),
+                              [{raw: '2'}])
+    assert.deepEqual(newItems([{raw: '1'}],
+                              [{raw: '1'}, {raw: '2'}, {raw: '3'}]),
+                              [{raw: '2'}, {raw: '3'}])
+    assert.deepEqual(newItems([{raw: '1'}, {raw: '2'}],
+                              [{raw: '2'}, {raw: '3'}]),
+                              [{raw: '3'}])
+    assert.deepEqual(newItems([{raw: '1'}, {raw: '2'}],
+                              [{raw: '1'}]),
                               [])
     require('process').exit()
   }

@@ -131,6 +131,7 @@ app.get('/donations', function(req, res){
       donor_name: dm.donor_name,
       donor_image: dm.donor_image,
       id: dm.id,
+      matchingMatches: dm.matchingMatches,
     }
   })})
 });
@@ -145,62 +146,69 @@ var donations = []
 
 requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
   var loadDonationHistory = function() {
-    var loadLastDonationid = function() {
-      return new Promise(function(resolve, reject) {
-        redis.get('lastDonationId', function(err, id) {
-          if (err) {
-            reject(err)
-          } else if (id === null) {
-            redis.set('lastDonationId', 0)
-            resolve(0)
-          } else {
-            console.log('last donation id', id)
-            resolve(parseInt(id, 10))
-          }
-        })
-      })
-    }
-    var loadGameIds = function() {
-      return new Promise(function(resolve, reject) {
-        redis.smembers('games', function(err, games) {
-          if (games) {
-            console.log('loaded games', games)
-            resolve(games)
-          } else {
-            reject(err)
-          }
-        })
-      })
-    }
-    var loadDonationsUpTo = function(lastDonationId, games) {
-      return new Promise(function(resolve, reject) {
-        if (lastDonationId < 1) return resolve([])
+    return loadLastDonationid().then(loadDonationsUpTo)
+  }
 
-        var idsToLoad = new Array(lastDonationId)
-        for (var id = 1;id <= lastDonationId;id++) {
-          idsToLoad[id-1] = 'donation'+id.toString()
+  var loadLastDonationid = function() {
+    return new Promise(function(resolve, reject) {
+      redis.get('lastDonationId', function(err, id) {
+        if (err) {
+          reject(err)
+        } else if (id === null) {
+          redis.set('lastDonationId', 0)
+          resolve(0)
+        } else {
+          console.log('last donation id', id)
+          resolve(parseInt(id, 10))
         }
-        redis.mget(idsToLoad, function(err, replies) {
-          if (replies) {
-            history = replies.map(function(d) {
-              var dm = Donation(JSON.parse(d))
-              dm.matchMatches(games, '')
-              return dm
-            })
-            console.log('loaded history', history.length)
-            resolve(history)
-          } else {
-            Redis.print(err, replies)
-            reject(err)
-          }
-        })
       })
-    }
+    })
+  }
 
-    return Promise.all([loadLastDonationid(), loadGameIds()])
-      .then(function(args) {
-        return loadDonationsUpTo(args[0], args[1])
+  var loadDonationsUpTo = function(lastDonationId) {
+    return new Promise(function(resolve, reject) {
+      if (lastDonationId < 1) return resolve([])
+
+      var idsToLoad = new Array(lastDonationId)
+      for (var id = 1;id <= lastDonationId;id++) {
+        idsToLoad[id-1] = 'donation'+id.toString()
+      }
+      redis.mget(idsToLoad, function(err, replies) {
+        if (replies) {
+          history = replies.map(function(d) {
+            var dm = Donation(JSON.parse(d))
+            return dm
+          })
+          updateMatchesInDonations(history)
+          console.log('loaded history', history.length)
+          resolve(history)
+        } else {
+          Redis.print(err, replies)
+          reject(err)
+        }
       })
+    })
+  }
+
+  var updateMatchesInDonations = function(list) {
+    loadGameIds().then(function(games) {
+      list.forEach(function(dm) {
+        dm.matchMatches(games, '')
+      })
+    })
+  }
+
+  var loadGameIds = function() {
+    return new Promise(function(resolve, reject) {
+      redis.smembers('games', function(err, games) {
+        if (games) {
+          console.log('loaded games', games)
+          resolve(games)
+        } else {
+          reject(err)
+        }
+      })
+    })
   }
 
   var persistDonation = function(dm) {

@@ -20,6 +20,16 @@
 
 - Multiple puppetmasters - coordination? central feed tracking executions?
 
+GET /options.json - 100+/day
+* PUT /games/:id - 5+/day
+* DELETE /games/:id - 0+/day
+GET /donations /10sec
+GET /donations/:matchid /10sec
+
+* load
+* autoupdate /10sec
+
+
 ### Ingame Mod
 
 - queuing things up pre-5-minutes.

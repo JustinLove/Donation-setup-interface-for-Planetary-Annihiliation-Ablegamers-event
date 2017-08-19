@@ -12,23 +12,13 @@
   - filter by match
     - x match list
     - x assign match to loaded data
-    - assign match to incoming data
-    - update donation matches if game data changes
+    - x assign match to incoming data
+    - x update donation matches if game data changes
     - endpoint for filtered donations
   - add or correct match number
   - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
 
 - Multiple puppetmasters - coordination? central feed tracking executions?
-
-GET /options.json - 100+/day
-* PUT /games/:id - 5+/day
-* DELETE /games/:id - 0+/day
-GET /donations /10sec
-GET /donations/:matchid /10sec
-
-x load
-x autoupdate /10sec
-
 
 ### Ingame Mod
 

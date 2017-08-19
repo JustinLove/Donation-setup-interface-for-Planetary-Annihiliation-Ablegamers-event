@@ -80,7 +80,9 @@ app.put('/games/:id', jsonParser, function(req, res){
   info.id = req.params.id
   redis.set(req.params.id, JSON.stringify(info), function(err, reply) {
     if (reply == 'OK') {
-      redis.sadd('games', req.params.id)
+      redis.sadd('games', req.params.id, function() {
+        updateMatchesInDonations()
+      })
       res.sendStatus(200)
     } else {
       res.sendStatus(507)
@@ -115,7 +117,9 @@ app.delete('/games/:id', jsonParser, function(req, res){
   }
   redis.del(req.params.id, function(err, reply) {
     if (reply == 1) {
-      redis.srem('games', req.params.id)
+      redis.srem('games', req.params.id, function() {
+        updateMatchesInDonations()
+      })
       res.sendStatus(204)
     } else {
       res.sendStatus(507)
@@ -143,6 +147,27 @@ requirejs.config({
 });
 
 var donations = []
+
+var updateMatchesInDonations = function(list) {
+  loadGameIds().then(function(games) {
+    list.forEach(function(dm) {
+      dm.matchMatches(games, '')
+    })
+  })
+}
+
+var loadGameIds = function() {
+  return new Promise(function(resolve, reject) {
+    redis.smembers('games', function(err, games) {
+      if (games) {
+        console.log('loaded games', games)
+        resolve(games)
+      } else {
+        reject(err)
+      }
+    })
+  })
+}
 
 requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
   var loadDonationHistory = function() {
@@ -184,27 +209,6 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
           resolve(history)
         } else {
           Redis.print(err, replies)
-          reject(err)
-        }
-      })
-    })
-  }
-
-  var updateMatchesInDonations = function(list) {
-    loadGameIds().then(function(games) {
-      list.forEach(function(dm) {
-        dm.matchMatches(games, '')
-      })
-    })
-  }
-
-  var loadGameIds = function() {
-    return new Promise(function(resolve, reject) {
-      redis.smembers('games', function(err, games) {
-        if (games) {
-          console.log('loaded games', games)
-          resolve(games)
-        } else {
           reject(err)
         }
       })

@@ -32,9 +32,6 @@ define(['donation_panel/menu'], function(menu) {
       this.matchingMatches = matchTags.filter(function(match) {
         return match && match.match(re)
       })
-      if (this.matchingMatches.length > 0 && this.matchingMatches.indexOf(currentMatch) == -1) {
-        // ????
-      }
     },
   }
 

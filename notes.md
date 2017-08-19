@@ -9,12 +9,12 @@
   - x configuration (ENV?)
     - x feed selection
   - x adding uniques ids
-  - filter by match
+  - x filter by match
     - x match list
     - x assign match to loaded data
     - x assign match to incoming data
     - x update donation matches if game data changes
-    - endpoint for filtered donations
+    - x endpoint for filtered donations
   - add or correct match number
   - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
 

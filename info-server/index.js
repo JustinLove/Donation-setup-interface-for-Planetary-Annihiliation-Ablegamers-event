@@ -128,7 +128,15 @@ app.delete('/games/:id', jsonParser, function(req, res){
 });
 
 app.get('/donations', function(req, res){
-  res.json({donations: donations.map(function(dm) {
+  var list = donations
+  if (req.query['game'] !== undefined) {
+    var game = req.query['game']
+    list = donations.filter(function(dm) {
+      return dm.matchingMatches.length < 1 ||
+             dm.matchingMatches.indexOf(game) != -1
+    })
+  }
+  res.json({donations: list.map(function(dm) {
     return {
       amount: dm.amount,
       comment: dm.comment,

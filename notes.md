@@ -26,8 +26,8 @@ GET /options.json - 100+/day
 GET /donations /10sec
 GET /donations/:matchid /10sec
 
-* load
-* autoupdate /10sec
+x load
+x autoupdate /10sec
 
 
 ### Ingame Mod

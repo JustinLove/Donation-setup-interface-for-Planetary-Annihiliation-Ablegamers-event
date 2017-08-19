@@ -242,14 +242,14 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
         persistDonation(dm)
       }
     })
+    return dm
   }
 
   var integrateDonations = function(incoming) {
     var fresh = newItems(donations, incoming)
-    if (fresh.length > 1) {
-      console.log('new donations', fresh.length)
-    }
-    fresh.forEach(insertDonation)
+    if (fresh.length < 1) return
+    console.log('new donations', fresh.length)
+    updateMatchesInDonations(fresh.map(insertDonation))
   }
 
   var update = function() {
@@ -333,7 +333,7 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
     autoUpdate()
     //test()
   }, function(err) {
-    console.log(err)
+    //console.log(err)
   })
 });
 

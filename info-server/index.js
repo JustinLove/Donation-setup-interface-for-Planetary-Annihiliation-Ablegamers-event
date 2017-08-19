@@ -129,11 +129,24 @@ app.delete('/games/:id', jsonParser, function(req, res){
 
 app.get('/donations', function(req, res){
   var list = donations
-  if (req.query['game'] !== undefined) {
-    var game = req.query['game']
+  var game
+  var untagged = false
+  if (typeof(req.query['game']) == 'string') {
+    game = req.query['game']
+  }
+  if (typeof(req.query['untagged']) == 'string') {
+    untagged = req.query['untagged'] == 'true'
+  }
+
+  if (game || untagged) {
     list = donations.filter(function(dm) {
-      return dm.matchingMatches.length < 1 ||
-             dm.matchingMatches.indexOf(game) != -1
+      if (untagged && dm.matchingMatches.length < 1) {
+        return true
+      } else if (game && dm.matchingMatches.indexOf(game) != -1) {
+        return true
+      } else {
+        return false
+      }
     })
   }
   res.json({donations: list.map(function(dm) {

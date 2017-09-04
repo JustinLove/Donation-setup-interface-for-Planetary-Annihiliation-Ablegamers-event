@@ -26,6 +26,7 @@
   - local data?
   - record to central server? localstorage?
 - chat message coordination?
+- bringing in edited donations?
 
 ### Donation Config UI
 

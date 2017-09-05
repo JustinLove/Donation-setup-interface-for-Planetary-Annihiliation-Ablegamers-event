@@ -13,6 +13,7 @@ define([], function() {
         donor_name: donor_name,
         donor_image: donor_image,
         id: id,
+        raw: JSON.stringify(donation),
       }
     }).reverse()
   }

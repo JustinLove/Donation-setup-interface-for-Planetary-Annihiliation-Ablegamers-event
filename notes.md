@@ -8,7 +8,9 @@
     - x store data
   - x configuration (ENV?)
     - x feed selection
-  - x adding uniques ids
+  - adding uniques ids
+    - x no control of ids - affects loading strategy
+    - tiltify has an id already - should not overwrite it
   - x filter by match
     - x match list
     - x assign match to loaded data

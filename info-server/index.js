@@ -213,33 +213,53 @@ var loadGameIds = function() {
 
 requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
   var loadDonationHistory = function() {
-    return loadLastDonationid().then(loadDonationsUpTo)
+    return loadDonationIdsLength()
+      .then(loadDonationIds)
+      .then(loadDonations)
   }
 
-  var loadLastDonationid = function() {
+  var loadDonationIdsLength = function() {
     return new Promise(function(resolve, reject) {
-      redis.get('lastDonationId', function(err, id) {
+      redis.llen('knownDonationIds', function(err, length) {
         if (err) {
           reject(err)
-        } else if (id === null) {
-          redis.set('lastDonationId', 0)
+        } else if (length === null) {
           resolve(0)
         } else {
-          console.log('last donation id', id)
-          resolve(parseInt(id, 10))
+          console.log('donation ids', length)
+          resolve(length)
         }
       })
     })
   }
 
-  var loadDonationsUpTo = function(lastDonationId) {
+  var loadDonationIds = function(length) {
     return new Promise(function(resolve, reject) {
-      if (lastDonationId < 1) return resolve([])
+      if (length < 1) return resolve([])
 
-      var idsToLoad = new Array(lastDonationId)
-      for (var id = 1;id <= lastDonationId;id++) {
-        idsToLoad[id-1] = 'donation'+id.toString()
+      var ids = []
+      var countdown = length
+
+      for (var i = 0;i < length;i++) {
+        redis.lindex('knownDonationIds', i, function(err, id) {
+          if (id) {
+            ids.push(id)
+          } else {
+            Redis.print(err, id)
+          }
+          if (--countdown < 1) {
+            //console.log('loaded ids', ids)
+            resolve(ids)
+          }
+        })
       }
+    })
+  }
+
+  var loadDonations = function(idsToLoad) {
+    return new Promise(function(resolve, reject) {
+      if (idsToLoad.length < 1) return resolve([])
+
       redis.mget(idsToLoad, function(err, replies) {
         if (replies) {
           history = replies.map(function(d) {
@@ -266,13 +286,20 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
       id: dm.id,
       raw: dm.raw,
     }
-    redis.set('donation'+persist.id, JSON.stringify(persist), function(err, ok) {
-      if (err) {
-        Redis.print(err, ok)
+    var key = 'donation'+persist.id
+    redis.rpush('knownDonationIds', key, function(idErr, idOkay) {
+      if (idErr) {
+        Redis.print(idErr, idOkay)
       } else {
-        donations.push(dm)
-        //console.log(donations.length)
-        //console.log(dm.id)
+        redis.set(key, JSON.stringify(persist), function(err, ok) {
+          if (err) {
+            Redis.print(err, ok)
+          } else {
+            donations.push(dm)
+            console.log(donations.length)
+            console.log(dm.id)
+          }
+        })
       }
     })
   }

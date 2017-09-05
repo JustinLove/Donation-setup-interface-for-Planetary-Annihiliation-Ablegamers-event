@@ -296,8 +296,8 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
             Redis.print(err, ok)
           } else {
             donations.push(dm)
-            console.log(donations.length)
-            console.log(dm.id)
+            //console.log(donations.length)
+            //console.log(dm.id)
           }
         })
       }
@@ -306,15 +306,18 @@ requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Do
 
   var insertDonation = function(d) {
     var dm = Donation(d)
-    //dm.matchMatches(config.match_tags(), config.current_match())
-    redis.incr('lastDonationId', function(err, lastDonationId) {
-      if (err) {
-        Redis.print(err, ok)
-      } else {
-        dm.id = lastDonationId
-        persistDonation(dm)
-      }
-    })
+    if (feed[feedName].process.providerId) {
+      persistDonation(dm)
+    } else {
+      redis.incr('lastDonationId', function(err, lastDonationId) {
+        if (err) {
+          Redis.print(err, ok)
+        } else {
+          dm.id = lastDonationId
+          persistDonation(dm)
+        }
+      })
+    }
     return dm
   }
 

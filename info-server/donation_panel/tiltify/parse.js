@@ -18,6 +18,8 @@ define([], function() {
     }).reverse()
   }
 
+  process.providerId = true
+
   return {
     process: process,
   }

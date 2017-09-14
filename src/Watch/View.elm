@@ -1,6 +1,7 @@
 module Watch.View exposing (view, WVMsg(..))
 
 import GameInfo exposing (GameInfo)
+import Donation exposing (Donation)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -34,6 +35,7 @@ view model =
         [ div [ class "filtering-section col" ] <| filteringSection model
         ]
       ]
+      , donationsList model.donations
     ]
 
 filteringSection model =
@@ -57,3 +59,20 @@ radioChoice msg name current val lab =
 tabHeader : String -> GameInfo -> Html WVMsg
 tabHeader current round =
   radioChoice ChooseRound "game" current round.id round.id
+
+donationsList : List Donation -> Html WVMsg
+donationsList donations =
+  div [ class "row col" ]
+    [ ul [ class "donations" ] <| List.map displayDonation donations
+    ]
+
+displayDonation : Donation -> Html WVMsg
+displayDonation donation =
+  li [ class "donation" ]
+    [ p []
+      [ span [ class "donor-name" ] [ text donation.donor_name ]
+      , span [ class "amount" ] [ text (toString donation.amount) ]
+      ]
+    , p [] (List.map text donation.matchingMatches)
+    , p [ class "comment" ] [ text donation.comment ]
+    ]

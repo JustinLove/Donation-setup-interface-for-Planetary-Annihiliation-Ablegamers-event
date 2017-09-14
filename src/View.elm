@@ -13,6 +13,8 @@ import Json.Decode
 
 -- VIEW
 
+characterLimit = 300
+
 --view : Model -> Html Msg
 view model =
   div []
@@ -140,6 +142,12 @@ bottomSection model =
             , onFocus (Select "output-message")
             ]
             [text (donationText model)]
+          , p []
+            [ small []
+              [ donationText model |> String.length |> toString |> text
+              , text (" / " ++ (toString characterLimit) ++ " characters")
+              ]
+            ]
           , br [] []
           ]
         , h2 []
@@ -273,20 +281,29 @@ donationTotal : List OrderItem -> Float
 donationTotal items =
   List.map (\i -> (toFloat i.quantity) * i.donation) items |> List.sum
 
---donationText : Model -> String
 donationText model =
+  if String.length (donationTextLong model) < characterLimit then
+    donationTextLong model
+  else
+    donationTextShort model
+
+donationHeader model =
+    String.join ", " <| List.filter (not << String.isEmpty) [ model.player, model.planet, model.round ]
+
+--donationText : Model -> String
+donationTextLong model =
   String.join ""
-    [ String.join ", " <| List.filter (not << String.isEmpty) [ model.player, model.planet, model.round ]
+    [ donationHeader model
     , "\n"
-    , orderText <| nonZero model.selections
+    , orderTextLong <| nonZero model.selections
     ]
 
-orderText : List OrderItem -> String
-orderText items =
-  List.map itemText items |> String.join "\n"
+orderTextLong : List OrderItem -> String
+orderTextLong items =
+  List.map itemTextLong items |> String.join "\n"
 
-itemText : OrderItem -> String
-itemText item =
+itemTextLong : OrderItem -> String
+itemTextLong item =
   String.join ""
     [ item.code
     , " x"
@@ -299,6 +316,25 @@ itemText item =
 buildText : Int -> BuildItem -> String
 buildText quantity build =
   toString (build.quantity * quantity) ++ " " ++ build.display_name
+
+donationTextShort model =
+  String.join ""
+    [ donationHeader model
+    , "\n"
+    , orderTextShort <| nonZero model.selections
+    ]
+
+orderTextShort : List OrderItem -> String
+orderTextShort items =
+  List.map itemTextShort items |> String.join "\n"
+
+itemTextShort : OrderItem -> String
+itemTextShort item =
+  String.join ""
+    [ item.code
+    , " x"
+    , toString item.quantity
+    ]
 
 nonZero : List OrderItem -> List OrderItem
 nonZero =

@@ -33,16 +33,16 @@ makeModel =
 init : (Model, Cmd Msg)
 init =
   ( makeModel
-  , Cmd.batch [ fetchGame, fetchDonations ]
+  , Cmd.batch [ fetchGame, fetchDonations "match1" ]
   )
 
 fetchGame : Cmd Msg
 fetchGame =
   Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.rounds)
 
-fetchDonations : Cmd Msg
-fetchDonations =
-  Http.send GotDonations (Http.get (config.server ++ "donations") Donation.donations)
+fetchDonations : String -> Cmd Msg
+fetchDonations game =
+  Http.send GotDonations (Http.get (config.server ++ "donations?game=" ++ game ++ "&untagged=true") Donation.donations)
 
 -- UPDATE
 
@@ -55,7 +55,7 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     WatchViewMsg (ChooseRound id) ->
-      ({ model | round = id}, Cmd.none)
+      ({ model | round = id}, fetchDonations id)
     WatchViewMsg None ->
       (model, Cmd.none)
     GotGameInfo (Ok rounds) ->

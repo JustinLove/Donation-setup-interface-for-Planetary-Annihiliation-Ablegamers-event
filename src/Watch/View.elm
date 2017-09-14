@@ -1,4 +1,4 @@
-module Watch.View exposing (view, WVMsg(..))
+module Watch.View exposing (view, RoundSelection(..), WVMsg(..))
 
 import GameInfo exposing (GameInfo)
 import Donation exposing (Donation)
@@ -8,8 +8,12 @@ import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
 import Html.Events exposing (onCheck, onSubmit)
 
+type RoundSelection
+  = AllRounds
+  | Round String
+
 type WVMsg
-  = ChooseRound String
+  = ChooseRound RoundSelection
   | None
 
 -- VIEW
@@ -43,22 +47,32 @@ filteringSection model =
     [ div [ class "rounds-header col" ]
       [ fieldset []
         [ legend [] [ text "Games" ]
-        , ul [] <| List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds
+        , ul [] <| (allHeader model.round) :: (List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds)
         ]
       ]
     ]
   ]
 
-radioChoice : (String -> WVMsg) -> String -> String -> String -> String -> Html WVMsg
-radioChoice msg name current val lab =
+allHeader : RoundSelection -> Html WVMsg
+allHeader current =
+  radioChoice (\_ -> ChooseRound AllRounds) "game" (current == AllRounds) "all" "all"
+
+tabHeader : RoundSelection -> GameInfo -> Html WVMsg
+tabHeader current round =
+  radioChoice (\_ -> ChooseRound (Round round.id)) "game" (isCurrent current round) round.id round.id
+
+isCurrent : RoundSelection -> GameInfo -> Bool
+isCurrent current round =
+  case current of
+    AllRounds -> False
+    Round id -> id == round.id
+
+radioChoice : (Bool -> WVMsg) -> String -> Bool -> String -> String -> Html WVMsg
+radioChoice msg name sel val lab =
   li []
-    [ input [type_ "radio", Html.Attributes.name name, id val, value val, onCheck (\_ -> msg val), checked (val == current)] []
+    [ input [type_ "radio", Html.Attributes.name name, id val, value val, onCheck msg, checked sel] []
     , label [ for val ] [text lab]
     ]
-
-tabHeader : String -> GameInfo -> Html WVMsg
-tabHeader current round =
-  radioChoice ChooseRound "game" current round.id round.id
 
 donationsList : List Donation -> Html WVMsg
 donationsList donations =

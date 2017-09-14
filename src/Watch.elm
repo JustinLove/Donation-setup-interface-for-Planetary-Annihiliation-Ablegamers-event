@@ -1,4 +1,4 @@
-import Watch.View exposing (view, WVMsg(..))
+import Watch.View exposing (view, RoundSelection(..), WVMsg(..))
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation) 
 import Config exposing (config) 
@@ -19,30 +19,34 @@ main =
 
 type alias Model =
   { rounds: List GameInfo
-  , round: String
+  , round: RoundSelection
   , donations: List Donation
   }
 
 makeModel : Model
 makeModel =
   { rounds = []
-  , round = ""
+  , round = AllRounds
   , donations = []
   }
 
 init : (Model, Cmd Msg)
 init =
   ( makeModel
-  , Cmd.batch [ fetchGame, fetchDonations "match1" ]
+  , Cmd.batch [ fetchGame, fetchDonations AllRounds ]
   )
 
 fetchGame : Cmd Msg
 fetchGame =
   Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.rounds)
 
-fetchDonations : String -> Cmd Msg
+fetchDonations : RoundSelection -> Cmd Msg
 fetchDonations game =
-  Http.send GotDonations (Http.get (config.server ++ "donations?game=" ++ game ++ "&untagged=true") Donation.donations)
+  case game of
+    AllRounds ->
+      Http.send GotDonations (Http.get (config.server ++ "donations") Donation.donations)
+    Round id ->
+      Http.send GotDonations (Http.get (config.server ++ "donations?game=" ++ id ++ "&untagged=true") Donation.donations)
 
 -- UPDATE
 

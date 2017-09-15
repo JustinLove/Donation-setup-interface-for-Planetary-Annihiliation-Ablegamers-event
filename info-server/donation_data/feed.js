@@ -1,9 +1,9 @@
 define([
-  'donation_panel/tiltify/local',
-  'donation_panel/tiltify/api_test',
-  'donation_panel/tiltify/live',
-  'donation_panel/donordrive/test',
-  'donation_panel/donordrive/live',
+  'donation_data/tiltify/local',
+  'donation_data/tiltify/api_test',
+  'donation_data/tiltify/live',
+  'donation_data/donordrive/test',
+  'donation_data/donordrive/live',
 ], function(
   tiltify_local,
   tiltify_api_test,

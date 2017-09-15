@@ -211,7 +211,7 @@ var loadGameIds = function() {
   })
 }
 
-requirejs(['donation_panel/feed', 'donation_panel/donation'], function (feed, Donation) {
+requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Donation) {
   var loadDonationHistory = function() {
     return loadDonationIdsLength()
       .then(loadDonationIds)

@@ -1,20 +1,24 @@
-define(['donation_panel/donordrive/parse'], function(parse) {
+define(['donation_data/tiltify/parse'], function(parse) {
   var http = require('https')
+  var URL = require('url')
 
-  var donations = "https://ablegamers.donordrive.com/index.cfm?fuseaction=donorDrive.teamDonations&teamID=5007"
-  //var donations = "https://ablegamers.donordrive.com/index.cfm?fuseaction=donorDrive.participantDonations&participantID=1002"
-  //var donations = "coui://ui/mods/donation_panel/donordrive/sample.htm"
+  var donations = "https://tiltify.com/api_test/v2/campaign/donations"
 
   var update = function(url) {
     return new Promise(function(resolve, reject) {
-      http.get(url || donations, function(res) {
+      var options = URL.parse(url || donations)
+      options.headers = {
+        'Authorization': 'Token token="test_479c924413fe9168952891e9a36"',
+      }
+
+      http.get(options, function(res) {
         var error;
         if (res.statusCode !== 200) {
           error = new Error('Request Failed.\n' +
                             `Status Code: ${res.statusCode}`);
-        } else if (!/^text\/html/.test(res.headers['content-type'])) {
+        } else if (!/^application\/json/.test(res.headers['content-type'])) {
           error = new Error('Invalid content-type.\n' +
-                            `Expected text/html but received ${res.headers['content-type']}`);
+                            `Expected application/json but received ${res.headers['content-type']}`);
         }
         if (error) {
           console.error(error.message);
@@ -29,7 +33,7 @@ define(['donation_panel/donordrive/parse'], function(parse) {
         res.on('data', (chunk) => { rawData += chunk; });
         res.on('end', () => {
           try {
-            var data = parse.process(rawData)
+            var data = parse.process(JSON.parse(rawData))
             resolve(data)
             return
           } catch (e) {

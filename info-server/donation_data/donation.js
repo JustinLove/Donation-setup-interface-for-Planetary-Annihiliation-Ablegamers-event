@@ -1,4 +1,4 @@
-define(['donation_panel/menu'], function(menu) {
+define(['donation_data/menu'], function(menu) {
   var prototype = {
     matchPlayers: function(players) {
       var words = this.comment.match(/\b\w{3,}\b/g)

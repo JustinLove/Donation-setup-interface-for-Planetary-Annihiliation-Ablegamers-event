@@ -1,5 +1,5 @@
 define([
-  'donation_panel/tiltify/parse',
+  'donation_data/tiltify/parse',
 ], function(parse) {
   var http = require('https')
   var URL = require('url')

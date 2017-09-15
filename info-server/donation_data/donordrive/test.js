@@ -1,13 +1,13 @@
-define(['donation_panel/donordrive/parse'], function(parse) {
+define(['donation_data/donordrive/parse'], function(parse) {
   var fs = require('fs')
 
   var testSequence = [
-    //"info-server/donation_panel/donordrive/sample.htm",
-    //"info-server/donation_panel/donordrive/sample201609.html",
-    "info-server/donation_panel/donordrive/donordrive00.html",
-    "info-server/donation_panel/donordrive/donordrive01.html",
-    "info-server/donation_panel/donordrive/donordrive02.html",
-    //"info_server/donation_panel/donordrive/test.htm",
+    //"info-server/donation_data/donordrive/sample.htm",
+    //"info-server/donation_data/donordrive/sample201609.html",
+    "info-server/donation_data/donordrive/donordrive00.html",
+    "info-server/donation_data/donordrive/donordrive01.html",
+    "info-server/donation_data/donordrive/donordrive02.html",
+    //"info_server/donation_data/donordrive/test.htm",
   ]
 
   var update = function() {

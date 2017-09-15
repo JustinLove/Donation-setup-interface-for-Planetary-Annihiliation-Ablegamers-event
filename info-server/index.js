@@ -178,6 +178,13 @@ app.get('/donations', function(req, res){
       donor_image: dm.donor_image,
       id: dm.id,
       matchingMatches: dm.matchingMatches,
+      //matchingPlayers: dm.matchingPlayers,
+      //matchingPlanets: dm.matchingPlanets,
+      codes: dm.codes,
+      //orders: dm.orders,
+      minimum: dm.minimum,
+      insufficient: dm.insufficient,
+      unaccounted: dm.unaccounted,
     }
   })})
 });

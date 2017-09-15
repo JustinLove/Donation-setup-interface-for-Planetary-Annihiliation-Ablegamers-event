@@ -82,11 +82,18 @@ donationsList donations =
 
 displayDonation : Donation -> Html WVMsg
 displayDonation donation =
-  li [ class "donation-item" ]
+  li [ classList
+      [ ("donation-item", True)
+      , ("insufficient", donation.insufficient)
+      , ("unaccounted", donation.unaccounted)
+      ]
+    ]
     [ p []
       [ span [ class "donor_name" ] [ text donation.donor_name ]
       , text " "
       , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
+      , text " "
+      , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
       ]
     , p [] (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
     , p [ class "comment" ] [ text donation.comment ]

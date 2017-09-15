@@ -222,11 +222,11 @@ li {
 }
 
 .insufficient {
-  background: #800;
+  background: #Fcc;
 }
 
 .unaccounted {
-  background: #040;
+  background: #cFc;
 }
 
 .amount {
@@ -276,11 +276,13 @@ li {
   background:#888;
   color: black;
   font-weight: bold;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
 }
 
 .minimum {
   font-size: 20px;
-  color: #ff0;
+  color: #cc0;
   font-weight: bold;
   padding-left: 1em;
 }

@@ -207,6 +207,85 @@ li {
   background-color: yellow;
 }
 
+.donation-item {
+  background-color: #eeeeee;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0.01em;
+  padding-bottom: 0.01em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
 .text {
   background-color: #eee;
 }
+
+.insufficient {
+  background: #800;
+}
+
+.unaccounted {
+  background: #040;
+}
+
+.amount {
+  text-align: right;
+  color: #0f0;
+  font-weight: bold;
+  padding-right: 0.5em;
+}
+
+.min-total {
+  text-align: right;
+  color: #ff0;
+  font-weight: bold;
+}
+
+.donor_name {
+  text-align: right;
+  color: #888;
+}
+
+.code {
+  font-size: 20px;
+  background:#1e7aa1;
+  color: black;
+  font-weight: bold;
+}
+
+.uncode {
+  background:#1e7aa1;
+  color: black;
+  font-weight: bold;
+}
+
+.player {
+  background:#a2a;
+  color: black;
+  font-weight: bold;
+}
+
+.planet {
+  background:#2a2;
+  color: black;
+  font-weight: bold;
+}
+
+.match {
+  background:#888;
+  color: black;
+  font-weight: bold;
+}
+
+.minimum {
+  font-size: 20px;
+  color: #ff0;
+  font-weight: bold;
+  padding-left: 1em;
+}
+
+.comment {
+  white-space: pre-line;
+}
+.

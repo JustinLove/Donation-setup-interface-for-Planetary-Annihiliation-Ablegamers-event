@@ -39,7 +39,7 @@ view model =
         [ div [ class "filtering-section col" ] <| filteringSection model
         ]
       ]
-      , donationsList model.donations
+      , donationsList <| List.reverse model.donations
     ]
 
 filteringSection model =
@@ -82,11 +82,12 @@ donationsList donations =
 
 displayDonation : Donation -> Html WVMsg
 displayDonation donation =
-  li [ class "donation" ]
+  li [ class "donation-item" ]
     [ p []
-      [ span [ class "donor-name" ] [ text donation.donor_name ]
-      , span [ class "amount" ] [ text (toString donation.amount) ]
+      [ span [ class "donor_name" ] [ text donation.donor_name ]
+      , text " "
+      , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
       ]
-    , p [] (List.map text donation.matchingMatches)
+    , p [] (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
     , p [ class "comment" ] [ text donation.comment ]
     ]

@@ -69,7 +69,7 @@ isCurrent current round =
 
 radioChoice : (Bool -> WVMsg) -> String -> Bool -> String -> String -> Html WVMsg
 radioChoice msg name sel val lab =
-  li []
+  li [ classList [ ("selected", sel) ] ]
     [ input [type_ "radio", Html.Attributes.name name, id val, value val, onCheck msg, checked sel] []
     , label [ for val ] [text lab]
     ]

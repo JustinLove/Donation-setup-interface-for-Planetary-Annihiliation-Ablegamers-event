@@ -207,6 +207,18 @@ li {
   background-color: yellow;
 }
 
+.rounds-header li {
+  display: inline;
+  padding-left: 0.7em;
+  padding-right: 0.7em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+.rounds-header li.selected {
+  background-color: #8ff;
+}
+
 .donation-item {
   background-color: #eeeeee;
   padding-left: 0.5em;
@@ -248,7 +260,6 @@ li {
 }
 
 .code {
-  font-size: 20px;
   background:#1e7aa1;
   color: black;
   font-weight: bold;
@@ -281,7 +292,6 @@ li {
 }
 
 .minimum {
-  font-size: 20px;
   color: #cc0;
   font-weight: bold;
   padding-left: 1em;

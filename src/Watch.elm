@@ -5,6 +5,7 @@ import Config exposing (config)
 
 import Html
 import Http
+import Time
 
 main : Program Never Model Msg
 main =
@@ -54,6 +55,7 @@ type Msg
   = GotGameInfo (Result Http.Error (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
   | WatchViewMsg WVMsg
+  | Poll Time.Time
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -72,10 +74,12 @@ update msg model =
     GotDonations (Err msg) ->
       let _ = Debug.log "donations error" msg in
       (model, Cmd.none)
+    Poll t ->
+      (model, fetchDonations model.round)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  Time.every (Time.second * 10) Poll
 

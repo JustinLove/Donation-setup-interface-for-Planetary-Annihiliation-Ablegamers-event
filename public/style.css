@@ -233,11 +233,11 @@ li {
   background-color: #eee;
 }
 
-.insufficient {
+.insufficient .amount, .insufficient .minimum {
   background: #Fcc;
 }
 
-.unaccounted {
+.unaccounted .amount, .unaccounted .minimum {
   background: #cFc;
 }
 

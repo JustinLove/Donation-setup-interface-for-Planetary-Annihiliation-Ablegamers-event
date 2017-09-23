@@ -17,6 +17,8 @@
 /* End DSG */
 
 .results { max-width: 40em; }
+.filtering-section { max-width: 7em; }
+.highlighting-section { max-width: 35em; }
 
 @media only screen and (min-width: 34em) {
   .players, .planets { width: 50%; }
@@ -207,16 +209,59 @@ li {
   background-color: yellow;
 }
 
-.rounds-header li {
+.highlighting-header ul {
   display: inline;
-  padding-left: 0.7em;
-  padding-right: 0.7em;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
 }
 
-.rounds-header li.selected {
-  background-color: #8ff;
+.highlighting-header .rounds > li {
+  width: 6em;
+  display: inline;
+  padding-left: 0.1em;
+  padding-right: 0.1em;
+  padding-top: 0.1em;
+  padding-bottom: 0.05em;
+}
+
+.highlighting-header label.round-title {
+  display: block;
+}
+
+.highlighting-header .colors li {
+  display: inline;
+  padding: 0;
+  padding-top: 0.1em;
+}
+
+.highlighting-header .colors li label {
+  display: none;
+}
+
+.grey {
+  background-color: #eeeeee;
+}
+
+.red {
+  background-color: #ffcccc;
+}
+
+.green {
+  background-color: #ccffcc;
+}
+
+.blue {
+  background-color: #ccccff;
+}
+
+.cyan {
+  background-color: #ccffff;
+}
+
+.magenta {
+  background-color: #ffccff;
+}
+
+.yellow {
+  background-color: #ffffcc;
 }
 
 .donation-item {
@@ -300,4 +345,3 @@ li {
 .comment {
   white-space: pre-line;
 }
-.

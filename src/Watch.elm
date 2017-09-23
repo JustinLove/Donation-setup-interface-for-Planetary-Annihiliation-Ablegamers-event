@@ -1,4 +1,4 @@
-import Watch.View exposing (view, RoundSelection(..), WVMsg(..))
+import Watch.View exposing (view, RoundSelection(..), HighlightColor(..), WVMsg(..))
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation) 
 import Config exposing (config) 
@@ -62,6 +62,8 @@ update msg model =
   case msg of
     WatchViewMsg (FilterRound id) ->
       ({ model | round = id}, fetchDonations id)
+    WatchViewMsg (HighlightRound id color) ->
+      (model, Cmd.none)
     WatchViewMsg None ->
       (model, Cmd.none)
     GotGameInfo (Ok rounds) ->

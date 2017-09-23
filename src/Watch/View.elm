@@ -1,4 +1,4 @@
-module Watch.View exposing (view, RoundSelection(..), WVMsg(..))
+module Watch.View exposing (view, RoundSelection(..), HighlightColor(..), WVMsg(..))
 
 import GameInfo exposing (GameInfo)
 import Donation exposing (Donation)
@@ -12,8 +12,28 @@ type RoundSelection
   = AllRounds
   | Round String
 
+type HighlightColor
+  = Grey
+  | Red
+  | Green
+  | Blue
+  | Cyan
+  | Magenta
+  | Yellow
+
+listOfColors =
+  [ Grey
+  , Red
+  , Green
+  , Blue
+  , Cyan
+  , Magenta
+  , Yellow
+  ]
+
 type WVMsg
   = FilterRound RoundSelection
+  | HighlightRound String HighlightColor
   | None
 
 -- VIEW
@@ -37,6 +57,7 @@ view model =
         ]
       , Html.form [ onSubmit None, class "row" ]
         [ div [ class "filtering-section col" ] <| filteringSection model
+        , div [ class "highlighting-section col" ] <| highlightingSection model
         ]
       ]
       , donationsList <| List.reverse model.donations
@@ -44,9 +65,9 @@ view model =
 
 filteringSection model =
   [ div [ class "row" ]
-    [ div [ class "rounds-header col" ]
+    [ div [ class "filtering-header col" ]
       [ fieldset []
-        [ legend [] [ text "Games" ]
+        [ legend [] [ text "Filter" ]
         , select
           [ Html.Attributes.name "game"
           , onInput filterMessage 
@@ -79,9 +100,53 @@ isCurrent current round =
     AllRounds -> False
     Round id -> id == round.id
 
-radioChoice : (Bool -> WVMsg) -> String -> Bool -> String -> String -> Html WVMsg
-radioChoice msg name sel val lab =
-  li [ classList [ ("selected", sel) ] ]
+highlightingSection model =
+  [ div [ class "row" ]
+    [ div [ class "highlighting-header col" ]
+      [ fieldset []
+        [ legend [] [ text "Highlight" ]
+        , ul [ class "rounds", class "row" ]
+          <| List.map highlightBox
+          <| (List.sortBy .name) model.rounds
+        ]
+      ]
+    ]
+  ]
+
+highlightBox : GameInfo -> Html WVMsg
+highlightBox round =
+  li [ class "col" ]
+    [ label [ class "round-title" ] [ text round.id ]
+    , ul [ class "colors" ] (List.map (colorChoice round) listOfColors)
+    ]
+
+colorChoice : GameInfo -> HighlightColor -> Html WVMsg
+colorChoice round color =
+  let
+    colorName = colorNames color
+    name = round.id ++ "-color"
+    sel = False
+    val = round.id ++ "-" ++ colorName
+    lab = colorName
+  in
+    radioChoice (\_ -> None) name sel val lab colorName
+
+colorNames : HighlightColor -> String
+colorNames color =
+  case color of
+    Grey -> "grey"
+    Red -> "red"
+    Green -> "green"
+    Blue -> "blue"
+    Cyan -> "cyan"
+    Magenta -> "magenta"
+    Yellow -> "yellow"
+
+radioChoice : (Bool -> WVMsg) -> String -> Bool -> String -> String -> String -> Html WVMsg
+radioChoice msg name sel val lab color =
+  li
+    [ classList [ ("selected", sel), (color, True) ]
+    ]
     [ input [type_ "radio", Html.Attributes.name name, id val, value val, onCheck msg, checked sel] []
     , label [ for val ] [text lab]
     ]

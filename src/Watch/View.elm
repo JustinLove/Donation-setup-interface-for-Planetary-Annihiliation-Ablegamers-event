@@ -3,6 +3,7 @@ module Watch.View exposing (view, RoundSelection(..), HighlightColor(..), WVMsg(
 import GameInfo exposing (GameInfo)
 import Donation exposing (Donation)
 
+import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
@@ -106,26 +107,32 @@ highlightingSection model =
       [ fieldset []
         [ legend [] [ text "Highlight" ]
         , ul [ class "rounds", class "row" ]
-          <| List.map highlightBox
+          <| List.map (highlightBox model.roundColors)
           <| (List.sortBy .name) model.rounds
         ]
       ]
     ]
   ]
 
-highlightBox : GameInfo -> Html WVMsg
-highlightBox round =
+highlightBox : Dict String HighlightColor -> GameInfo -> Html WVMsg
+highlightBox roundColors round =
   li [ class "col" ]
     [ label [ class "round-title" ] [ text round.id ]
-    , ul [ class "colors" ] (List.map (colorChoice round) listOfColors)
+    , ul [ class "colors" ] (List.map (colorChoice round (lookupColor round.id roundColors)) listOfColors)
     ]
 
-colorChoice : GameInfo -> HighlightColor -> Html WVMsg
-colorChoice round color =
+lookupColor : String -> Dict String HighlightColor -> HighlightColor
+lookupColor id roundColors =
+  case Dict.get id roundColors of
+    Just color -> color
+    Nothing -> Grey
+
+colorChoice : GameInfo -> HighlightColor -> HighlightColor -> Html WVMsg
+colorChoice round current color =
   let
     colorName = colorNames color
     name = round.id ++ "-color"
-    sel = False
+    sel = current == color
     val = round.id ++ "-" ++ colorName
     lab = colorName
   in

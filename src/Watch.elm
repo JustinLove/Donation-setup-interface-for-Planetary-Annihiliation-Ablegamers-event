@@ -3,6 +3,7 @@ import GameInfo exposing (GameInfo)
 import Donation exposing (Donation) 
 import Config exposing (config) 
 
+import Dict
 import Html
 import Http
 import Time
@@ -21,6 +22,7 @@ main =
 type alias Model =
   { rounds: List GameInfo
   , round: RoundSelection
+  , roundColors: Dict.Dict String HighlightColor
   , donations: List Donation
   }
 
@@ -28,6 +30,7 @@ makeModel : Model
 makeModel =
   { rounds = []
   , round = AllRounds
+  , roundColors = Dict.empty
   , donations = []
   }
 
@@ -63,7 +66,7 @@ update msg model =
     WatchViewMsg (FilterRound id) ->
       ({ model | round = id}, fetchDonations id)
     WatchViewMsg (HighlightRound id color) ->
-      (model, Cmd.none)
+      ({ model | roundColors = Dict.insert id color model.roundColors}, Cmd.none)
     WatchViewMsg None ->
       (model, Cmd.none)
     GotGameInfo (Ok rounds) ->

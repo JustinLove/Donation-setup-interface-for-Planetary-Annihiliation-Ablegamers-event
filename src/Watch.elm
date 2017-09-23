@@ -60,7 +60,7 @@ type Msg
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    WatchViewMsg (ChooseRound id) ->
+    WatchViewMsg (FilterRound id) ->
       ({ model | round = id}, fetchDonations id)
     WatchViewMsg None ->
       (model, Cmd.none)

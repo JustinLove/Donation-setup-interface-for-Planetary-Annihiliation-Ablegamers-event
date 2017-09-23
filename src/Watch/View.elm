@@ -6,14 +6,14 @@ import Donation exposing (Donation)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
-import Html.Events exposing (onCheck, onSubmit)
+import Html.Events exposing (onCheck, onSubmit, onInput)
 
 type RoundSelection
   = AllRounds
   | Round String
 
 type WVMsg
-  = ChooseRound RoundSelection
+  = FilterRound RoundSelection
   | None
 
 -- VIEW
@@ -47,19 +47,31 @@ filteringSection model =
     [ div [ class "rounds-header col" ]
       [ fieldset []
         [ legend [] [ text "Games" ]
-        , ul [] <| (allHeader model.round) :: (List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds)
+        , select
+          [ Html.Attributes.name "game"
+          , onInput filterMessage 
+          ]
+          <| (allHeader model.round) :: (List.map (tabHeader model.round)
+          <| (List.sortBy .name) model.rounds)
         ]
       ]
     ]
   ]
 
+filterMessage : String -> WVMsg
+filterMessage val =
+  if val == "all" then
+    FilterRound AllRounds
+  else
+    FilterRound (Round val)
+
 allHeader : RoundSelection -> Html WVMsg
 allHeader current =
-  radioChoice (\_ -> ChooseRound AllRounds) "game" (current == AllRounds) "all" "all"
+  option [ value "all", selected (current == AllRounds) ] [ text "all" ] 
 
 tabHeader : RoundSelection -> GameInfo -> Html WVMsg
 tabHeader current round =
-  radioChoice (\_ -> ChooseRound (Round round.id)) "game" (isCurrent current round) round.id round.id
+  option [ value round.id, selected (isCurrent current round) ] [ text round.id ] 
 
 isCurrent : RoundSelection -> GameInfo -> Bool
 isCurrent current round =

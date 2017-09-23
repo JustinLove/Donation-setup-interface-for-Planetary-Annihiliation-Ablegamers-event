@@ -61,7 +61,7 @@ view model =
         , div [ class "highlighting-section col" ] <| highlightingSection model
         ]
       ]
-      , donationsList <| List.reverse model.donations
+      , donationsList model.roundColors <| List.reverse model.donations
     ]
 
 filteringSection model =
@@ -118,11 +118,11 @@ highlightBox : Dict String HighlightColor -> GameInfo -> Html WVMsg
 highlightBox roundColors round =
   li [ class "col" ]
     [ label [ class "round-title" ] [ text round.id ]
-    , ul [ class "colors" ] (List.map (colorChoice round (lookupColor round.id roundColors)) listOfColors)
+    , ul [ class "colors" ] (List.map (colorChoice round (lookupColor roundColors round.id)) listOfColors)
     ]
 
-lookupColor : String -> Dict String HighlightColor -> HighlightColor
-lookupColor id roundColors =
+lookupColor : Dict String HighlightColor -> String -> HighlightColor
+lookupColor roundColors id =
   case Dict.get id roundColors of
     Just color -> color
     Nothing -> Grey
@@ -136,7 +136,7 @@ colorChoice round current color =
     val = round.id ++ "-" ++ colorName
     lab = colorName
   in
-    radioChoice (\_ -> None) name sel val lab colorName
+    radioChoice (\_ -> HighlightRound round.id color) name sel val lab colorName
 
 colorNames : HighlightColor -> String
 colorNames color =
@@ -158,19 +158,26 @@ radioChoice msg name sel val lab color =
     , label [ for val ] [text lab]
     ]
 
-donationsList : List Donation -> Html WVMsg
-donationsList donations =
+donationsList : Dict String HighlightColor -> List Donation -> Html WVMsg
+donationsList roundColors donations =
   div [ class "row col" ]
-    [ ul [ class "donations" ] <| List.map displayDonation donations
+    [ ul [ class "donations" ] <| List.map (displayDonation roundColors) donations
     ]
 
-displayDonation : Donation -> Html WVMsg
-displayDonation donation =
+displayDonation : Dict String HighlightColor -> Donation -> Html WVMsg
+displayDonation roundColors donation =
   li [ classList
-      [ ("donation-item", True)
-      , ("insufficient", donation.insufficient)
-      , ("unaccounted", donation.unaccounted)
-      ]
+      (List.append
+        [ ("donation-item", True)
+        , ("insufficient", donation.insufficient)
+        , ("unaccounted", donation.unaccounted)
+        ]
+        (List.map
+          (lookupColor roundColors
+          >> colorNames
+          >> (\c -> (c, True)))
+          donation.matchingMatches)
+      )
     ]
     [ p []
       [ span [ class "donor_name" ] [ text donation.donor_name ]

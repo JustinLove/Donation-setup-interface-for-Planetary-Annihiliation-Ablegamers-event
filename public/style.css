@@ -265,7 +265,7 @@ li {
 }
 
 .donation-item {
-  background-color: #eeeeee;
+  background-color: #f8f8f8;
   padding-left: 0.5em;
   padding-right: 0.5em;
   padding-top: 0.01em;
@@ -274,16 +274,44 @@ li {
   margin-bottom: 1em;
 }
 
+.donation-item.grey {
+  background-color: #eeeeee;
+}
+
+.donation-item.red {
+  background-color: #ffcccc;
+}
+
+.donation-item.green {
+  background-color: #ccffcc;
+}
+
+.donation-item.blue {
+  background-color: #ccccff;
+}
+
+.donation-item.cyan {
+  background-color: #ccffff;
+}
+
+.donation-item.magenta {
+  background-color: #ffccff;
+}
+
+.donation-item.yellow {
+  background-color: #ffffcc;
+}
+
 .text {
   background-color: #eee;
 }
 
 .insufficient .amount, .insufficient .minimum {
-  background: #Fcc;
+  background: #000;
 }
 
 .unaccounted .amount, .unaccounted .minimum {
-  background: #cFc;
+  background: #FFF;
 }
 
 .amount {

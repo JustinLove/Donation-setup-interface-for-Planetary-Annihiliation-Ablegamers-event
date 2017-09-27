@@ -219,6 +219,18 @@ wss.on('connection', function connection(con) {
   })
 });
 
+var simulation = function() {
+  var dms = [].concat(donations)
+  var simulate = function() {
+    var dm = dms.shift()
+    if (dm) {
+      notifyClients([dm])
+      setTimeout(simulate, 1000)
+    }
+  }
+  simulate()
+}
+
 var notifyClients = function(dms) {
   wss.clients.forEach(function(con) {
     var query = websocketQuery(con)

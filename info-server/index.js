@@ -56,6 +56,7 @@ var fetchOptions = function() {
 
 var express = require('express');
 var app = express();
+var http = require('http').Server(app)
 var bodyParser = require('body-parser')
 var jsonParser = bodyParser.json()
 
@@ -149,18 +150,22 @@ app.delete('/games/:id', jsonParser, function(req, res){
 });
 
 app.get('/donations', function(req, res){
-  var list = donations
+  res.json(filterDonations(donations, req.query))
+});
+
+var filterDonations = function(dms, query) {
+  var list = dms
   var game
   var untagged = false
-  if (typeof(req.query['game']) == 'string') {
-    game = req.query['game']
+  if (typeof(query['game']) == 'string') {
+    game = query['game']
   }
-  if (typeof(req.query['untagged']) == 'string') {
-    untagged = req.query['untagged'] == 'true'
+  if (typeof(query['untagged']) == 'string') {
+    untagged = query['untagged'] == 'true'
   }
 
   if (game || untagged) {
-    list = donations.filter(function(dm) {
+    list = dms.filter(function(dm) {
       if (untagged && dm.matchingMatches.length < 1) {
         return true
       } else if (game && dm.matchingMatches.indexOf(game) != -1) {
@@ -170,7 +175,7 @@ app.get('/donations', function(req, res){
       }
     })
   }
-  res.json({donations: list.map(function(dm) {
+  return {donations: list.map(function(dm) {
     return {
       amount: dm.amount,
       comment: dm.comment,
@@ -186,8 +191,43 @@ app.get('/donations', function(req, res){
       insufficient: dm.insufficient,
       unaccounted: dm.unaccounted,
     }
-  })})
+  })}
+}
+
+var WebSocketServer = require('ws').Server
+var wss = new WebSocketServer({ server: http })
+var Url = require('url')
+
+var websocketQuery = function(con) {
+  var url = Url.parse(con.upgradeReq.url)
+  var params = new Url.URLSearchParams(url.search)
+  return {
+    game: params.get('game'),
+    untagged: params.get('untagged')
+  }
+}
+
+wss.on('connection', function connection(con) {
+  var query = websocketQuery(con)
+  console.log('connection', query)
+  con.on('message', function incoming(message) {
+    console.log('received: %s', wss.clients.length, message);
+  });
+
+  con.on('close', function() {
+    console.log('close')
+  })
 });
+
+var notifyClients = function(dms) {
+  wss.clients.forEach(function(con) {
+    var query = websocketQuery(con)
+    var struct = filterDonations(dms, query)
+    if (struct.donations.length > 0) {
+      con.send(JSON.stringify(struct))
+    }
+  })
+}
 
 var requirejs = require('requirejs');
 
@@ -303,6 +343,7 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
             Redis.print(err, ok)
           } else {
             donations.push(dm)
+            notifyClients([dm])
             //console.log(donations.length)
             //console.log(dm.id)
           }
@@ -423,7 +464,6 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
 app.set('port', (process.env.PORT || 5000));
 
 
-app.listen(app.get('port'), function(){
+http.listen(app.get('port'), function(){
   console.log('listening on *:', app.get('port'));
 });
-

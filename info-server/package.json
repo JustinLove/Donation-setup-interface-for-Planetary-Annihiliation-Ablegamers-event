@@ -9,7 +9,8 @@
     "express": "^4.14.0",
     "js-nacl": "^1.2.0",
     "redis": "^2.6.2",
-    "requirejs": "^2.3.4"
+    "requirejs": "^2.3.4",
+    "ws": "^1.1.1"
   },
   "devDependencies": {},
   "scripts": {

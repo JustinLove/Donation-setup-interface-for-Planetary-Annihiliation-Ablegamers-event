@@ -7,6 +7,8 @@ import Dict
 import Html
 import Http
 import Time
+import WebSocket
+import Json.Decode
 
 main : Program Never Model Msg
 main =
@@ -46,17 +48,23 @@ fetchGame =
 
 fetchDonations : RoundSelection -> Cmd Msg
 fetchDonations game =
+  Http.send GotDonations (Http.get (config.server ++ (donationsPath game)) Donation.donations)
+
+donationsPath : RoundSelection -> String
+donationsPath game =
   case game of
     AllRounds ->
-      Http.send GotDonations (Http.get (config.server ++ "donations") Donation.donations)
+      "donations"
     Round id ->
-      Http.send GotDonations (Http.get (config.server ++ "donations?game=" ++ id ++ "&untagged=true") Donation.donations)
+      "donations?game=" ++ id ++ "&untagged=true"
+
 
 -- UPDATE
 
 type Msg
   = GotGameInfo (Result Http.Error (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
+  | GotUpdate (Result String (List Donation))
   | WatchViewMsg WVMsg
   | Poll Time.Time
 
@@ -77,7 +85,12 @@ update msg model =
     GotDonations (Ok donations) ->
       ({ model | donations = donations}, Cmd.none)
     GotDonations (Err msg) ->
-      let _ = Debug.log "donations error" msg in
+      let _ = Debug.log "donations fetch error" msg in
+      (model, Cmd.none)
+    GotUpdate (Ok donations) ->
+      ({ model | donations = List.append model.donations donations}, Cmd.none)
+    GotUpdate (Err msg) ->
+      let _ = Debug.log "donations update error" msg in
       (model, Cmd.none)
     Poll t ->
       (model, fetchDonations model.round)
@@ -86,5 +99,9 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Time.every (Time.second * 10) Poll
+  --Time.every (Time.second * 10) Poll
+  WebSocket.listen (config.wsserver ++ (donationsPath model.round)) receiveUpdate
 
+receiveUpdate : String -> Msg
+receiveUpdate message =
+  GotUpdate <| Json.Decode.decodeString Donation.donations message

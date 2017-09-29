@@ -156,6 +156,12 @@ li {
   font-size: 13px;
 }
 
+.menu-graphic {
+  display: block;
+  width: 60px;
+  height: 60px;
+}
+
 .menu-code {
   position: absolute;
   bottom: 0.2em;
@@ -170,6 +176,14 @@ li {
   right: 0.2em;
   padding: 0.2em 0.4em;
   background-color: #0F0;
+}
+
+.menu-text {
+  position: absolute;
+  bottom: 3em;
+  left: 0.2em;
+  padding: 0.2em 0.4em;
+  color: #0FF;
 }
 
 .order-item ul {
@@ -332,7 +346,7 @@ li {
   color: #888;
 }
 
-.code {
+.code-tag {
   background:#1e7aa1;
   color: black;
   font-weight: bold;

@@ -69,14 +69,21 @@ unitFor info spec =
   List.filter (\u -> u.spec == spec)info |> List.head
 
 cook : List UnitInfo -> List RawMenuItem -> List MenuItem
-cook info =
-  List.map (cookMenuItem info)
+cook info menu =
+  List.append (List.map (cookMenuItem info) menu) [priorityItem]
 
 cookMenuItem : List UnitInfo -> RawMenuItem -> MenuItem
 cookMenuItem info item =
   { donation = item.donation
   , code = item.code
   , build = cookBuilds info item.build
+  }
+
+priorityItem : MenuItem
+priorityItem =
+  { donation = 1
+  , code = "P1"
+  , build = [priorityBuild]
   }
 
 cookBuilds : List UnitInfo -> List RawBuildItem -> List BuildItem
@@ -98,6 +105,14 @@ cookBuildItem info (n, spec) =
       , image = ""
       , quantity = n
       }
+
+priorityBuild : BuildItem
+priorityBuild =
+  { spec = ""
+  , display_name = "Priority"
+  , image = ""
+  , quantity = 1
+  }
 
 imagePath : String -> String
 imagePath s =

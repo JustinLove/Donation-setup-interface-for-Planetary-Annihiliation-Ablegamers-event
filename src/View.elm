@@ -250,7 +250,7 @@ displayMenuItem : MenuItem -> Html Msg
 displayMenuItem item =
   li [ class "menu-item" ]
     [ button [ onClick (AddOne item.code) ]
-      [ span [] <| List.map buildImage item.build
+      [ span [ class "menu-graphic" ] <| List.map buildImage item.build
       , span [ class "menu-code" ] [ text item.code ]
       , span [ class "menu-donation" ] [ text <| dollars item.donation ]
       ]
@@ -259,7 +259,7 @@ displayMenuItem item =
 buildImage : BuildItem -> Html Msg
 buildImage build =
   if String.isEmpty build.image then
-    text <| quantityName build
+    strong [ class "menu-text" ] [ text <| quantityName build ]
   else
     img
       [ src build.image

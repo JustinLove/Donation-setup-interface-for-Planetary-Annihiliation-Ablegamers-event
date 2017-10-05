@@ -10,6 +10,7 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import Task
 import Json.Encode
+import Regex exposing (regex)
 
 main : Program Never Model Msg
 main =
@@ -50,6 +51,7 @@ type Msg
   | SetKey String
   | Deleted (Result Http.Error ())
   | DeleteRound String
+  | SetDiscountLevel String String
   | None
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -72,6 +74,8 @@ update msg model =
       (model, Cmd.none)
     DeleteRound round ->
       (removeRound round model, deleteRound model.signsk round)
+    SetDiscountLevel id level ->
+      (updateRound (setRoundDiscountLevel level) id model, Cmd.none)
     None ->
       (model, Cmd.none)
 
@@ -90,6 +94,28 @@ deleteRound key round =
     , timeout = Nothing
     , withCredentials = False
     }
+
+updateRound : (GameInfo -> GameInfo) -> String -> Model -> Model
+updateRound f id model =
+  { model | rounds = List.map
+      (\r -> if r.id == id then f r else r)
+      model.rounds
+  }
+
+setRoundDiscountLevel : String -> GameInfo -> GameInfo
+setRoundDiscountLevel discountLevel round =
+  if validNumber discountLevel then
+    { round | discountLevel = getNumber discountLevel}
+  else
+    { round | discountLevel = 0}
+
+getNumber : String -> Int
+getNumber s =
+  String.toInt s |> Result.withDefault 0
+
+validNumber : String -> Bool
+validNumber value =
+  Regex.contains (regex "^\\d+$") value
 
 signedBody : String -> String -> String
 signedBody key round =
@@ -126,9 +152,16 @@ view model =
 
 displayRound : GameInfo -> Html Msg
 displayRound round =
-  li [ onClick (DeleteRound round.id) ]
-    [ Html.button []
+  li []
+    [ Html.button [ onClick (DeleteRound round.id) ]
       [ text "X "
       , text round.name
       ]
+    , text " discount level: "
+    , input
+      [ type_ "number"
+      , Html.Attributes.min "0"
+      , value (round.discountLevel |> toString)
+      , onInput (SetDiscountLevel round.id)
+      ] []
     ]

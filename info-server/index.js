@@ -100,6 +100,7 @@ app.put('/games/:id', jsonParser, function(req, res){
   var info = JSON.parse(sinfo)
   console.log('info', info)
   info.id = req.params.id
+  info.discount_level = 0
   redis.set(req.params.id, JSON.stringify(info), function(err, reply) {
     if (reply == 'OK') {
       redis.sadd('games', req.params.id, function() {

@@ -3,6 +3,7 @@
     {
       "name": "AbleGamers Match 1",
       "id": "match1",
+      "discount_level": 0,
       "players": [
         "ljfed",
         "cdrkf",
@@ -18,6 +19,7 @@
     {
       "name": "AbleGamers Match 2",
       "id": "match2",
+      "discount_level": 0,
       "players": [
         "elodea",
         "theiban",
@@ -33,6 +35,7 @@
     {
       "name": "AbleGamers Match 3",
       "id": "match3",
+      "discount_level": 0,
       "players": [
         "Admiral",
         "Flubb",
@@ -48,6 +51,7 @@
     {
       "name": "AbleGamers Match 4",
       "id": "match4",
+      "discount_level": 0,
       "players": [
         "cola_colin",
         "River",
@@ -63,6 +67,7 @@
     {
       "name": "AbleGamers Finals",
       "id": "finals",
+      "discount_level": 0,
       "players": [
         "ljfed",
         "cdrkf",

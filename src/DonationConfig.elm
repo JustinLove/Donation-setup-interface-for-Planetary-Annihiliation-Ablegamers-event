@@ -1,7 +1,7 @@
 import View exposing (view)
 import Msg exposing (..)
 import Menu exposing (..)
-import GameInfo exposing (GameInfo) 
+import GameInfo exposing (Options, GameInfo) 
 import Config exposing (config) 
 import Harbor exposing (..) 
 
@@ -27,8 +27,10 @@ main =
 -- MODEL
 
 type alias Model =
-  { menu : List MenuItem
+  { rawMenu : List RawMenuItem
+  , menu : List MenuItem
   , unitInfo: List UnitInfo
+  , discountLevel: Int
   , rounds: List GameInfo
   , round: String
   , player: String
@@ -42,14 +44,28 @@ model menu info =
   let
     m2 = cook 0 info menu
   in
-    { menu = m2
+    { rawMenu = menu
+    , menu = m2
     , unitInfo = info
+    , discountLevel = 0
     , rounds = []
     , round = ""
     , player = ""
     , planet = ""
     , selections = List.map makeOrder m2
     , instructionsOpen = False
+    }
+
+updateOptions : Options -> Model -> Model 
+updateOptions options model =
+  let
+    m2 = cook options.discountLevel model.unitInfo model.rawMenu
+  in
+    { model
+    | menu = m2
+    , discountLevel = options.discountLevel
+    , rounds = options.games
+    , selections = List.map makeOrder m2
     }
 
 init : Arguments -> (Model, Cmd Msg)
@@ -60,7 +76,7 @@ init args =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.rounds)
+  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.options)
 
 -- UPDATE
 
@@ -79,8 +95,8 @@ update msg model =
       ({ model | planet = name}, Cmd.none)
     ChooseRound id ->
       ({ model | round = id}, Cmd.none)
-    GotGameInfo (Ok rounds) ->
-      ({ model | rounds = rounds}, Cmd.none)
+    GotGameInfo (Ok options) ->
+      (updateOptions options model, Cmd.none)
     GotGameInfo (Err msg) ->
       let _ = Debug.log "error" msg in
       (model, Cmd.none)

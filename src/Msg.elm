@@ -1,6 +1,6 @@
 module Msg exposing (Msg(..))
 
-import GameInfo exposing (GameInfo)
+import GameInfo exposing (Options)
 import Http
 
 type Msg
@@ -9,7 +9,7 @@ type Msg
   | AddOne String
   | SetPlayer String
   | SetPlanet String
-  | GotGameInfo (Result Http.Error (List GameInfo))
+  | GotGameInfo (Result Http.Error Options)
   | ChooseRound String
   | Select String
   | Instructions Bool

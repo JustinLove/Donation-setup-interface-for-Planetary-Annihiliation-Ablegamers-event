@@ -1,4 +1,4 @@
-module GameInfo exposing (GameInfo, rounds)
+module GameInfo exposing (Options, GameInfo, options, rounds)
 
 import Json.Decode exposing (..)
 
@@ -8,6 +8,17 @@ type alias GameInfo =
   , players: List String
   , planets: List String
   }
+
+type alias Options =
+  { discountLevel: Int
+  , games: List GameInfo
+  }
+
+options : Decoder Options
+options =
+  map2 Options
+    (field "discount_level" int)
+    rounds
 
 rounds : Decoder (List GameInfo)
 rounds =

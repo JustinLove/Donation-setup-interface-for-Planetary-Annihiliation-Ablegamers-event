@@ -40,7 +40,7 @@ type alias Model =
 model : List RawMenuItem -> List UnitInfo -> Model
 model menu info =
   let
-    m2 = cook info menu
+    m2 = cook 0 info menu
   in
     { menu = m2
     , unitInfo = info

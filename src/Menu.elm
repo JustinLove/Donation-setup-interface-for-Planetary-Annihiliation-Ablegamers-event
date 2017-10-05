@@ -3,6 +3,7 @@ module Menu exposing (OrderItem, RawMenuItem, RawBuildItem, MenuItem, BuildItem,
 import Regex exposing (regex)
 import String
 import Tuple exposing (first)
+import Array exposing (Array)
 
 type alias OrderItem =
   { donation: Float
@@ -26,8 +27,9 @@ type alias BuildItem =
   }
 
 type alias RawMenuItem =
-  { donation: Float
-  , code: String
+  { code: String
+  , donation: Float
+  , discounts: Array Float
   , build: List RawBuildItem
   }
 
@@ -68,13 +70,15 @@ unitFor : List UnitInfo -> String -> Maybe UnitInfo
 unitFor info spec =
   List.filter (\u -> u.spec == spec)info |> List.head
 
-cook : List UnitInfo -> List RawMenuItem -> List MenuItem
-cook info menu =
-  List.append (List.map (cookMenuItem info) menu) [priorityItem]
+cook : Int -> List UnitInfo -> List RawMenuItem -> List MenuItem
+cook discountLevel info menu =
+  List.append (List.map (cookMenuItem discountLevel info) menu) [priorityItem]
 
-cookMenuItem : List UnitInfo -> RawMenuItem -> MenuItem
-cookMenuItem info item =
-  { donation = item.donation
+cookMenuItem : Int -> List UnitInfo -> RawMenuItem -> MenuItem
+cookMenuItem discountLevel info item =
+  { donation = item.discounts
+    |> Array.get (min discountLevel ((Array.length item.discounts) - 1))
+    |> Maybe.withDefault item.donation
   , code = item.code
   , build = cookBuilds info item.build
   }

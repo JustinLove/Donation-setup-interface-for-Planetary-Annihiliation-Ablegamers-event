@@ -30,4 +30,4 @@ games =
     (field "id" string)
     (field "players" (list string))
     (field "planets" (list string))
-    (succeed 0)
+    (field "discount_level" int)

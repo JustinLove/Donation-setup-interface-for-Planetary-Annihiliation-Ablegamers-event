@@ -42,10 +42,7 @@ var fetchOptions = function() {
       if (games) {
         redis.mget(games, function(err2, replies) {
           if (replies) {
-            resolve({
-              discount_level: 0,
-              games: replies.map(JSON.parse)
-            })
+            resolve({games: replies.map(JSON.parse)})
           } else {
             reject(err2)
           }

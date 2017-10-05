@@ -9,6 +9,7 @@ import Html
 import Http
 import Regex exposing (regex)
 import String
+import Array exposing (Array)
 
 type alias Arguments =
   { menu: List RawMenuItem
@@ -94,7 +95,7 @@ update msg model =
     SetPlanet name ->
       ({ model | planet = name}, Cmd.none)
     ChooseRound id ->
-      ({ model | round = id}, Cmd.none)
+      (updateDiscounts { model | round = id}, Cmd.none)
     GotGameInfo (Ok options) ->
       (updateOptions options model, Cmd.none)
     GotGameInfo (Err msg) ->
@@ -136,6 +137,31 @@ getNumber s =
 validNumber : String -> Bool
 validNumber value =
   Regex.contains (regex "^\\d+$") value
+
+updateDiscounts : Model -> Model
+updateDiscounts model =
+  let discountLevel = Debug.log "level" <| currentDiscountLevel model in 
+    { model
+    | menu = cook discountLevel model.unitInfo model.rawMenu
+    , selections = List.map (updateOrderDiscounts discountLevel) model.selections
+    }
+
+updateOrderDiscounts : Int -> OrderItem -> OrderItem
+updateOrderDiscounts discountLevel item =
+  { item | donation = item.discounts
+    |> Array.get (min discountLevel ((Array.length item.discounts) - 1))
+    |> Maybe.withDefault item.donation
+  }
+
+currentDiscountLevel : Model -> Int
+currentDiscountLevel model =
+  model.rounds
+  |> List.filterMap (\round -> if model.round == round.id then
+                              Just round.discountLevel
+                            else
+                              Nothing)
+  |> List.head
+  |> Maybe.withDefault 0
 
 instructionFocus : Bool -> String
 instructionFocus open =

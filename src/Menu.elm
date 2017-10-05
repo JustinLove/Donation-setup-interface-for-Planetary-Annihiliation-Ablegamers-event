@@ -7,6 +7,7 @@ import Array exposing (Array)
 
 type alias OrderItem =
   { donation: Float
+  , discounts : Array Float
   , code: String
   , build: List BuildItem
   , quantity: Int
@@ -15,6 +16,7 @@ type alias OrderItem =
 
 type alias MenuItem =
   { donation: Float
+  , discounts : Array Float
   , code: String
   , build: List BuildItem
   }
@@ -43,6 +45,7 @@ type alias UnitInfo =
 makeOrder : MenuItem -> OrderItem
 makeOrder item =
   { donation = item.donation
+  , discounts = item.discounts
   , code = item.code
   , build = item.build
   , quantity = 0
@@ -79,6 +82,7 @@ cookMenuItem discountLevel info item =
   { donation = item.discounts
     |> Array.get (min discountLevel ((Array.length item.discounts) - 1))
     |> Maybe.withDefault item.donation
+  , discounts = item.discounts
   , code = item.code
   , build = cookBuilds info item.build
   }
@@ -86,6 +90,7 @@ cookMenuItem discountLevel info item =
 priorityItem : MenuItem
 priorityItem =
   { donation = 1
+  , discounts = Array.fromList [1]
   , code = "P1"
   , build = [priorityBuild]
   }

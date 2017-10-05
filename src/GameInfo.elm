@@ -7,6 +7,7 @@ type alias GameInfo =
   , id: String
   , players: List String
   , planets: List String
+  , discountLevel : Int
   }
 
 type alias Options =
@@ -26,8 +27,9 @@ rounds =
 
 games : Decoder GameInfo
 games =
-  map4 GameInfo
+  map5 GameInfo
     (field "name" string)
     (field "id" string)
     (field "players" (list string))
     (field "planets" (list string))
+    (succeed 0)

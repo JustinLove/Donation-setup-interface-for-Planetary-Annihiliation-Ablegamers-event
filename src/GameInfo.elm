@@ -11,14 +11,12 @@ type alias GameInfo =
   }
 
 type alias Options =
-  { discountLevel: Int
-  , games: List GameInfo
+  { games: List GameInfo
   }
 
 options : Decoder Options
 options =
-  map2 Options
-    (field "discount_level" int)
+  map Options
     rounds
 
 rounds : Decoder (List GameInfo)

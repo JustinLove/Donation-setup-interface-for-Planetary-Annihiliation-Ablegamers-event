@@ -31,7 +31,6 @@ type alias Model =
   { rawMenu : List RawMenuItem
   , menu : List MenuItem
   , unitInfo: List UnitInfo
-  , discountLevel: Int
   , rounds: List GameInfo
   , round: String
   , player: String
@@ -48,25 +47,12 @@ model menu info =
     { rawMenu = menu
     , menu = m2
     , unitInfo = info
-    , discountLevel = 0
     , rounds = []
     , round = ""
     , player = ""
     , planet = ""
     , selections = List.map makeOrder m2
     , instructionsOpen = False
-    }
-
-updateOptions : Options -> Model -> Model 
-updateOptions options model =
-  let
-    m2 = cook options.discountLevel model.unitInfo model.rawMenu
-  in
-    { model
-    | menu = m2
-    , discountLevel = options.discountLevel
-    , rounds = options.games
-    , selections = List.map makeOrder m2
     }
 
 init : Arguments -> (Model, Cmd Msg)
@@ -97,7 +83,7 @@ update msg model =
     ChooseRound id ->
       (updateDiscounts { model | round = id}, Cmd.none)
     GotGameInfo (Ok options) ->
-      (updateOptions options model, Cmd.none)
+      (updateDiscounts { model | rounds = options.games}, Cmd.none)
     GotGameInfo (Err msg) ->
       let _ = Debug.log "error" msg in
       (model, Cmd.none)
@@ -140,7 +126,7 @@ validNumber value =
 
 updateDiscounts : Model -> Model
 updateDiscounts model =
-  let discountLevel = Debug.log "level" <| currentDiscountLevel model in 
+  let discountLevel = currentDiscountLevel model in 
     { model
     | menu = cook discountLevel model.unitInfo model.rawMenu
     , selections = List.map (updateOrderDiscounts discountLevel) model.selections

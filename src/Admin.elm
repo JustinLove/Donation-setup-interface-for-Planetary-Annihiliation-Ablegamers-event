@@ -49,7 +49,7 @@ fetchGame =
 type Msg
   = GotGameInfo (Result Http.Error (List GameInfo))
   | SetKey String
-  | Deleted (Result Http.Error ())
+  | EmptyRequestComplete (Result Http.Error ())
   | DeleteRound String
   | SetDiscountLevel String String
   | None
@@ -67,15 +67,20 @@ update msg model =
         ({ model | signsk = signsk }, fetchGame)
       else
         (model, Cmd.none)
-    Deleted (Ok response) ->
+    EmptyRequestComplete (Ok response) ->
       (model, Cmd.none)
-    Deleted (Err msg) ->
+    EmptyRequestComplete (Err msg) ->
       let _ = Debug.log "raw error" msg in
       (model, Cmd.none)
     DeleteRound round ->
-      (removeRound round model, deleteRound model.signsk round)
-    SetDiscountLevel id level ->
-      (updateRound (setRoundDiscountLevel level) id model, Cmd.none)
+      ( removeRound round model
+      , sendDeleteRound model.signsk round
+      )
+    SetDiscountLevel id input ->
+      let level = parseDiscountLevel input in
+      ( updateRound (setRoundDiscountLevel level) id model
+      , sendDiscountLevel model.signsk id level
+      )
     None ->
       (model, Cmd.none)
 
@@ -83,12 +88,24 @@ removeRound : String -> Model -> Model
 removeRound round model =
   { model | rounds = List.filter (\r -> not (r.id == round)) model.rounds }
 
-deleteRound : String -> String -> Cmd Msg
-deleteRound key round =
-  Http.send Deleted <| Http.request
+sendDeleteRound : String -> String -> Cmd Msg
+sendDeleteRound key round =
+  Http.send EmptyRequestComplete <| Http.request
     { method = "DELETE"
     , headers = []
     , url = config.server ++ "games/" ++ round
+    , body = message key round |> Http.jsonBody
+    , expect = Http.expectStringResponse (\_ -> Ok ())
+    , timeout = Nothing
+    , withCredentials = False
+    }
+
+sendDiscountLevel : String -> String -> Int -> Cmd Msg
+sendDiscountLevel key round level =
+  Http.send EmptyRequestComplete <| Http.request
+    { method = "PUT"
+    , headers = []
+    , url = config.server ++ "games/" ++ round ++ "/discount_level"
     , body = message key round |> Http.jsonBody
     , expect = Http.expectStringResponse (\_ -> Ok ())
     , timeout = Nothing
@@ -102,12 +119,16 @@ updateRound f id model =
       model.rounds
   }
 
-setRoundDiscountLevel : String -> GameInfo -> GameInfo
+setRoundDiscountLevel : Int -> GameInfo -> GameInfo
 setRoundDiscountLevel discountLevel round =
+  { round | discountLevel = discountLevel}
+
+parseDiscountLevel : String -> Int
+parseDiscountLevel discountLevel =
   if validNumber discountLevel then
-    { round | discountLevel = getNumber discountLevel}
+    getNumber discountLevel
   else
-    { round | discountLevel = 0}
+    0
 
 getNumber : String -> Int
 getNumber s =
@@ -118,9 +139,9 @@ validNumber value =
   Regex.contains (regex "^\\d+$") value
 
 signedBody : String -> String -> String
-signedBody key round =
+signedBody key body =
   let
-    msg = Nacl.encode_utf8 round
+    msg = Nacl.encode_utf8 body
     signsk = Nacl.from_hex key
     signed = Nacl.crypto_sign msg signsk
   in

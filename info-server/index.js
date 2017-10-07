@@ -104,7 +104,7 @@ app.put('/games/:id', jsonParser, function(req, res){
   redis.set(req.params.id, JSON.stringify(info), function(err, reply) {
     if (reply == 'OK') {
       redis.sadd('games', req.params.id, function() {
-        updateMatchesInDonations()
+        updateMatchesInDonations(donations)
       })
       res.sendStatus(200)
     } else {
@@ -141,7 +141,8 @@ app.delete('/games/:id', jsonParser, function(req, res){
   redis.del(req.params.id, function(err, reply) {
     if (reply == 1) {
       redis.srem('games', req.params.id, function() {
-        updateMatchesInDonations()
+        // Do not want to untag donations because it affects filtering for untagged donations
+        //updateMatchesInDonations(donations)
       })
       res.sendStatus(204)
     } else {

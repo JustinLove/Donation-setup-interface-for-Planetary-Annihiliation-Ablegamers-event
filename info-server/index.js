@@ -78,25 +78,8 @@ app.get('/options.json', function(req, res){
 });
 
 app.put('/games/:id', jsonParser, function(req, res){
-  if (!signpk) {
-    console.log('no public key')
-    res.sendStatus(500)
-    return
-  }
-  var signed = nacl.from_hex(req.body.data)
-  try {
-    var binfo = nacl.crypto_sign_open(signed, signpk)
-  } catch (e) {
-    console.log('nacl exception', e)
-    res.sendStatus(500)
-    return
-  }
-  if (!binfo) {
-    console.log('no binfo')
-    res.sendStatus(401)
-    return
-  }
-  var sinfo = nacl.decode_utf8(binfo)
+  var sinfo = checkSignature(req, res)
+  if (!sinfo) return
   var info = JSON.parse(sinfo)
   console.log('info', info)
   info.id = req.params.id
@@ -114,25 +97,8 @@ app.put('/games/:id', jsonParser, function(req, res){
 });
 
 app.put('/games/:id/discount_level', jsonParser, function(req, res){
-  if (!signpk) {
-    console.log('no public key')
-    res.sendStatus(500)
-    return
-  }
-  var signed = nacl.from_hex(req.body.data)
-  try {
-    var binfo = nacl.crypto_sign_open(signed, signpk)
-  } catch (e) {
-    console.log('nacl exception', e)
-    res.sendStatus(500)
-    return
-  }
-  if (!binfo) {
-    console.log('no binfo')
-    res.sendStatus(401)
-    return
-  }
-  var sinfo = nacl.decode_utf8(binfo)
+  var sinfo = checkSignature(req, res)
+  if (!sinfo) return
   var info = JSON.parse(sinfo)
   console.log('info', info)
   if (info.id != req.params.id) {
@@ -159,25 +125,8 @@ app.put('/games/:id/discount_level', jsonParser, function(req, res){
 });
 
 app.delete('/games/:id', jsonParser, function(req, res){
-  if (!signpk) {
-    console.log('no public key')
-    res.sendStatus(500)
-    return
-  }
-  var signed = nacl.from_hex(req.body.data)
-  try {
-    var bid = nacl.crypto_sign_open(signed, signpk)
-  } catch (e) {
-    console.log('nacl exception', e)
-    res.sendStatus(500)
-    return
-  }
-  if (!bid) {
-    console.log('no bid')
-    res.sendStatus(401)
-    return
-  }
-  var sid = nacl.decode_utf8(bid)
+  var sid = checkSignature(req, res)
+  if (!sid) return
   if (sid != req.params.id) {
     console.log('target id mismatch')
     res.sendStatus(401)
@@ -199,6 +148,28 @@ app.delete('/games/:id', jsonParser, function(req, res){
 app.get('/donations', function(req, res){
   res.json(filterDonations(donations, req.query))
 });
+
+var checkSignature = function(req, res) {
+  if (!signpk) {
+    console.log('no public key')
+    res.sendStatus(500)
+    return null
+  }
+  var signed = nacl.from_hex(req.body.data)
+  try {
+    var binfo = nacl.crypto_sign_open(signed, signpk)
+  } catch (e) {
+    console.log('nacl exception', e)
+    res.sendStatus(500)
+    return null
+  }
+  if (!binfo) {
+    console.log('no binfo')
+    res.sendStatus(401)
+    return null
+  }
+  return nacl.decode_utf8(binfo)
+}
 
 var filterDonations = function(dms, query) {
   var list = dms

@@ -34,3 +34,8 @@
 
 - x More explicit instructions. I could try adding some large type to the donation app pointing out that it isn't enough.
 - x Unspecified planet. App likely biased to specifying planet. Should add explicit option for unspecified planet (in base) (re: 50 air facs after player left planet)
+
+## Testing/Streaming keys
+
+signPk b8deab9af248ad2144c0c5eec322ac5261a8703775b5d99ef44755aa8812fe65
+signSk 8d617768768b308f0546309c2088a0a37eee7bf7aa511b7fda083f285bc1711bb8deab9af248ad2144c0c5eec322ac5261a8703775b5d99ef44755aa8812fe65

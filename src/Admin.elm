@@ -94,7 +94,7 @@ sendDeleteRound key round =
     { method = "DELETE"
     , headers = []
     , url = config.server ++ "games/" ++ round
-    , body = message key round |> Http.jsonBody
+    , body = message key round round |> Http.jsonBody
     , expect = Http.expectStringResponse (\_ -> Ok ())
     , timeout = Nothing
     , withCredentials = False
@@ -106,7 +106,7 @@ sendDiscountLevel key round level =
     { method = "PUT"
     , headers = []
     , url = config.server ++ "games/" ++ round ++ "/discount_level"
-    , body = message key round |> Http.jsonBody
+    , body = discountLevelBody round level |> message key round |> Http.jsonBody
     , expect = Http.expectStringResponse (\_ -> Ok ())
     , timeout = Nothing
     , withCredentials = False
@@ -147,13 +147,19 @@ signedBody key body =
   in
     Nacl.to_hex signed
 
-message : String -> String -> Json.Encode.Value
-message key id =
+message : String -> String -> String -> Json.Encode.Value
+message key id body =
   Json.Encode.object
     [ ("id", Json.Encode.string id)
-    , ("data", Json.Encode.string <| signedBody key id)
+    , ("data", Json.Encode.string <| signedBody key body)
     ]
 
+discountLevelBody : String -> Int -> String
+discountLevelBody id discount_level =
+  Json.Encode.encode 0 <| Json.Encode.object
+    [ ("id", Json.Encode.string id)
+    , ("discount_level", Json.Encode.int discount_level)
+    ]
 
 -- SUBSCRIPTIONS
 

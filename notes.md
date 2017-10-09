@@ -24,7 +24,7 @@
     - x match tagging broken
     - x notifications split/removed: redis pubsub?
       - x handle possible duplicates
-      - forward to websocket clients
+      - ? forward to websocket clients
     - donation loading duplicated
   - x priority donations
   - x discount level

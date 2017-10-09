@@ -312,6 +312,7 @@ requirejs(['donation_data/donation'], function (Donation) {
       dms.forEach(function(dmx) {
         var dm = dmx
         if (donations.every(function(d) {return d.id != dm.id})) {
+          notifyClients([dm])
           donations.push(dm)
         }
       })

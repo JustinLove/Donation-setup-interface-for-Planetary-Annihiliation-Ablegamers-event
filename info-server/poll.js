@@ -27,6 +27,10 @@ redis.on('error', function(err) {
 
 var feedName = process.env.FEED
 
+var notifySubscribers = function(id) {
+  redis.publish("new-donation", id)
+}
+
 var requirejs = require('requirejs');
 
 requirejs.config({
@@ -141,7 +145,7 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
             Redis.print(err, ok)
           } else {
             donations.push(dm)
-            //notifyClients([dm])
+            notifySubscribers(dm.id)
             //console.log(donations.length)
             //console.log(dm.id)
           }
@@ -250,10 +254,22 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
     require('process').exit()
   }
 
+  var simulation = function() {
+    var dms = [].concat(donations)
+    var simulate = function() {
+      var dm = dms.shift()
+      if (dm) {
+        notifySubscribers(dm.id)
+        setTimeout(simulate, 1000)
+      }
+    }
+    simulate()
+  }
+
   loadDonationHistory().then(function(history) {
     donations = history
     autoUpdate()
-    //test()
+    //simulation()
   }, function(err) {
     //console.log(err)
   })

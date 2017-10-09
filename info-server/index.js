@@ -24,6 +24,7 @@ var redis = Redis.createClient({
 redis.on('error', function(err) {
   console.log('Redis error', err)
 })
+var redisSubscriptions = redis.duplicate()
 
 var nacl
 var signpk
@@ -304,6 +305,12 @@ requirejs(['donation_data/donation'], function (Donation) {
       .then(loadDonations)
   }
 
+  var loadNewDonations = function(idsToLoad) {
+    loadDonations(idsToLoad).then(function(dms) {
+      donations = donations.concat(dms)
+    })
+  }
+
   var loadDonationIdsLength = function() {
     return new Promise(function(resolve, reject) {
       redis.llen('knownDonationIds', function(err, length) {
@@ -370,6 +377,15 @@ requirejs(['donation_data/donation'], function (Donation) {
   }, function(err) {
     //console.log(err)
   })
+
+  redisSubscriptions.on('message', function(channel, message) {
+    console.log(arguments)
+    if (channel == 'new-donations') {
+      loadNewDonations([message])
+    }
+  })
+
+  redisSubscriptions.subscribe('new-donation')
 });
 
 app.set('port', (process.env.PORT || 5000));

@@ -23,7 +23,7 @@
     - x ids added to redis list mulitple times
     - x match tagging broken
     - x notifications split/removed: redis pubsub?
-      - handle possible duplicates
+      - x handle possible duplicates
       - forward to websocket clients
     - donation loading duplicated
   - x priority donations

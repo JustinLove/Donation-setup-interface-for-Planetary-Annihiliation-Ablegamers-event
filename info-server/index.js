@@ -1,3 +1,5 @@
+'use strict';
+
 var Redis = require('redis')
 var redis = Redis.createClient({
   url: process.env.REDIS_URL,
@@ -307,7 +309,12 @@ requirejs(['donation_data/donation'], function (Donation) {
 
   var loadNewDonations = function(idsToLoad) {
     loadDonations(idsToLoad).then(function(dms) {
-      donations = donations.concat(dms)
+      dms.forEach(function(dmx) {
+        var dm = dmx
+        if (donations.every(function(d) {return d.id != dm.id})) {
+          donations.push(dm)
+        }
+      })
     })
   }
 
@@ -355,9 +362,14 @@ requirejs(['donation_data/donation'], function (Donation) {
 
       redis.mget(idsToLoad, function(err, replies) {
         if (replies) {
-          history = replies.map(function(d) {
-            var dm = Donation(JSON.parse(d))
-            return dm
+          var history = replies.map(function(d) {
+            if (d) {
+              var dm = Donation(JSON.parse(d))
+              return dm
+            } else {
+              console.log('bogus reply', d)
+              return Donation({})
+            }
           })
           updateMatchesInDonations(history).then(function() {
             console.log('loaded history', history.length)
@@ -380,7 +392,7 @@ requirejs(['donation_data/donation'], function (Donation) {
 
   redisSubscriptions.on('message', function(channel, message) {
     console.log(arguments)
-    if (channel == 'new-donations') {
+    if (channel == 'new-donation') {
       loadNewDonations([message])
     }
   })

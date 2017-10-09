@@ -1,3 +1,5 @@
+'use strict';
+
 var Redis = require('redis')
 var redis = Redis.createClient({
   url: process.env.REDIS_URL,
@@ -28,6 +30,7 @@ redis.on('error', function(err) {
 var feedName = process.env.FEED
 
 var notifySubscribers = function(id) {
+  console.log('notify', id)
   redis.publish("new-donation", id)
 }
 
@@ -111,7 +114,7 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
 
       redis.mget(idsToLoad, function(err, replies) {
         if (replies) {
-          history = replies.map(function(d) {
+          var history = replies.map(function(d) {
             var dm = Donation(JSON.parse(d))
             return dm
           })
@@ -145,7 +148,7 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
             Redis.print(err, ok)
           } else {
             donations.push(dm)
-            notifySubscribers(dm.id)
+            notifySubscribers(key)
             //console.log(donations.length)
             //console.log(dm.id)
           }
@@ -259,7 +262,8 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
     var simulate = function() {
       var dm = dms.shift()
       if (dm) {
-        notifySubscribers(dm.id)
+        var key = 'donation'+dm.id
+        notifySubscribers(key)
         setTimeout(simulate, 1000)
       }
     }

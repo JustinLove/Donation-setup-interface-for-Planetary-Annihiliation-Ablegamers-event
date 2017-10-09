@@ -18,9 +18,9 @@
     - x update donation matches if game data changes
     - x endpoint for filtered donations
   - donation feed does not scale
-    - ids added to redis list mulitple times: convert to always query
-    - kept in process, possibly not synced
+    - x kept in process, possibly not synced: convert to always query
     - every web server is polling data source: have separate polling process
+    - ids added to redis list mulitple times
     - notifications split: redis pubsub?
   - x priority donations
   - x discount level

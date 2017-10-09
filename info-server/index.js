@@ -146,7 +146,13 @@ app.delete('/games/:id', jsonParser, function(req, res){
 });
 
 app.get('/donations', function(req, res){
-  res.json(filterDonations(donations, req.query))
+  loadDonationHistory().then(function(history) {
+    donations = history
+    res.json(filterDonations(donations, req.query))
+  }, function(err) {
+    console.log('donation load failed')
+    res.sendStatus(500)
+  })
 });
 
 var checkSignature = function(req, res) {
@@ -288,8 +294,12 @@ var loadGameIds = function() {
   })
 }
 
+var loadDonationHistory = function() {
+  return new Promise(function(resolve, reject) {reject("stub function")})
+}
+
 requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Donation) {
-  var loadDonationHistory = function() {
+  loadDonationHistory = function() {
     return loadDonationIdsLength()
       .then(loadDonationIds)
       .then(loadDonations)

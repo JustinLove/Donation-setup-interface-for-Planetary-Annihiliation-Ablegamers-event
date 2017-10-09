@@ -21,6 +21,7 @@
     - x kept in process, possibly not synced: convert to always query
     - x every web server is polling data source: have separate polling process
     - x ids added to redis list mulitple times
+    - x match tagging broken
     - notifications split/removed: redis pubsub?
     - donation loading duplicated
   - x priority donations

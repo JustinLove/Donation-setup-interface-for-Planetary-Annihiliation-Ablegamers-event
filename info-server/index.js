@@ -272,10 +272,11 @@ requirejs.config({
 var donations = []
 
 var updateMatchesInDonations = function(list) {
-  loadGameIds().then(function(games) {
+  return loadGameIds().then(function(games) {
     list.forEach(function(dm) {
       dm.matchMatches(games, '')
     })
+    return list
   })
 }
 
@@ -351,9 +352,10 @@ requirejs(['donation_data/donation'], function (Donation) {
             var dm = Donation(JSON.parse(d))
             return dm
           })
-          updateMatchesInDonations(history)
-          console.log('loaded history', history.length)
-          resolve(history)
+          updateMatchesInDonations(history).then(function() {
+            console.log('loaded history', history.length)
+            resolve(history)
+          })
         } else {
           Redis.print(err, replies)
           reject(err)

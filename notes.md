@@ -19,9 +19,10 @@
     - x endpoint for filtered donations
   - donation feed does not scale
     - x kept in process, possibly not synced: convert to always query
-    - every web server is polling data source: have separate polling process
-    - ids added to redis list mulitple times
-    - notifications split: redis pubsub?
+    - x every web server is polling data source: have separate polling process
+    - x ids added to redis list mulitple times
+    - notifications split/removed: redis pubsub?
+    - donation loading duplicated
   - x priority donations
   - x discount level
     - x UI

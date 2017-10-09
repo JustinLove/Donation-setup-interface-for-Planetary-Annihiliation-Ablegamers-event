@@ -1,4 +1,5 @@
 web: supervisor --no-restart-on error -w info-server info-server/index.js 
+poll: supervisor --no-restart-on error -w info-server info-server/poll.js 
 static: supervisor -w static-server static-server/index.js
 donate: watch "elm-make src/DonationConfig.elm --output public/donate.js" src
 watch: watch "elm-make src/Watch.elm --output public/watch.js" src

@@ -34,8 +34,6 @@ require('js-nacl').instantiate(function(n) {
   }
 })
 
-var feedName = process.env.FEED
-
 var fetchOptions = function() {
   return new Promise(function(resolve, reject) {
     redis.smembers('games', function(err, games) {
@@ -298,7 +296,7 @@ var loadDonationHistory = function() {
   return new Promise(function(resolve, reject) {reject("stub function")})
 }
 
-requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Donation) {
+requirejs(['donation_data/donation'], function (Donation) {
   loadDonationHistory = function() {
     return loadDonationIdsLength()
       .then(loadDonationIds)
@@ -364,137 +362,8 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
     })
   }
 
-  var persistDonation = function(dm) {
-    var persist = {
-      amount: dm.amount,
-      comment: dm.comment,
-      donor_name: dm.donor_name,
-      donor_image: dm.donor_image,
-      id: dm.id,
-      raw: dm.raw,
-    }
-    var key = 'donation'+persist.id
-    redis.rpush('knownDonationIds', key, function(idErr, idOkay) {
-      if (idErr) {
-        Redis.print(idErr, idOkay)
-      } else {
-        redis.set(key, JSON.stringify(persist), function(err, ok) {
-          if (err) {
-            Redis.print(err, ok)
-          } else {
-            donations.push(dm)
-            notifyClients([dm])
-            //console.log(donations.length)
-            //console.log(dm.id)
-          }
-        })
-      }
-    })
-  }
-
-  var insertDonation = function(d) {
-    var dm = Donation(d)
-    if (feed[feedName].process.providerId) {
-      persistDonation(dm)
-    } else {
-      redis.incr('lastDonationId', function(err, lastDonationId) {
-        if (err) {
-          Redis.print(err, ok)
-        } else {
-          dm.id = lastDonationId
-          persistDonation(dm)
-        }
-      })
-    }
-    return dm
-  }
-
-  var integrateDonations = function(incoming) {
-    var fresh = newItems(donations, incoming)
-    if (fresh.length < 1) return
-    console.log('new donations', fresh.length)
-    updateMatchesInDonations(fresh.map(insertDonation))
-  }
-
-  var update = function() {
-    feed[feedName].update().then(integrateDonations)
-  }
-
-  var autoUpdate = function() {
-    update()
-    setTimeout(autoUpdate, 10000)
-  }
-
-  // goal: find alignment of sequences
-  // previous:        1234567
-  // incoming:        56789
-  // incomingWithinPre^
-  //
-  // previous:        1234567
-  // incoming:            56789
-  // incomingWithinPre----^
-  //
-  // previous:            567
-  // incoming:            56789
-  // incomingWithinPre    ^
-  //
-  // previous:            12
-  // incoming:            1
-  // incomingWithinPre    ^
-  var newItems = function(previous, incoming) {
-    if (incoming.length < 1) return []
-    if (previous.length < 1) return incoming
-    var index = 0
-    var incomingWithinPrevious = 0
-    while (incomingWithinPrevious < previous.length) {
-      if (index + incomingWithinPrevious >= previous.length) {
-        return incoming.slice(index, incoming.length)
-      }
-      if (index >= incoming.length) {
-        return []
-      }
-      if (previous[index + incomingWithinPrevious].raw == incoming[index].raw) {
-        index++
-      } else {
-        index = 0
-        incomingWithinPrevious++
-      }
-    }
-    return incoming
-  }
-
-  var test = function() {
-    var assert = require('assert')
-    assert.deepEqual(newItems([],
-                              []),
-                              [])
-    assert.deepEqual(newItems([{raw: '1'}],
-                              []),
-                              [])
-    assert.deepEqual(newItems([],
-                              [{raw: '2'}]),
-                              [{raw: '2'}])
-    assert.deepEqual(newItems([{raw: '1'}],
-                              [{raw: '2'}]),
-                              [{raw: '2'}])
-    assert.deepEqual(newItems([{raw: '1'}],
-                              [{raw: '1'}, {raw: '2'}]),
-                              [{raw: '2'}])
-    assert.deepEqual(newItems([{raw: '1'}],
-                              [{raw: '1'}, {raw: '2'}, {raw: '3'}]),
-                              [{raw: '2'}, {raw: '3'}])
-    assert.deepEqual(newItems([{raw: '1'}, {raw: '2'}],
-                              [{raw: '2'}, {raw: '3'}]),
-                              [{raw: '3'}])
-    assert.deepEqual(newItems([{raw: '1'}, {raw: '2'}],
-                              [{raw: '1'}]),
-                              [])
-    require('process').exit()
-  }
-
   loadDonationHistory().then(function(history) {
     donations = history
-    autoUpdate()
     //test()
   }, function(err) {
     //console.log(err)

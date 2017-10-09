@@ -1,7 +1,7 @@
 ### Central server(s)
 
 - Central feed of donations
-  - extract page scrapers from game mod into server
+  - x extract page scrapers from game mod into server
     - x load test feed
     - x fetch real data
     - x update data
@@ -17,6 +17,17 @@
     - x assign match to incoming data
     - x update donation matches if game data changes
     - x endpoint for filtered donations
+  - donation feed does not scale
+    - ids added to redis list mulitple times: convert to always query
+    - kept in process, possibly not synced
+    - every web server is polling data source: have separate polling process
+    - notifications split: redis pubsub?
+  - x priority donations
+  - x discount level
+    - x UI
+    - x Admin UI
+    - UI update notification
+    - Check for scaling issues
   - add or correct match number
   - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
 

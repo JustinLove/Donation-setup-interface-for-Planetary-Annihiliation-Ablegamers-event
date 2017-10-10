@@ -25,6 +25,7 @@
     - x notifications split/removed: redis pubsub?
       - x handle possible duplicates
       - ? forward to websocket clients
+    - do not to do full reload with updates being sent
     - donation loading duplicated
   - x priority donations
   - x discount level

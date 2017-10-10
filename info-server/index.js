@@ -156,6 +156,24 @@ app.get('/donations', function(req, res){
   })
 });
 
+app.delete('/donations', jsonParser, function(req, res){
+  var command = checkSignature(req, res)
+  if (!command) return
+  if (command != 'clear') {
+    console.log('not a clear donations command')
+    res.sendStatus(401)
+    return
+  }
+  clearDonationHistory().then(function() {
+    donations = []
+    console.log('donation clear succeeded')
+    res.sendStatus(204)
+  }, function(err) {
+    console.log('donation clear failed', err)
+    res.sendStatus(500)
+  })
+});
+
 var checkSignature = function(req, res) {
   if (!signpk) {
     console.log('no public key')
@@ -296,15 +314,25 @@ var loadGameIds = function() {
   })
 }
 
-var loadDonationHistory = function() {
+var promiseStub = function() {
   return new Promise(function(resolve, reject) {reject("stub function")})
 }
+
+var loadDonationHistory = promiseStub
+var clearDonationHistory = promiseStub
 
 requirejs(['donation_data/donation'], function (Donation) {
   loadDonationHistory = function() {
     return loadDonationIdsLength()
       .then(loadDonationIds)
       .then(loadDonations)
+  }
+
+  clearDonationHistory = function() {
+    return loadDonationIdsLength()
+      .then(loadDonationIds)
+      .then(clearDonations)
+      .then(clearDonationIds)
   }
 
   var loadNewDonations = function(idsToLoad) {
@@ -383,6 +411,40 @@ requirejs(['donation_data/donation'], function (Donation) {
       })
     })
   }
+
+  var clearDonations = function(idsToClear) {
+    return new Promise(function(resolve, reject) {
+      if (idsToClear.length < 1) return resolve([])
+
+      redis.del(idsToClear, function(err, replies) {
+        if (replies) {
+          Redis.print(err, replies)
+          resolve(idsToClear)
+        } else {
+          Redis.print(err, replies)
+          reject(err)
+        }
+      })
+    })
+  }
+
+  var clearDonationIds = function(idsToClear) {
+    return new Promise(function(resolve, reject) {
+      if (idsToClear.length < 1) return resolve([])
+
+      // start > end means delete the whole list
+      redis.ltrim('knownDonationIds', 1, 0, function(err, replies) {
+        if (replies) {
+          Redis.print(err, replies)
+          resolve(idsToClear)
+        } else {
+          Redis.print(err, replies)
+          reject(err)
+        }
+      })
+    })
+  }
+
 
   loadDonationHistory().then(function(history) {
     donations = history

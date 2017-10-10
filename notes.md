@@ -26,7 +26,7 @@
       - x handle possible duplicates
       - ? forward to websocket clients
     - x do not to do full reload with updates being sent
-    - donation loading duplicated
+    - x donation loading duplicated
   - x priority donations
   - x discount level
     - x UI

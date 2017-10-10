@@ -43,92 +43,24 @@ requirejs.config({
 
 var donations = []
 
-var updateMatchesInDonations = function(list) {
-  loadGameIds().then(function(games) {
-    list.forEach(function(dm) {
-      dm.matchMatches(games, '')
-    })
-  })
+var promiseStub = function() {
+  return new Promise(function(resolve, reject) {reject("stub function")})
 }
 
-var loadGameIds = function() {
-  return new Promise(function(resolve, reject) {
-    redis.smembers('games', function(err, games) {
-      if (games) {
-        console.log('loaded games', games)
-        resolve(games)
-      } else {
-        reject(err)
-      }
-    })
-  })
-}
+var updateMatchesInDonations = promiseStub
 
-requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Donation) {
-  var loadDonationHistory = function() {
-    return loadDonationIdsLength()
-      .then(loadDonationIds)
-      .then(loadDonations)
-  }
+requirejs([
+  'donation_data/feed',
+  'donation_data/donation',
+  'donation_loading'
+], function (
+  feed,
+  Donation,
+  donation_loading
+) {
+  var loading = donation_loading(redis)
 
-  var loadDonationIdsLength = function() {
-    return new Promise(function(resolve, reject) {
-      redis.llen('knownDonationIds', function(err, length) {
-        if (err) {
-          reject(err)
-        } else if (length === null) {
-          resolve(0)
-        } else {
-          console.log('donation ids', length)
-          resolve(length)
-        }
-      })
-    })
-  }
-
-  var loadDonationIds = function(length) {
-    return new Promise(function(resolve, reject) {
-      if (length < 1) return resolve([])
-
-      var ids = []
-      var countdown = length
-
-      for (var i = 0;i < length;i++) {
-        redis.lindex('knownDonationIds', i, function(err, id) {
-          if (id) {
-            ids.push(id)
-          } else {
-            Redis.print(err, id)
-          }
-          if (--countdown < 1) {
-            //console.log('loaded ids', ids)
-            resolve(ids)
-          }
-        })
-      }
-    })
-  }
-
-  var loadDonations = function(idsToLoad) {
-    return new Promise(function(resolve, reject) {
-      if (idsToLoad.length < 1) return resolve([])
-
-      redis.mget(idsToLoad, function(err, replies) {
-        if (replies) {
-          var history = replies.map(function(d) {
-            var dm = Donation(JSON.parse(d))
-            return dm
-          })
-          updateMatchesInDonations(history)
-          console.log('loaded history', history.length)
-          resolve(history)
-        } else {
-          Redis.print(err, replies)
-          reject(err)
-        }
-      })
-    })
-  }
+  updateMatchesInDonations = loading.updateMatchesInDonations
 
   var persistDonation = function(dm) {
     var persist = {
@@ -271,7 +203,7 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
     simulate()
   }
 
-  loadDonationHistory().then(function(history) {
+  loading.loadDonationHistory().then(function(history) {
     donations = history
     autoUpdate()
     //simulation()

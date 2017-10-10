@@ -59,6 +59,7 @@ type Msg
   | SetKey String
   | EmptyRequestComplete (Result Http.Error ())
   | DeleteRound String
+  | ClearDonations
   | SetDiscountLevel String String
   | None
 
@@ -90,6 +91,10 @@ update msg model =
     DeleteRound round ->
       ( removeRound round model
       , sendDeleteRound model.signsk round
+      )
+    ClearDonations ->
+      ( { model | donations = [] }
+      , Cmd.none
       )
     SetDiscountLevel id input ->
       let level = parseDiscountLevel input in
@@ -190,6 +195,7 @@ view model =
     [ p [] [ text config.server ]
     , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
     , ul [] <| List.map displayRound <| (List.sortBy .name) model.rounds
+    , Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
     , ul [] <| List.map displayDonation <| List.reverse model.donations
     ]
 

@@ -30,7 +30,7 @@ redis.on('error', function(err) {
 var feedName = process.env.FEED
 
 var notifySubscribers = function(id) {
-  console.log('notify', id)
+  //console.log('notify', id)
   redis.publish("new-donation", id)
 }
 

@@ -94,7 +94,7 @@ update msg model =
       )
     ClearDonations ->
       ( { model | donations = [] }
-      , Cmd.none
+      , sendClearDonations model.signsk
       )
     SetDiscountLevel id input ->
       let level = parseDiscountLevel input in
@@ -131,6 +131,19 @@ sendDiscountLevel key round level =
     , timeout = Nothing
     , withCredentials = False
     }
+
+sendClearDonations : String -> Cmd Msg
+sendClearDonations key =
+  Http.send EmptyRequestComplete <| Http.request
+    { method = "DELETE"
+    , headers = []
+    , url = config.server ++ "donations"
+    , body = message key "donations" "clear" |> Http.jsonBody
+    , expect = Http.expectStringResponse (\_ -> Ok ())
+    , timeout = Nothing
+    , withCredentials = False
+    }
+
 
 updateRound : (GameInfo -> GameInfo) -> String -> Model -> Model
 updateRound f id model =

@@ -1,5 +1,6 @@
 import Config exposing (config) 
 import GameInfo exposing (GameInfo) 
+import Donation exposing (Donation)
 import Nacl
 
 import String
@@ -25,12 +26,14 @@ main =
 
 type alias Model =
   { rounds: List GameInfo
+  , donations: List Donation
   , signsk: String
   }
 
 makeModel : Model
 makeModel =
   { rounds = []
+  , donations = []
   , signsk = ""
   }
 
@@ -44,10 +47,15 @@ fetchGame : Cmd Msg
 fetchGame =
   Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.rounds)
 
+fetchDonations : Cmd Msg
+fetchDonations =
+  Http.send GotDonations (Http.get (config.server ++ "donations") Donation.donations)
+
 -- UPDATE
 
 type Msg
   = GotGameInfo (Result Http.Error (List GameInfo))
+  | GotDonations (Result Http.Error (List Donation))
   | SetKey String
   | EmptyRequestComplete (Result Http.Error ())
   | DeleteRound String
@@ -62,9 +70,16 @@ update msg model =
     GotGameInfo (Err msg) ->
       let _ = Debug.log "error" msg in
       (model, Cmd.none)
+    GotDonations (Ok donations) ->
+      ({ model | donations = donations}, Cmd.none)
+    GotDonations (Err msg) ->
+      let _ = Debug.log "donations fetch error" msg in
+      (model, Cmd.none)
     SetKey signsk ->
       if (String.length signsk) == 128 then
-        ({ model | signsk = signsk }, fetchGame)
+        ( { model | signsk = signsk }
+        , Cmd.batch [ fetchGame, fetchDonations ]
+        )
       else
         (model, Cmd.none)
     EmptyRequestComplete (Ok response) ->
@@ -175,6 +190,7 @@ view model =
     [ p [] [ text config.server ]
     , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
     , ul [] <| List.map displayRound <| (List.sortBy .name) model.rounds
+    , ul [] <| List.map displayDonation <| List.reverse model.donations
     ]
 
 displayRound : GameInfo -> Html Msg
@@ -192,3 +208,25 @@ displayRound round =
       , onInput (SetDiscountLevel round.id)
       ] []
     ]
+
+displayDonation : Donation -> Html Msg
+displayDonation donation =
+  li [ classList
+       [ ("donation-item", True)
+       , ("insufficient", donation.insufficient)
+       , ("unaccounted", donation.unaccounted)
+       ]
+     ]
+     [ p [] <|
+       List.concat
+       [ [ span [ class "donor_name" ] [ text donation.donor_name ]
+         , text " "
+         , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
+         , text " "
+         , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
+         , text " "
+         ]
+       , (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
+       , [ span [ class "comment" ] [ text donation.comment ] ]
+       ]
+     ]

@@ -167,25 +167,25 @@ donationsList roundColors donations =
 displayDonation : Dict String HighlightColor -> Donation -> Html WVMsg
 displayDonation roundColors donation =
   li [ classList
-      (List.append
-        [ ("donation-item", True)
-        , ("insufficient", donation.insufficient)
-        , ("unaccounted", donation.unaccounted)
-        ]
-        (List.map
-          (lookupColor roundColors
-          >> colorNames
-          >> (\c -> (c, True)))
-          donation.matchingMatches)
-      )
-    ]
-    [ p []
-      [ span [ class "donor_name" ] [ text donation.donor_name ]
-      , text " "
-      , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
-      , text " "
-      , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
-      ]
-    , p [] (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
-    , p [ class "comment" ] [ text donation.comment ]
-    ]
+       (List.append
+          [ ("donation-item", True)
+          , ("insufficient", donation.insufficient)
+          , ("unaccounted", donation.unaccounted)
+          ]
+          (List.map
+            (lookupColor roundColors
+            >> colorNames
+            >> (\c -> (c, True)))
+            donation.matchingMatches)
+       )
+     ]
+     [ p []
+       [ span [ class "donor_name" ] [ text donation.donor_name ]
+       , text " "
+       , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
+       , text " "
+       , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
+       ]
+     , p [] (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
+     , p [ class "comment" ] [ text donation.comment ]
+     ]

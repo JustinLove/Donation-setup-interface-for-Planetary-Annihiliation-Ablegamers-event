@@ -28,6 +28,11 @@ redis.on('error', function(err) {
 })
 var redisSubscriptions = redis.duplicate()
 
+var notifySubscribers = function() {
+  //console.log('notify')
+  redis.publish("clear-donations", "")
+}
+
 var nacl
 var signpk
 require('js-nacl').instantiate(function(n) {
@@ -165,8 +170,8 @@ app.delete('/donations', jsonParser, function(req, res){
     return
   }
   clearDonationHistory().then(function() {
-    donations = []
     console.log('donation clear succeeded')
+    notifySubscribers() // ends up clearing cache
     res.sendStatus(204)
   }, function(err) {
     console.log('donation clear failed', err)
@@ -457,10 +462,13 @@ requirejs(['donation_data/donation'], function (Donation) {
     console.log(arguments)
     if (channel == 'new-donation') {
       loadNewDonations([message])
+    } else if (channel == 'clear-donations') {
+      donations = []
     }
   })
 
   redisSubscriptions.subscribe('new-donation')
+  redisSubscriptions.subscribe('clear-donations')
 });
 
 app.set('port', (process.env.PORT || 5000));

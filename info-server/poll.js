@@ -26,6 +26,7 @@ var redis = Redis.createClient({
 redis.on('error', function(err) {
   console.log('Redis error', err)
 })
+var redisSubscriptions = redis.duplicate()
 
 var feedName = process.env.FEED
 
@@ -277,4 +278,13 @@ requirejs(['donation_data/feed', 'donation_data/donation'], function (feed, Dona
   }, function(err) {
     //console.log(err)
   })
+
+  redisSubscriptions.on('message', function(channel, message) {
+    console.log(arguments)
+    if (channel == 'clear-donations') {
+      donations = []
+    }
+  })
+
+  redisSubscriptions.subscribe('clear-donations')
 });

@@ -152,13 +152,7 @@ app.delete('/games/:id', jsonParser, function(req, res){
 });
 
 app.get('/donations', function(req, res){
-  loadDonationHistory().then(function(history) {
-    donations = history
-    res.json(filterDonations(donations, req.query))
-  }, function(err) {
-    console.log('donation load failed')
-    res.sendStatus(500)
-  })
+  res.json(filterDonations(donations, req.query))
 });
 
 app.delete('/donations', jsonParser, function(req, res){

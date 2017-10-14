@@ -33,6 +33,21 @@ define(['donation_data/menu'], function(menu) {
         return match && match.match(re)
       })
     },
+    matchMenu: function(menu) {
+      this.codes = menu.match(this.comment)
+      this.orders = menu.orders(this.codes)
+
+      compressBulkMultiples(this)
+
+      this.minimum = this.orders
+        .map(function(o) {return o.donation})
+        .reduce(function(a, b) {return a + b}, 0)
+      this.insufficient = this.minimum > this.amount
+
+      expandSimpleMultiples(this)
+
+      this.unaccounted = this.minimum < this.amount
+    },
   }
 
   var expandSimpleMultiples = function(model) {
@@ -83,17 +98,7 @@ define(['donation_data/menu'], function(menu) {
     model.comment = (model.comment || '').replace(/^\s+|\s+$/gm, '')
     model.discount_level = model.discount_level || 0
 
-    model.codes = menu.match(model.comment)
-    model.orders = menu.orders(model.codes)
-
-    compressBulkMultiples(model)
-
-    model.minimum = model.orders
-      .map(function(o) {return o.donation})
-      .reduce(function(a, b) {return a + b}, 0)
-    model.insufficient = model.minimum > model.amount
-
-    expandSimpleMultiples(model)
+    model.matchMenu(menu)
 
     model.unaccounted = model.minimum < model.amount
 

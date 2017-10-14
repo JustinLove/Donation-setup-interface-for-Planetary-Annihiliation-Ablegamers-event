@@ -282,7 +282,13 @@ var fetchOptions = promiseStub
 var updateMatchesInDonations = promiseStub
 var clearDonationHistory = promiseStub
 
-requirejs(['donation_loading'], function (donation_loading) {
+requirejs([
+  'donation_loading',
+  'donation_data/menu',
+], function (
+  donation_loading,
+  menu
+) {
   var loading = donation_loading(redis)
 
   fetchOptions = loading.fetchOptions
@@ -291,6 +297,7 @@ requirejs(['donation_loading'], function (donation_loading) {
 
   var loadNewDonations = function(idsToLoad) {
     loading.loadDonations(idsToLoad).then(function(dms) {
+      updateMenuInDonations(dms)
       dms.forEach(function(dmx) {
         var dm = dmx
         if (donations.every(function(d) {return d.id != dm.id})) {
@@ -301,7 +308,12 @@ requirejs(['donation_loading'], function (donation_loading) {
     })
   }
 
+  var updateMenuInDonations = function(dms) {
+    dms.forEach(function(dm) {dm.matchMenu(menu)})
+  }
+
   loading.loadDonationHistory().then(function(history) {
+    updateMenuInDonations(history)
     donations = history
     //test()
   }, function(err) {

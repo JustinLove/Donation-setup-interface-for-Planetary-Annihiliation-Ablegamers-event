@@ -1,4 +1,4 @@
-define(['donation_data/menu'], function(menu) {
+define([], function() {
   var prototype = {
     matchPlayers: function(players) {
       var words = this.comment.match(/\b\w{3,}\b/g)
@@ -97,10 +97,6 @@ define(['donation_data/menu'], function(menu) {
     model.comment = model.comment || ''
     model.comment = (model.comment || '').replace(/^\s+|\s+$/gm, '')
     model.discount_level = model.discount_level || 0
-
-    model.matchMenu(menu)
-
-    model.unaccounted = model.minimum < model.amount
 
     model.matchingPlayers = []
     model.matchingPlayerIndex = -1

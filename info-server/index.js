@@ -42,24 +42,6 @@ require('js-nacl').instantiate(function(n) {
   }
 })
 
-var fetchOptions = function() {
-  return new Promise(function(resolve, reject) {
-    redis.smembers('games', function(err, games) {
-      if (games) {
-        redis.mget(games, function(err2, replies) {
-          if (replies) {
-            resolve({games: replies.map(JSON.parse)})
-          } else {
-            reject(err2)
-          }
-        })
-      } else {
-        reject(err)
-      }
-    })
-  })
-}
-
 var express = require('express');
 var app = express();
 var http = require('http').Server(app)
@@ -295,12 +277,14 @@ var promiseStub = function() {
   return new Promise(function(resolve, reject) {reject("stub function")})
 }
 
+var fetchOptions = promiseStub
 var updateMatchesInDonations = promiseStub
 var clearDonationHistory = promiseStub
 
 requirejs(['donation_loading'], function (donation_loading) {
   var loading = donation_loading(redis)
 
+  fetchOptions = loading.fetchOptions
   clearDonationHistory = loading.clearDonationHistory
   updateMatchesInDonations = loading.updateMatchesInDonations
 

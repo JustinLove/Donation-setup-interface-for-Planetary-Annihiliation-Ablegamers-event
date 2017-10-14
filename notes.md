@@ -27,12 +27,18 @@
       - ? forward to websocket clients
     - x do not to do full reload with updates being sent
     - x donation loading duplicated
+    - once version for scheduled task instead of polling?
   - x priority donations
   - x discount level
     - x UI
     - x Admin UI
-    - UI update notification
+    - tag discount level received
+    - return discount level
+    - Watch UI
+    - Donation UI update notification
     - Check for scaling issues
+  - reduce log spam
+  - better testing for pubsub/websocket events
   - add or correct match number
   - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
 
@@ -40,6 +46,8 @@
 
 ### Ingame Mod
 
+- received discount level?
+- websockets?
 - queuing things up pre-5-minutes.
   - local data?
   - record to central server? localstorage?

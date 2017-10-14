@@ -244,6 +244,11 @@ displayDonation donation =
          , text " "
          , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
          , text " "
+         , if donation.discount_level == 0 then
+             text ""
+           else
+             span [ class "discount_level" ] [ text <| "(" ++ (toString donation.discount_level) ++ ")" ]
+         , text " "
          ]
        , (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
        , [ span [ class "comment" ] [ text donation.comment ] ]

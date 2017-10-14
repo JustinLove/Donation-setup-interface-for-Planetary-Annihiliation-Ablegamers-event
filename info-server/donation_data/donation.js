@@ -1,4 +1,4 @@
-define([], function() {
+define(['sandbox_unit_menu/discounts'], function(discounts) {
   var prototype = {
     matchPlayers: function(players) {
       var words = this.comment.match(/\b\w{3,}\b/g)
@@ -35,7 +35,7 @@ define([], function() {
     },
     matchMenu: function(menu) {
       this.codes = menu.match(this.comment)
-      this.orders = menu.orders(this.codes)
+      this.orders = discounts.discounts(menu.orders(this.codes), this.discount_level)
 
       compressBulkMultiples(this)
 

@@ -68,6 +68,7 @@ requirejs([
       comment: dm.comment,
       donor_name: dm.donor_name,
       donor_image: dm.donor_image,
+      discount_level: dm.discount_level,
       id: dm.id,
       raw: dm.raw,
     }
@@ -90,8 +91,7 @@ requirejs([
     })
   }
 
-  var insertDonation = function(d) {
-    var dm = Donation(d)
+  var insertDonation = function(dm) {
     if (feed[feedName].process.providerId) {
       persistDonation(dm)
     } else {
@@ -107,15 +107,35 @@ requirejs([
     return dm
   }
 
+  var tagRecievedDiscountLevel = function(fresh) {
+    return loading.fetchOptions().then(function(options) {
+      return fresh.map(function(dm) {
+        if (dm.matchingMatches.length == 1) {
+          var game = options.games.find(function(g) {
+            return g.id == dm.matchingMatches[0]
+          })
+          if (game) {
+            dm.discount_level = game.discount_level
+          }
+        }
+        return dm
+      })
+    })
+  }
+
   var integrateDonations = function(incoming) {
     var fresh = newItems(donations, incoming)
     if (fresh.length < 1) return
     console.log('new donations', fresh.length)
-    updateMatchesInDonations(fresh.map(insertDonation))
+    updateMatchesInDonations(fresh.map(Donation))
+      .then(tagRecievedDiscountLevel)
+      .then(function(list) {return list.map(insertDonation)})
   }
 
   var update = function() {
-    feed[feedName].update().then(integrateDonations)
+    feed[feedName].update()
+      //.then(function(l) {return l.slice(0, 2)})
+      .then(integrateDonations)
   }
 
   var autoUpdate = function() {

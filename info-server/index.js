@@ -206,6 +206,7 @@ var filterDonations = function(dms, query) {
       donor_name: dm.donor_name,
       donor_image: dm.donor_image,
       id: dm.id,
+      discount_level: dm.discount_level,
       matchingMatches: dm.matchingMatches,
       //matchingPlayers: dm.matchingPlayers,
       //matchingPlanets: dm.matchingPlanets,

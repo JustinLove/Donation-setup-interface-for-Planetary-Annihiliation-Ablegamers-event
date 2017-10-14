@@ -32,8 +32,8 @@
   - x discount level
     - x UI
     - x Admin UI
-    - tag discount level received
-    - return discount level
+    - x tag discount level received
+    - x return discount level
     - Watch UI
     - Donation UI update notification
     - Check for scaling issues

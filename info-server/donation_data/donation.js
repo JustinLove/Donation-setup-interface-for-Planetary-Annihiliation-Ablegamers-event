@@ -81,6 +81,7 @@ define(['donation_data/menu'], function(menu) {
     model.donor_image = model.donor_image || ''
     model.comment = model.comment || ''
     model.comment = (model.comment || '').replace(/^\s+|\s+$/gm, '')
+    model.discount_level = model.discount_level || 0
 
     model.codes = menu.match(model.comment)
     model.orders = menu.orders(model.codes)

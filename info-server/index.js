@@ -28,9 +28,9 @@ redis.on('error', function(err) {
 })
 var redisSubscriptions = redis.duplicate()
 
-var notifySubscribers = function() {
+var notifySubscribers = function(channel) {
   //console.log('notify')
-  redis.publish("clear-donations", "")
+  redis.publish(channel, "")
 }
 
 var nacl
@@ -101,6 +101,7 @@ app.put('/games/:id/discount_level', jsonParser, function(req, res){
 
       redis.set(req.params.id, JSON.stringify(game), function(err2, reply2) {
         if (reply2 == 'OK') {
+          notifySubscribers('options-changed')
           res.sendStatus(200)
         } else {
           res.sendStatus(507)
@@ -147,7 +148,7 @@ app.delete('/donations', jsonParser, function(req, res){
   }
   clearDonationHistory().then(function() {
     console.log('donation clear succeeded')
-    notifySubscribers() // ends up clearing cache
+    notifySubscribers('clear-donations') // ends up clearing cache
     res.sendStatus(204)
   }, function(err) {
     console.log('donation clear failed', err)
@@ -326,11 +327,13 @@ requirejs([
       loadNewDonations([message])
     } else if (channel == 'clear-donations') {
       donations = []
+    } else if (channel == 'options-changed') {
     }
   })
 
   redisSubscriptions.subscribe('new-donation')
   redisSubscriptions.subscribe('clear-donations')
+  redisSubscriptions.subscribe('options-changed')
 });
 
 app.set('port', (process.env.PORT || 5000));

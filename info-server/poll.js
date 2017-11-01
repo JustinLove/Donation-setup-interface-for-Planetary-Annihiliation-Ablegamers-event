@@ -230,6 +230,7 @@ requirejs([
   }
 
   loading.loadDonationHistory().then(function(history) {
+    console.log('loaded history', history.length)
     donations = history
     if (process.argv[2] == 'simulate') {
       simulation()

@@ -16,7 +16,7 @@ define(['donation_data/donation'], function (Donation) {
       return new Promise(function(resolve, reject) {
         redis.smembers('games', function(err, games) {
           if (games) {
-            console.log('loaded games', games)
+            //console.log('loaded games', games)
             resolve(games)
           } else {
             reject(err)
@@ -112,7 +112,7 @@ define(['donation_data/donation'], function (Donation) {
               }
             })
             updateMatchesInDonations(history).then(function() {
-              console.log('loaded history', history.length)
+              //console.log('loaded history', history.length)
               resolve(history)
             })
           } else {

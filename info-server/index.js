@@ -327,6 +327,7 @@ requirejs([
   }
 
   loading.loadDonationHistory().then(function(history) {
+    console.log('loaded history', history.length)
     updateMenuInDonations(history)
     donations = history
     //test()

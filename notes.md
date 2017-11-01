@@ -37,6 +37,7 @@
     - x Watch UI
     - Donation UI update notification
     - Check for scaling issues
+  - poller error with blank database
   - reduce log spam
   - better testing for pubsub/websocket events
   - add or correct match number

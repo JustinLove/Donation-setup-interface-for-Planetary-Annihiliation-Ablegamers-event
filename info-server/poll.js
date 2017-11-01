@@ -120,6 +120,9 @@ requirejs([
         }
         return dm
       })
+    }, function(err) {
+      console.log("failure loading options", err)
+      return fresh
     })
   }
 

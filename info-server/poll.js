@@ -214,22 +214,28 @@ requirejs([
   }
 
   var simulation = function() {
-    var dms = [].concat(donations)
+    var dms = []
     var simulate = function() {
       var dm = dms.shift()
       if (dm) {
         var key = 'donation'+dm.id
         notifySubscribers(key)
-        setTimeout(simulate, 1000)
+      } else {
+        redis.publish("clear-donations", "")
+        dms = [].concat(donations)
       }
+      setTimeout(simulate, 1000)
     }
     simulate()
   }
 
   loading.loadDonationHistory().then(function(history) {
     donations = history
-    autoUpdate()
-    //simulation()
+    if (process.argv[2] == 'simulate') {
+      simulation()
+    } else {
+      autoUpdate()
+    }
   }, function(err) {
     //console.log(err)
   })

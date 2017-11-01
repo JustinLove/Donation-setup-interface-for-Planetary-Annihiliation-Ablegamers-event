@@ -39,7 +39,7 @@
     - Check for scaling issues
   - x poller error with blank database
   - reduce log spam
-  - better testing for pubsub/websocket events
+  - x better testing for pubsub/websocket events
   - add or correct match number
   - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
 

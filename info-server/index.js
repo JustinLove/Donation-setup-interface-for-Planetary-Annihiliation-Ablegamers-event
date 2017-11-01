@@ -223,14 +223,12 @@ var filterDonations = function(dms, query) {
 var WebSocketServer = require('ws').Server
 var wss = new WebSocketServer({ server: http })
 var Url = require('url')
+var QueryString = require('querystring')
 
 var websocketQuery = function(con) {
   var url = Url.parse(con.upgradeReq.url)
-  var params = new Url.URLSearchParams(url.search)
-  return {
-    game: params.get('game'),
-    untagged: params.get('untagged')
-  }
+  var params = QueryString.parse(url.query)
+  return params
 }
 
 wss.on('connection', function connection(con) {

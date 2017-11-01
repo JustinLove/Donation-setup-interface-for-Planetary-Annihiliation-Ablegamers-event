@@ -228,6 +228,7 @@ var QueryString = require('querystring')
 var websocketQuery = function(con) {
   var url = Url.parse(con.upgradeReq.url)
   var params = QueryString.parse(url.query)
+  params.pathname = url.pathname
   return params
 }
 
@@ -258,9 +259,11 @@ var simulation = function() {
 var notifyClients = function(dms) {
   wss.clients.forEach(function(con) {
     var query = websocketQuery(con)
-    var struct = filterDonations(dms, query)
-    if (struct.donations.length > 0) {
-      con.send(JSON.stringify(struct))
+    if (query.pathname == '/donations') {
+      var struct = filterDonations(dms, query)
+      if (struct.donations.length > 0) {
+        con.send(JSON.stringify(struct))
+      }
     }
   })
 }

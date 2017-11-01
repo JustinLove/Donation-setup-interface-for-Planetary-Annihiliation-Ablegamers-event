@@ -10,6 +10,8 @@ import Http
 import Regex exposing (regex)
 import String
 import Array exposing (Array)
+import WebSocket
+import Json.Decode
 
 type alias Arguments =
   { menu: List RawMenuItem
@@ -63,7 +65,12 @@ init args =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.options)
+  Http.send mapError (Http.get (config.server ++ "options.json") GameInfo.options)
+
+mapError : (Result Http.Error Options) -> Msg
+mapError =
+  Result.mapError toString
+    >> GotGameInfo
 
 -- UPDATE
 
@@ -161,5 +168,8 @@ instructionFocus open =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  WebSocket.listen (config.wsserver ++ "options.json") receiveOptions
 
+receiveOptions : String -> Msg
+receiveOptions message =
+  GotGameInfo <| Json.Decode.decodeString GameInfo.options message

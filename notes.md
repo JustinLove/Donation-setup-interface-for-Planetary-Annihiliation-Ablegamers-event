@@ -35,7 +35,7 @@
     - x tag discount level received
     - x return discount level
     - x Watch UI
-    - Donation UI update notification
+    - x Donation UI update notification
     - Check for scaling issues
   - x poller error with blank database
   - reduce log spam

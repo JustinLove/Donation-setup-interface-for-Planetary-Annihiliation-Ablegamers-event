@@ -9,7 +9,7 @@ type Msg
   | AddOne String
   | SetPlayer String
   | SetPlanet String
-  | GotGameInfo (Result Http.Error Options)
+  | GotGameInfo (Result String Options)
   | ChooseRound String
   | Select String
   | Instructions Bool

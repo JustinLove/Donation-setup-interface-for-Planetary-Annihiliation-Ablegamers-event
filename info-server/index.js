@@ -249,14 +249,14 @@ var simulation = function() {
   var simulate = function() {
     var dm = dms.shift()
     if (dm) {
-      notifyClients([dm])
+      notifyClientsNewDonations([dm])
       setTimeout(simulate, 1000)
     }
   }
   simulate()
 }
 
-var notifyClients = function(dms) {
+var notifyClientsNewDonations = function(dms) {
   wss.clients.forEach(function(con) {
     var query = websocketQuery(con)
     if (query.pathname == '/donations') {
@@ -265,6 +265,18 @@ var notifyClients = function(dms) {
         con.send(JSON.stringify(struct))
       }
     }
+  })
+}
+
+var notifyClientsOptionsChanged = function() {
+  fetchOptions().then(function(data) {
+    var message = JSON.stringify(data)
+    wss.clients.forEach(function(con) {
+      var query = websocketQuery(con)
+      if (query.pathname == '/options.json') {
+        con.send(message)
+      }
+    })
   })
 }
 
@@ -303,7 +315,7 @@ requirejs([
       dms.forEach(function(dmx) {
         var dm = dmx
         if (donations.every(function(d) {return d.id != dm.id})) {
-          notifyClients([dm])
+          notifyClientsNewDonations([dm])
           donations.push(dm)
         }
       })
@@ -329,6 +341,7 @@ requirejs([
     } else if (channel == 'clear-donations') {
       donations = []
     } else if (channel == 'options-changed') {
+      notifyClientsOptionsChanged()
     }
   })
 

@@ -40,6 +40,7 @@
   - x poller error with blank database
   - x reduce log spam
   - x better testing for pubsub/websocket events
+  - Uber Auth??
   - add or correct match number
   - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
 

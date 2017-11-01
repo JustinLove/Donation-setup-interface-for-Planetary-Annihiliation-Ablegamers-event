@@ -29,6 +29,8 @@ define(['donation_data/donation'], function (Donation) {
       return new Promise(function(resolve, reject) {
         redis.smembers('games', function(err, games) {
           if (games) {
+            if (games.length < 1) return resolve({games: []})
+
             redis.mget(games, function(err2, replies) {
               if (replies) {
                 resolve({games: replies.map(JSON.parse)})

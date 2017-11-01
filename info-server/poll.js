@@ -130,13 +130,13 @@ requirejs([
     var fresh = newItems(donations, incoming)
     if (fresh.length < 1) return
     console.log('new donations', fresh.length)
-    updateMatchesInDonations(fresh.map(Donation))
+    return updateMatchesInDonations(fresh.map(Donation))
       .then(tagRecievedDiscountLevel)
       .then(function(list) {return list.map(insertDonation)})
   }
 
   var update = function() {
-    feed[feedName].update()
+    return feed[feedName].update()
       //.then(function(l) {return l.slice(0, 2)})
       .then(integrateDonations)
   }
@@ -234,6 +234,10 @@ requirejs([
     donations = history
     if (process.argv[2] == 'simulate') {
       simulation()
+    } else if (process.argv[2] == 'once') {
+      update().then(function() {
+        setTimeout(process.exit, 5000)
+      })
     } else {
       autoUpdate()
     }

@@ -27,7 +27,7 @@
       - ? forward to websocket clients
     - x do not to do full reload with updates being sent
     - x donation loading duplicated
-    - once version for scheduled task instead of polling?
+    - x once version for scheduled task instead of polling?
   - x priority donations
   - x discount level
     - x UI

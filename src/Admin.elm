@@ -109,9 +109,20 @@ update msg model =
           , Cmd.none
           )
     AdminViewMsg (DoneEditing) ->
-      ( { model | editing = NotEditing }
-      , Cmd.none
-      )
+      case model.editing of
+        NotEditing -> (model, Cmd.none)
+        Editing donation comment ->
+          ( { model
+            | editing = NotEditing
+            , donations = List.map
+              (\d -> if d.id == donation.id then
+                       {d | comment = comment}
+                     else
+                       d)
+                model.donations
+            }
+          , Cmd.none
+          )
 
 removeRound : String -> Model -> Model
 removeRound round model =

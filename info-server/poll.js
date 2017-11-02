@@ -63,16 +63,8 @@ requirejs([
   updateMatchesInDonations = loading.updateMatchesInDonations
 
   var persistDonation = function(dm) {
-    var persist = {
-      amount: dm.amount,
-      comment: dm.comment,
-      donor_name: dm.donor_name,
-      donor_image: dm.donor_image,
-      discount_level: dm.discount_level,
-      id: dm.id,
-      raw: dm.raw,
-    }
-    var key = 'donation'+persist.id
+    var persist = loading.persistFields(dm)
+    var key = loading.persistKey(dm)
     redis.rpush('knownDonationIds', key, function(idErr, idOkay) {
       if (idErr) {
         Redis.print(idErr, idOkay)
@@ -218,7 +210,7 @@ requirejs([
     var simulate = function() {
       var dm = dms.shift()
       if (dm) {
-        var key = 'donation'+dm.id
+        var key = loading.persistKey(dm)
         notifySubscribers(key)
       } else {
         redis.publish("clear-donations", "")

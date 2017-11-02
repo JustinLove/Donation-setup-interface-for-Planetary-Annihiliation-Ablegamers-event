@@ -138,6 +138,36 @@ app.get('/donations', function(req, res){
   res.json(filterDonations(donations, req.query))
 });
 
+app.put('/donations/:id', jsonParser, function(req, res){
+  var sinfo = checkSignature(req, res)
+  if (!sinfo) return
+  var updates = JSON.parse(sinfo)
+  console.log('donation edit', updates)
+  if (updates.id != req.params.id) {
+    console.log('target id mismatch')
+    res.sendStatus(401)
+    return
+  }
+  var key = persistKey(updates)
+  redis.get(key, function(gerr, reply) {
+    if (reply) {
+      var donation = Object.assign(JSON.parse(reply), updates)
+      var persist = persistFields(donation)
+      redis.set(key, JSON.stringify(persist), function(err, ok) {
+        if (err) {
+          Redis.print(err, ok)
+          res.sendStatus(500)
+        } else {
+          //notifySubscribers(key)
+          res.sendStatus(204)
+        }
+      })
+    } else {
+      res.sendStatus(404)
+    }
+  })
+});
+
 app.delete('/donations', jsonParser, function(req, res){
   var command = checkSignature(req, res)
   if (!command) return
@@ -292,6 +322,8 @@ var promiseStub = function() {
   return new Promise(function(resolve, reject) {reject("stub function")})
 }
 
+var persistFields = promiseStub
+var persistKey = promiseStub
 var fetchOptions = promiseStub
 var updateMatchesInDonations = promiseStub
 var clearDonationHistory = promiseStub
@@ -305,6 +337,8 @@ requirejs([
 ) {
   var loading = donation_loading(redis)
 
+  persistFields = loading.persistFields
+  persistKey = loading.persistKey
   fetchOptions = loading.fetchOptions
   clearDonationHistory = loading.clearDonationHistory
   updateMatchesInDonations = loading.updateMatchesInDonations

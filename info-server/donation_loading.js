@@ -3,6 +3,23 @@ define(['donation_data/donation'], function (Donation) {
   var Redis = require('redis')
 
   return function(redis) {
+
+    var persistFields = function(dm) {
+      return {
+        amount: dm.amount,
+        comment: dm.comment,
+        donor_name: dm.donor_name,
+        donor_image: dm.donor_image,
+        discount_level: dm.discount_level,
+        id: dm.id,
+        raw: dm.raw,
+      }
+    }
+
+    var persistKey = function(dm) {
+      return 'donation'+dm.id
+    }
+
     var updateMatchesInDonations = function(list) {
       return loadGameIds().then(function(games) {
         list.forEach(function(dm) {
@@ -157,6 +174,8 @@ define(['donation_data/donation'], function (Donation) {
     }
 
     return {
+      persistFields: persistFields,
+      persistKey: persistKey,
       fetchOptions: fetchOptions,
       updateMatchesInDonations: updateMatchesInDonations,
       loadDonationHistory: loadDonationHistory,

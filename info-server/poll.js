@@ -248,7 +248,9 @@ requirejs([
   redisSubscriptions.on('message', function(channel, message) {
     console.log(arguments)
     if (channel == 'clear-donations') {
-      donations = []
+      loading.loadDonationHistory().then(function(history) {
+        donations = history
+      })
     }
   })
 

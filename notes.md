@@ -49,7 +49,7 @@
 ### Ingame Mod
 
 - received discount level?
-- websockets?
+- x websockets?
 - queuing things up pre-5-minutes.
   - local data?
   - record to central server? localstorage?

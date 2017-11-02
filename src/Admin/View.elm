@@ -29,8 +29,7 @@ view model =
     [ p [] [ text config.server ]
     , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
     , ul [] <| List.map displayRound <| (List.sortBy .name) model.rounds
-    , displayEditing model.editing
-    , ul [] <| List.map displayDonation <| List.reverse model.donations
+    , ul [] <| List.map (displayDonation model.editing) <| List.reverse model.donations
     , Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
     ]
 
@@ -53,9 +52,9 @@ displayRound round =
 displayEditing : DonationEdit -> Html AVMsg
 displayEditing edit =
   case edit of 
-    NotEditing -> div [] []
+    NotEditing -> li [] []
     Editing donation comment ->
-      div []
+      li []
         [ p [] 
           [ span [ class "donor_name" ] [ text donation.donor_name ]
           , text " "
@@ -65,8 +64,18 @@ displayEditing edit =
         , p [] [ Html.button [ onClick DoneEditing ] [ text "Done" ] ]
         ]
 
-displayDonation : Donation -> Html AVMsg
-displayDonation donation =
+displayDonation : DonationEdit -> Donation -> Html AVMsg
+displayDonation edit donation =
+  case edit of 
+    NotEditing -> displayDonationOnly donation
+    Editing editing comment ->
+      if donation.id == editing.id then
+        displayEditing edit
+      else
+        displayDonationOnly donation
+
+displayDonationOnly : Donation -> Html AVMsg
+displayDonationOnly donation =
   li [ classList
        [ ("donation-item", True)
        , ("insufficient", donation.insufficient)

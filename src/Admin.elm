@@ -2,6 +2,8 @@ import Admin.View exposing (view, DonationEdit(..), AVMsg(..))
 import Config exposing (config) 
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation)
+import Donation.Decode
+import Donation.Encode
 import Nacl
 
 import String
@@ -49,7 +51,7 @@ fetchGame =
 
 fetchDonations : Cmd Msg
 fetchDonations =
-  Http.send GotDonations (Http.get (config.server ++ "donations") Donation.donations)
+  Http.send GotDonations (Http.get (config.server ++ "donations") Donation.Decode.donations)
 
 -- UPDATE
 
@@ -116,7 +118,7 @@ update msg model =
             (setDonationComment comment)
             donation.id
             { model | editing = NotEditing }
-          , Cmd.none
+          , sendDonationEdit model.signsk (setDonationComment comment donation)
           )
 
 removeRound : String -> Model -> Model
@@ -154,6 +156,18 @@ sendClearDonations key =
     , headers = []
     , url = config.server ++ "donations"
     , body = message key "donations" "clear" |> Http.jsonBody
+    , expect = Http.expectStringResponse (\_ -> Ok ())
+    , timeout = Nothing
+    , withCredentials = False
+    }
+
+sendDonationEdit : String -> Donation -> Cmd Msg
+sendDonationEdit key donation =
+  Http.send EmptyRequestComplete <| Http.request
+    { method = "PUT"
+    , headers = []
+    , url = config.server ++ "donations/" ++ (toString donation.id)
+    , body = donationEditBody donation |> message key (toString donation.id) |> Http.jsonBody
     , expect = Http.expectStringResponse (\_ -> Ok ())
     , timeout = Nothing
     , withCredentials = False
@@ -218,6 +232,10 @@ discountLevelBody id discount_level =
     [ ("id", Json.Encode.string id)
     , ("discount_level", Json.Encode.int discount_level)
     ]
+
+donationEditBody : Donation -> String
+donationEditBody donation =
+  Json.Encode.encode 0 <| Donation.Encode.donation donation
 
 -- SUBSCRIPTIONS
 

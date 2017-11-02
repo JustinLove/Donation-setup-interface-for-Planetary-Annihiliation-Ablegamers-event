@@ -1,3 +1,4 @@
+import Admin.View exposing (view, AVMsg(..))
 import Config exposing (config) 
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation)
@@ -5,9 +6,6 @@ import Nacl
 
 import String
 import Html
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
 import Http
 import Task
 import Json.Encode
@@ -17,7 +15,7 @@ main : Program Never Model Msg
 main =
   Html.program
     { init = init
-    , view = view
+    , view = \model -> Html.map AdminViewMsg (view model)
     , update = update
     , subscriptions = subscriptions
     }
@@ -56,12 +54,8 @@ fetchDonations =
 type Msg
   = GotGameInfo (Result Http.Error (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
-  | SetKey String
   | EmptyRequestComplete (Result Http.Error ())
-  | DeleteRound String
-  | ClearDonations
-  | SetDiscountLevel String String
-  | None
+  | AdminViewMsg AVMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -76,7 +70,7 @@ update msg model =
     GotDonations (Err msg) ->
       let _ = Debug.log "donations fetch error" msg in
       (model, Cmd.none)
-    SetKey signsk ->
+    AdminViewMsg (SetKey signsk) ->
       if (String.length signsk) == 128 then
         ( { model | signsk = signsk }
         , Cmd.batch [ fetchGame, fetchDonations ]
@@ -88,21 +82,19 @@ update msg model =
     EmptyRequestComplete (Err msg) ->
       let _ = Debug.log "raw error" msg in
       (model, Cmd.none)
-    DeleteRound round ->
+    AdminViewMsg (DeleteRound round) ->
       ( removeRound round model
       , sendDeleteRound model.signsk round
       )
-    ClearDonations ->
+    AdminViewMsg (ClearDonations) ->
       ( { model | donations = [] }
       , sendClearDonations model.signsk
       )
-    SetDiscountLevel id input ->
+    AdminViewMsg (SetDiscountLevel id input) ->
       let level = parseDiscountLevel input in
       ( updateRound (setRoundDiscountLevel level) id model
       , sendDiscountLevel model.signsk id level
       )
-    None ->
-      (model, Cmd.none)
 
 removeRound : String -> Model -> Model
 removeRound round model =
@@ -199,58 +191,3 @@ discountLevelBody id discount_level =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.none
-
--- VIEW
-
-view : Model -> Html Msg
-view model =
-  div []
-    [ p [] [ text config.server ]
-    , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
-    , ul [] <| List.map displayRound <| (List.sortBy .name) model.rounds
-    , Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
-    , ul [] <| List.map displayDonation <| List.reverse model.donations
-    ]
-
-displayRound : GameInfo -> Html Msg
-displayRound round =
-  li []
-    [ Html.button [ onClick (DeleteRound round.id) ]
-      [ text "X "
-      , text round.name
-      ]
-    , text " discount level: "
-    , input
-      [ type_ "number"
-      , Html.Attributes.min "0"
-      , value (round.discountLevel |> toString)
-      , onInput (SetDiscountLevel round.id)
-      ] []
-    ]
-
-displayDonation : Donation -> Html Msg
-displayDonation donation =
-  li [ classList
-       [ ("donation-item", True)
-       , ("insufficient", donation.insufficient)
-       , ("unaccounted", donation.unaccounted)
-       ]
-     ]
-     [ p [] <|
-       List.concat
-       [ [ span [ class "donor_name" ] [ text donation.donor_name ]
-         , text " "
-         , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
-         , text " "
-         , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
-         , text " "
-         , if donation.discount_level == 0 then
-             text ""
-           else
-             span [ class "discount_level" ] [ text <| "(" ++ (toString donation.discount_level) ++ ")" ]
-         , text " "
-         ]
-       , (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
-       , [ span [ class "comment" ] [ text donation.comment ] ]
-       ]
-     ]

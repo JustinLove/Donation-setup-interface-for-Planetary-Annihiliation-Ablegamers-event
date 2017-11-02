@@ -1,4 +1,4 @@
-import Admin.View exposing (view, AVMsg(..))
+import Admin.View exposing (view, DonationEdit(..), AVMsg(..))
 import Config exposing (config) 
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation)
@@ -25,6 +25,7 @@ main =
 type alias Model =
   { rounds: List GameInfo
   , donations: List Donation
+  , editing: DonationEdit
   , signsk: String
   }
 
@@ -32,6 +33,7 @@ makeModel : Model
 makeModel =
   { rounds = []
   , donations = []
+  , editing = NotEditing
   , signsk = ""
   }
 
@@ -94,6 +96,21 @@ update msg model =
       let level = parseDiscountLevel input in
       ( updateRound (setRoundDiscountLevel level) id model
       , sendDiscountLevel model.signsk id level
+      )
+    AdminViewMsg (EditDonation donation) ->
+      ( { model | editing = Editing donation donation.comment }
+      , Cmd.none
+      )
+    AdminViewMsg (CommentChange text) ->
+      case model.editing of
+        NotEditing -> (model, Cmd.none)
+        Editing donation comment ->
+          ( { model | editing = Editing donation text }
+          , Cmd.none
+          )
+    AdminViewMsg (DoneEditing) ->
+      ( { model | editing = NotEditing }
+      , Cmd.none
       )
 
 removeRound : String -> Model -> Model

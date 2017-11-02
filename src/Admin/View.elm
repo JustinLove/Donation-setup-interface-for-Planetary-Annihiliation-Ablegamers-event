@@ -1,4 +1,4 @@
-module Admin.View exposing (view, AVMsg(..))
+module Admin.View exposing (view, DonationEdit(..), AVMsg(..))
 import Config exposing (config) 
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation)
@@ -13,6 +13,13 @@ type AVMsg
   | DeleteRound String
   | ClearDonations
   | SetDiscountLevel String String
+  | EditDonation Donation
+  | CommentChange String
+  | DoneEditing
+
+type DonationEdit
+  = NotEditing
+  | Editing Donation String
 
 -- VIEW
 
@@ -22,8 +29,9 @@ view model =
     [ p [] [ text config.server ]
     , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
     , ul [] <| List.map displayRound <| (List.sortBy .name) model.rounds
-    , Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
+    , displayEditing model.editing
     , ul [] <| List.map displayDonation <| List.reverse model.donations
+    , Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
     ]
 
 displayRound : GameInfo -> Html AVMsg
@@ -42,6 +50,21 @@ displayRound round =
       ] []
     ]
 
+displayEditing : DonationEdit -> Html AVMsg
+displayEditing edit =
+  case edit of 
+    NotEditing -> div [] []
+    Editing donation comment ->
+      div []
+        [ p [] 
+          [ span [ class "donor_name" ] [ text donation.donor_name ]
+          , text " "
+          , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
+          ]
+        , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text comment ]
+        , p [] [ Html.button [ onClick DoneEditing ] [ text "Done" ] ]
+        ]
+
 displayDonation : Donation -> Html AVMsg
 displayDonation donation =
   li [ classList
@@ -52,7 +75,9 @@ displayDonation donation =
      ]
      [ p [] <|
        List.concat
-       [ [ span [ class "donor_name" ] [ text donation.donor_name ]
+       [ [ Html.button [ onClick (EditDonation donation) ] [ text "Edit" ]
+         , text " "
+         , span [ class "donor_name" ] [ text donation.donor_name ]
          , text " "
          , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
          , text " "
@@ -65,6 +90,6 @@ displayDonation donation =
          , text " "
          ]
        , (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
-       , [ span [ class "comment" ] [ text donation.comment ] ]
+       , [ text " ", span [ class "comment" ] [ text donation.comment ] ]
        ]
      ]

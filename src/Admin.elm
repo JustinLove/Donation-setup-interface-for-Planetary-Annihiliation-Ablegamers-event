@@ -112,15 +112,10 @@ update msg model =
       case model.editing of
         NotEditing -> (model, Cmd.none)
         Editing donation comment ->
-          ( { model
-            | editing = NotEditing
-            , donations = List.map
-              (\d -> if d.id == donation.id then
-                       {d | comment = comment}
-                     else
-                       d)
-                model.donations
-            }
+          ( updateDonation
+            (setDonationComment comment)
+            donation.id
+            { model | editing = NotEditing }
           , Cmd.none
           )
 
@@ -164,6 +159,16 @@ sendClearDonations key =
     , withCredentials = False
     }
 
+updateDonation : (Donation -> Donation) -> Int -> Model -> Model
+updateDonation f id model =
+  { model | donations = List.map
+            (\d -> if d.id == id then f d else d)
+            model.donations
+  }
+
+setDonationComment : String -> Donation -> Donation
+setDonationComment comment donation =
+  { donation | comment = comment}
 
 updateRound : (GameInfo -> GameInfo) -> String -> Model -> Model
 updateRound f id model =

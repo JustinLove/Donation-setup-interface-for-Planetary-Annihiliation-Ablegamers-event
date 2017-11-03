@@ -28,9 +28,9 @@ redis.on('error', function(err) {
 })
 var redisSubscriptions = redis.duplicate()
 
-var notifySubscribers = function(channel) {
+var notifySubscribers = function(channel, key) {
   //console.log('notify')
-  redis.publish(channel, "")
+  redis.publish(channel, key || "")
 }
 
 var nacl
@@ -158,7 +158,7 @@ app.put('/donations/:id', jsonParser, function(req, res){
           Redis.print(err, ok)
           res.sendStatus(500)
         } else {
-          //notifySubscribers(key)
+          notifySubscribers('donation-update', key)
           res.sendStatus(204)
         }
       })
@@ -356,6 +356,23 @@ requirejs([
     })
   }
 
+  var loadUpdatedDonations = function(idsToLoad) {
+    loading.loadDonations(idsToLoad).then(function(dms) {
+      updateMenuInDonations(dms)
+      dms.forEach(function(dmx) {
+        var dm = dmx
+        donations = donations.map(function(d) {
+          if (d.id == dm.id) {
+            //notifyClientsNewDonations([dm])
+            return dm
+          } else {
+            return d
+          }
+        })
+      })
+    })
+  }
+
   var updateMenuInDonations = function(dms) {
     dms.forEach(function(dm) {dm.matchMenu(menu)})
   }
@@ -371,8 +388,10 @@ requirejs([
 
   redisSubscriptions.on('message', function(channel, message) {
     console.log(arguments)
-    if (channel == 'new-donation') {
+    if (channel == 'donation-create') {
       loadNewDonations([message])
+    } else if (channel == 'donation-update') {
+      loadUpdatedDonations([message])
     } else if (channel == 'clear-donations') {
       donations = []
     } else if (channel == 'options-changed') {
@@ -380,7 +399,8 @@ requirejs([
     }
   })
 
-  redisSubscriptions.subscribe('new-donation')
+  redisSubscriptions.subscribe('donation-create')
+  redisSubscriptions.subscribe('donation-update')
   redisSubscriptions.subscribe('clear-donations')
   redisSubscriptions.subscribe('options-changed')
 });

@@ -32,7 +32,7 @@ var feedName = process.env.FEED
 
 var notifySubscribers = function(id) {
   //console.log('notify', id)
-  redis.publish("new-donation", id)
+  redis.publish("donation-create", id)
 }
 
 var requirejs = require('requirejs');
@@ -221,6 +221,12 @@ requirejs([
     simulate()
   }
 
+  var reloadDonations = function() {
+    loading.loadDonationHistory().then(function(history) {
+      donations = history
+    })
+  }
+
   loading.loadDonationHistory().then(function(history) {
     console.log('loaded history', history.length)
     donations = history
@@ -239,12 +245,13 @@ requirejs([
 
   redisSubscriptions.on('message', function(channel, message) {
     console.log(arguments)
-    if (channel == 'clear-donations') {
-      loading.loadDonationHistory().then(function(history) {
-        donations = history
-      })
+    if (channel == 'donation-update') {
+      reloadDonations()
+    } else if (channel == 'clear-donations') {
+      reloadDonations()
     }
   })
 
+  redisSubscriptions.subscribe('donation-update')
   redisSubscriptions.subscribe('clear-donations')
 });

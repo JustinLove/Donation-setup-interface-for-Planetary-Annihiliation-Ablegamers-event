@@ -43,7 +43,7 @@
   - Uber Auth??
   - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
     - x pubsub changes, local cached lists on both poll and web
-    - watcher
+    - x watcher
     - game mods
     - admin?
 

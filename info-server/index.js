@@ -279,14 +279,14 @@ var simulation = function() {
   var simulate = function() {
     var dm = dms.shift()
     if (dm) {
-      notifyClientsNewDonations([dm])
+      notifyClientsDonations([dm])
       setTimeout(simulate, 1000)
     }
   }
   simulate()
 }
 
-var notifyClientsNewDonations = function(dms) {
+var notifyClientsDonations = function(dms) {
   wss.clients.forEach(function(con) {
     var query = websocketQuery(con)
     if (query.pathname == '/donations') {
@@ -349,7 +349,7 @@ requirejs([
       dms.forEach(function(dmx) {
         var dm = dmx
         if (donations.every(function(d) {return d.id != dm.id})) {
-          notifyClientsNewDonations([dm])
+          notifyClientsDonations([dm])
           donations.push(dm)
         }
       })
@@ -363,7 +363,7 @@ requirejs([
         var dm = dmx
         donations = donations.map(function(d) {
           if (d.id == dm.id) {
-            //notifyClientsNewDonations([dm])
+            notifyClientsDonations([dm])
             return dm
           } else {
             return d

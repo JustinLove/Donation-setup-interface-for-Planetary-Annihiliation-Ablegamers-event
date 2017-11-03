@@ -1,6 +1,7 @@
 import Watch.View exposing (view, RoundSelection(..), HighlightColor(..), WVMsg(..))
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation) 
+import Donation.Decode
 import Config exposing (config) 
 
 import Dict
@@ -48,7 +49,7 @@ fetchGame =
 
 fetchDonations : RoundSelection -> Cmd Msg
 fetchDonations game =
-  Http.send GotDonations (Http.get (config.server ++ (donationsPath game)) Donation.donations)
+  Http.send GotDonations (Http.get (config.server ++ (donationsPath game)) Donation.Decode.donations)
 
 donationsPath : RoundSelection -> String
 donationsPath game =
@@ -88,12 +89,24 @@ update msg model =
       let _ = Debug.log "donations fetch error" msg in
       (model, Cmd.none)
     GotUpdate (Ok donations) ->
-      ({ model | donations = List.append model.donations donations}, Cmd.none)
+      ({ model | donations = upsertDonations donations model.donations}, Cmd.none)
     GotUpdate (Err msg) ->
       let _ = Debug.log "donations update error" msg in
       (model, Cmd.none)
     Poll t ->
       (model, fetchDonations model.round)
+
+upsertDonations : List Donation -> List Donation -> List Donation
+upsertDonations updates donations =
+  List.foldr upsertDonation donations updates
+
+upsertDonation : Donation -> List Donation -> List Donation
+upsertDonation update donations =
+  if List.any (\d -> d.id == update.id) donations then
+    donations
+      |> List.map (\d -> if d.id == update.id then update else d)
+  else
+    donations ++ [update]
 
 -- SUBSCRIPTIONS
 
@@ -104,4 +117,4 @@ subscriptions model =
 
 receiveUpdate : String -> Msg
 receiveUpdate message =
-  GotUpdate <| Json.Decode.decodeString Donation.donations message
+  GotUpdate <| Json.Decode.decodeString Donation.Decode.donations message

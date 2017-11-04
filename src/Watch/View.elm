@@ -45,7 +45,7 @@ view model =
     [ div []
       [ header [ class "row col" ]
         [ a
-          [ href "http://ablegamers.donordrive.com/"
+          [ href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2017"
           , class "logo"
           ]
           [ img

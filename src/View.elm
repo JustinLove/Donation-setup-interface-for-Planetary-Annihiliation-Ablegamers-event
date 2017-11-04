@@ -21,7 +21,7 @@ view model =
     [ div [ ariaHidden model.instructionsOpen ]
       [ header [ class "row col" ]
         [ a
-          [ href "http://ablegamers.donordrive.com/"
+          [ href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2017"
           , class "logo"
           ]
           [ img
@@ -54,13 +54,13 @@ instructions =
         [ id "instructions"
         , src "instructions.png"
         , alt "On the upcoming donation page: Choose 'Other' and then enter amount. Paste message into the message box, and add placement suggestions or comments. (Leave message and amount public.)"
-        , width 716
-        , height 768
+        , width 680
+        , height 725
         ] []
       , footer []
         [ a
           [ target "_blank"
-          , href "https://ablegamers.donordrive.com/index.cfm?fuseaction=donate.team&teamID=5007"
+          , href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2017/donate"
           , class "primary button"
           , id "navigate-donation"
           ] [ text "Take Me There" ]
@@ -99,7 +99,7 @@ targetingSection model =
 menuSection model =
   [ div [ class "row col" ]
     [ fieldset []
-      [ legend [] [ text "Add Items" ]
+      [ legend [] [ text "Add Items (2017 menu not yet set)" ]
       , ul [ class "menu" ] <| List.map displayMenuItem model.menu
       ]
     ]
@@ -120,11 +120,18 @@ bottomSection model =
           ]
         , p []
           [ span [ id "not-enough" ] [ text "This page is not enough!" ]
-          , text " Units are added based on the donation feed at donordrive.com." ]
+          , text " Units are added based on the "
+          , a 
+            [ target "_blank"
+            , href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2017/donations"
+            ]
+            [ text "donation feed at tiltify.com" ]
+          , text "."
+          ]
         , p []
           [ small
             [ id "message-instructions" ]
-            [ text "Copy-paste into donation message. You may make additional notes. Please ensure that message and amount remain set to public." ]
+            [ text "Copy-paste into donation message. You may make additional notes." ]
           ]
         , p [ class "total" ]
           [ text "Total "

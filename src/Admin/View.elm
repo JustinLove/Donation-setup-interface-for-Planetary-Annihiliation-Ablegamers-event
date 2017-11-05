@@ -56,12 +56,18 @@ displayEditing edit =
     NotEditing -> li [] []
     Editing edited  ->
       li []
-        [ p [] 
+        [ p []
+          <| List.intersperse (text " ")
           [ span [ class "donor_name" ] [ text edited.donor_name ]
-          , text " "
           , span [ class "amount" ] [ text <| "$" ++ (toString edited.amount) ]
+          , span [ class "minimum" ] [ text <| "$" ++ (toString edited.minimum) ]
+          , if edited.discount_level == 0 then
+              text ""
+            else
+              span [ class "discount_level" ] [ text <| "(" ++ (toString edited.discount_level) ++ ")" ]
+          , span [] (List.map (span [ class "match" ] << List.singleton << text) edited.matchingMatches)
+          , span [ class "comment" ] [ text edited.comment ]
           ]
-        , displayDonationOnly edited
         , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text edited.comment ]
         , p []
           [ Html.button [ onClick DoneEditing ] [ text "Done" ]
@@ -81,29 +87,25 @@ displayDonation edit donation =
 
 displayDonationOnly : Donation -> Html AVMsg
 displayDonationOnly donation =
-  li [ classList
-       [ ("donation-item", True)
-       , ("insufficient", donation.insufficient)
-       , ("unaccounted", donation.unaccounted)
-       ]
-     ]
-     [ p [] <|
-       List.concat
-       [ [ Html.button [ onClick (EditDonation donation) ] [ text "Edit" ]
-         , text " "
-         , span [ class "donor_name" ] [ text donation.donor_name ]
-         , text " "
-         , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
-         , text " "
-         , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
-         , text " "
-         , if donation.discount_level == 0 then
-             text ""
-           else
-             span [ class "discount_level" ] [ text <| "(" ++ (toString donation.discount_level) ++ ")" ]
-         , text " "
-         ]
-       , (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
-       , [ text " ", span [ class "comment" ] [ text donation.comment ] ]
-       ]
-     ]
+  li
+    [ classList
+      [ ("donation-item", True)
+      , ("insufficient", donation.insufficient)
+      , ("unaccounted", donation.unaccounted)
+      ]
+    ]
+    [ p []
+      <| List.intersperse (text " ")
+
+      [ Html.button [ onClick (EditDonation donation) ] [ text "Edit" ]
+      , span [ class "donor_name" ] [ text donation.donor_name ]
+      , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
+      , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
+      , if donation.discount_level == 0 then
+          text ""
+        else
+          span [ class "discount_level" ] [ text <| "(" ++ (toString donation.discount_level) ++ ")" ]
+      , span [] (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
+      , span [ class "comment" ] [ text donation.comment ]
+      ]
+    ]

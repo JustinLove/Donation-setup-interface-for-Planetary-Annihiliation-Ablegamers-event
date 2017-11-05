@@ -6,6 +6,7 @@ import GameInfo exposing (GameInfo)
 import Donation exposing (Donation)
 import Donation.Decode
 import Donation.Encode
+import Admin.Harbor exposing (..)
 import Nacl
 
 import String
@@ -64,6 +65,7 @@ type Msg
   | GotDonations (Result Http.Error (List Donation))
   | GotUpdate (Result String (List Donation))
   | EmptyRequestComplete (Result Http.Error ())
+  | MatchedModel (Result String Donation)
   | AdminViewMsg AVMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -96,6 +98,12 @@ update msg model =
     EmptyRequestComplete (Err msg) ->
       let _ = Debug.log "raw error" msg in
       (model, Cmd.none)
+    MatchedModel (Ok donation) ->
+      let _ = Debug.log "donation" donation in
+      (model, Cmd.none)
+    MatchedModel (Err msg) ->
+      let _ = Debug.log "match error" msg in
+      (model, Cmd.none)
     AdminViewMsg (DeleteRound round) ->
       ( removeRound round model
       , sendDeleteRound model.signsk round
@@ -114,11 +122,14 @@ update msg model =
       , Cmd.none
       )
     AdminViewMsg (CommentChange text) ->
+      let _ = Debug.log "change" text in
       case model.editing of
         NotEditing -> (model, Cmd.none)
         Editing donation comment ->
           ( { model | editing = Editing donation text }
-          , Cmd.none
+          , matchInDonation
+            <| Donation.Encode.donation
+            <| setDonationComment text donation
           )
     AdminViewMsg (DoneEditing) ->
       case model.editing of
@@ -267,8 +278,21 @@ upsertDonation update donations =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
+  Sub.batch
+    [ WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
+    , matchSubscription model
+    ]
 
 receiveUpdate : String -> Msg
 receiveUpdate message =
   GotUpdate <| Json.Decode.decodeString Donation.Decode.donations message
+
+matchSubscription : Model -> Sub Msg
+matchSubscription model =
+  case model.editing of
+    NotEditing -> Sub.none
+    Editing _ _ -> matchedModel receiveModel
+
+receiveModel : Json.Decode.Value -> Msg
+receiveModel value =
+  MatchedModel <| Json.Decode.decodeValue Donation.Decode.donation value

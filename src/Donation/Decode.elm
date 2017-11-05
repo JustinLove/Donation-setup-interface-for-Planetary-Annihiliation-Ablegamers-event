@@ -1,4 +1,4 @@
-module Donation.Decode exposing (donations)
+module Donation.Decode exposing (donations, donation)
 
 import Donation exposing (Donation)
 

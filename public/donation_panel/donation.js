@@ -24,7 +24,7 @@ define(['sandbox_unit_menu/discounts'], function(discounts) {
         this.matchingPlanetIndex = planets.indexOf(this.matchingPlanets[0])
       }
     },
-    matchMatches: function(matchTags, currentMatch) {
+    matchMatches: function(matchTags) {
       var words = this.comment.match(/\b\w{3,}\b/g)
       if (!words) return
 

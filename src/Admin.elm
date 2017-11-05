@@ -99,9 +99,15 @@ update msg model =
     EmptyRequestComplete (Err msg) ->
       let _ = Debug.log "raw error" msg in
       (model, Cmd.none)
-    MatchedModel (Ok donation) ->
-      let _ = Debug.log "donation" donation in
-      (model, Cmd.none)
+    MatchedModel (Ok matched) ->
+      --let _ = Debug.log "donation" donation in
+      case model.editing of
+        NotEditing -> (model, Cmd.none)
+        Editing edited ->
+          let merge = setDonationComment edited.comment matched in
+          ( { model | editing = Editing merge }
+          , Cmd.none
+          )
     MatchedModel (Err msg) ->
       let _ = Debug.log "match error" msg in
       (model, Cmd.none)
@@ -119,29 +125,30 @@ update msg model =
       , sendDiscountLevel model.signsk id level
       )
     AdminViewMsg (EditDonation donation) ->
-      ( { model | editing = Editing donation donation.comment }
+      ( { model | editing = Editing donation }
       , Cmd.none
       )
     AdminViewMsg (CommentChange text) ->
       let _ = Debug.log "change" text in
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        Editing donation comment ->
-          ( { model | editing = Editing donation text }
+        Editing edited ->
+          let edit = setDonationComment text edited in
+          ( { model | editing = Editing edit }
           , matchInDonation
             { rounds = model.rounds
-            , donation = setDonationComment text donation
+            , donation = edit
             }
           )
     AdminViewMsg (DoneEditing) ->
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        Editing donation comment ->
+        Editing edited ->
           ( updateDonation
-            (setDonationComment comment)
-            donation.id
+            (always edited)
+            edited.id
             { model | editing = NotEditing }
-          , sendDonationEdit model.signsk (setDonationComment comment donation)
+          , sendDonationEdit model.signsk edited
           )
     AdminViewMsg (CancelEditing) ->
       ( { model | editing = NotEditing }
@@ -293,7 +300,7 @@ matchSubscription : Model -> Sub Msg
 matchSubscription model =
   case model.editing of
     NotEditing -> Sub.none
-    Editing _ _ -> matchedModel receiveModel
+    Editing _ -> matchedModel receiveModel
 
 receiveModel : Json.Decode.Value -> Msg
 receiveModel value =

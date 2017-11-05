@@ -2,9 +2,10 @@ require(["donation_panel/donation", "donation_panel/menu", "admin"], function(Do
   var app = Elm.Admin.fullscreen()
 
   app.ports.matchInDonation.subscribe(function(args) {
-    console.log(args.rounds)
     var dm = Donation(args.donation)
     dm.matchMenu(menu)
+    var matches = args.rounds.map(function(r) {return r.id})
+    dm.matchMatches(matches)
     console.log(dm)
     app.ports.matchedModel.send(dm)
   })

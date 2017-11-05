@@ -20,7 +20,7 @@ type AVMsg
 
 type DonationEdit
   = NotEditing
-  | Editing Donation String
+  | Editing Donation
 
 -- VIEW
 
@@ -54,14 +54,15 @@ displayEditing : DonationEdit -> Html AVMsg
 displayEditing edit =
   case edit of 
     NotEditing -> li [] []
-    Editing donation comment ->
+    Editing edited  ->
       li []
         [ p [] 
-          [ span [ class "donor_name" ] [ text donation.donor_name ]
+          [ span [ class "donor_name" ] [ text edited.donor_name ]
           , text " "
-          , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
+          , span [ class "amount" ] [ text <| "$" ++ (toString edited.amount) ]
           ]
-        , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text comment ]
+        , displayDonationOnly edited
+        , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text edited.comment ]
         , p []
           [ Html.button [ onClick DoneEditing ] [ text "Done" ]
           , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
@@ -72,8 +73,8 @@ displayDonation : DonationEdit -> Donation -> Html AVMsg
 displayDonation edit donation =
   case edit of 
     NotEditing -> displayDonationOnly donation
-    Editing editing comment ->
-      if donation.id == editing.id then
+    Editing edited ->
+      if donation.id == edited.id then
         displayEditing edit
       else
         displayDonationOnly donation

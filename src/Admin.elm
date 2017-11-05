@@ -3,6 +3,7 @@ module Admin exposing (..)
 import Admin.View exposing (view, DonationEdit(..), AVMsg(..))
 import Config exposing (config) 
 import GameInfo exposing (GameInfo) 
+import GameInfo.Decode
 import Donation exposing (Donation)
 import Donation.Decode
 import Donation.Encode
@@ -52,7 +53,7 @@ init =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.rounds)
+  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.Decode.rounds)
 
 fetchDonations : Cmd Msg
 fetchDonations =
@@ -128,8 +129,9 @@ update msg model =
         Editing donation comment ->
           ( { model | editing = Editing donation text }
           , matchInDonation
-            <| Donation.Encode.donation
-            <| setDonationComment text donation
+            { rounds = model.rounds
+            , donation = setDonationComment text donation
+            }
           )
     AdminViewMsg (DoneEditing) ->
       case model.editing of

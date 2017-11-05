@@ -1,6 +1,14 @@
 port module Admin.Harbor exposing (matchInDonation, matchedModel)
 
+import Donation
+import GameInfo
+
 import Json.Decode
 
-port matchInDonation : Json.Decode.Value -> Cmd msg
+type alias MatchArguments =
+  { rounds: List GameInfo.GameInfo
+  , donation: Donation.Donation
+  }
+
+port matchInDonation : MatchArguments -> Cmd msg
 port matchedModel : (Json.Decode.Value -> msg) -> Sub msg

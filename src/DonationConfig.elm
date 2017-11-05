@@ -4,6 +4,7 @@ import DonationConfig.View exposing (view)
 import DonationConfig.Msg exposing (..)
 import Menu exposing (..)
 import GameInfo exposing (Options, GameInfo) 
+import GameInfo.Decode
 import Config exposing (config) 
 import DonationConfig.Harbor exposing (..) 
 
@@ -67,7 +68,7 @@ init args =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Http.send mapError (Http.get (config.server ++ "options.json") GameInfo.options)
+  Http.send mapError (Http.get (config.server ++ "options.json") GameInfo.Decode.options)
 
 mapError : (Result Http.Error Options) -> Msg
 mapError =
@@ -174,4 +175,4 @@ subscriptions model =
 
 receiveOptions : String -> Msg
 receiveOptions message =
-  GotGameInfo <| Json.Decode.decodeString GameInfo.options message
+  GotGameInfo <| Json.Decode.decodeString GameInfo.Decode.options message

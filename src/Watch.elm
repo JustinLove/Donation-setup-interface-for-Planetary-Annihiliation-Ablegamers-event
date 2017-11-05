@@ -2,6 +2,7 @@ module Watch exposing (..)
 
 import Watch.View exposing (view, RoundSelection(..), HighlightColor(..), WVMsg(..))
 import GameInfo exposing (GameInfo) 
+import GameInfo.Decode
 import Donation exposing (Donation) 
 import Donation.Decode
 import Config exposing (config) 
@@ -47,7 +48,7 @@ init =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.rounds)
+  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.Decode.rounds)
 
 fetchDonations : RoundSelection -> Cmd Msg
 fetchDonations game =

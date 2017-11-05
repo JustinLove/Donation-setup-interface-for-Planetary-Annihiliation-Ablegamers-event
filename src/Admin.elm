@@ -130,6 +130,10 @@ update msg model =
             { model | editing = NotEditing }
           , sendDonationEdit model.signsk (setDonationComment comment donation)
           )
+    AdminViewMsg (CancelEditing) ->
+      ( { model | editing = NotEditing }
+      , Cmd.none
+      )
 
 removeRound : String -> Model -> Model
 removeRound round model =

@@ -16,6 +16,7 @@ type AVMsg
   | EditDonation Donation
   | CommentChange String
   | DoneEditing
+  | CancelEditing
 
 type DonationEdit
   = NotEditing
@@ -61,7 +62,10 @@ displayEditing edit =
           , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
           ]
         , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text comment ]
-        , p [] [ Html.button [ onClick DoneEditing ] [ text "Done" ] ]
+        , p []
+          [ Html.button [ onClick DoneEditing ] [ text "Done" ]
+          , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
+          ]
         ]
 
 displayDonation : DonationEdit -> Donation -> Html AVMsg

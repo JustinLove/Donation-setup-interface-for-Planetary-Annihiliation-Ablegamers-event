@@ -11,8 +11,10 @@ import Nacl
 import String
 import Html
 import Http
+import WebSocket
 import Task
 import Json.Encode
+import Json.Decode
 import Regex exposing (regex)
 
 main : Program Never Model Msg
@@ -60,6 +62,7 @@ fetchDonations =
 type Msg
   = GotGameInfo (Result Http.Error (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
+  | GotUpdate (Result String (List Donation))
   | EmptyRequestComplete (Result Http.Error ())
   | AdminViewMsg AVMsg
 
@@ -75,6 +78,11 @@ update msg model =
       ({ model | donations = donations}, Cmd.none)
     GotDonations (Err msg) ->
       let _ = Debug.log "donations fetch error" msg in
+      (model, Cmd.none)
+    GotUpdate (Ok donations) ->
+      ({ model | donations = upsertDonations donations model.donations}, Cmd.none)
+    GotUpdate (Err msg) ->
+      let _ = Debug.log "donations update error" msg in
       (model, Cmd.none)
     AdminViewMsg (SetKey signsk) ->
       if (String.length signsk) == 128 then
@@ -239,8 +247,24 @@ donationEditBody : Donation -> String
 donationEditBody donation =
   Json.Encode.encode 0 <| Donation.Encode.donation donation
 
+upsertDonations : List Donation -> List Donation -> List Donation
+upsertDonations updates donations =
+  List.foldr upsertDonation donations updates
+
+upsertDonation : Donation -> List Donation -> List Donation
+upsertDonation update donations =
+  if List.any (\d -> d.id == update.id) donations then
+    donations
+      |> List.map (\d -> if d.id == update.id then update else d)
+  else
+    donations ++ [update]
+
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
+
+receiveUpdate : String -> Msg
+receiveUpdate message =
+  GotUpdate <| Json.Decode.decodeString Donation.Decode.donations message

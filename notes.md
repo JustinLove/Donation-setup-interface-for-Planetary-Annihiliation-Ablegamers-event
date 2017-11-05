@@ -45,7 +45,7 @@
     - x pubsub changes, local cached lists on both poll and web
     - x watcher
     - x game mods
-    - admin?
+    - x admin
     - improved editing experience
 
 - Multiple puppetmasters - coordination? central feed tracking executions?

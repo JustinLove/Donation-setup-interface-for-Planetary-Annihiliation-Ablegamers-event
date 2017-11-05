@@ -39,6 +39,11 @@ var requirejs = require('requirejs');
 
 requirejs.config({
     nodeRequire: require
+    paths: {
+      "donation_panel": "../public/donation_panel",
+      "sandbox_unit_menu": "../public/sandbox_unit_menu",
+      "menu": "../public/menu",
+    }
 });
 
 var donations = []
@@ -51,7 +56,7 @@ var updateMatchesInDonations = promiseStub
 
 requirejs([
   'donation_data/feed',
-  'donation_data/donation',
+  'donation_panel/donation',
   'donation_loading'
 ], function (
   feed,

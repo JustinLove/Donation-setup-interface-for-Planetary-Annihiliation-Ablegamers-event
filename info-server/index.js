@@ -313,7 +313,12 @@ var notifyClientsOptionsChanged = function() {
 var requirejs = require('requirejs');
 
 requirejs.config({
-    nodeRequire: require
+    nodeRequire: require,
+    paths: {
+      "donation_panel": "../public/donation_panel",
+      "sandbox_unit_menu": "../public/sandbox_unit_menu",
+      "menu": "../public/menu",
+    }
 });
 
 var donations = []
@@ -330,7 +335,7 @@ var clearDonationHistory = promiseStub
 
 requirejs([
   'donation_loading',
-  'donation_data/menu',
+  'donation_panel/menu',
 ], function (
   donation_loading,
   menu

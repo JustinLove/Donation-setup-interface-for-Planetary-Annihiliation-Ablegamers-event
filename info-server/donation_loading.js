@@ -1,5 +1,5 @@
 "use strict";
-define(['donation_data/donation'], function (Donation) {
+define(['donation_panel/donation'], function (Donation) {
   var Redis = require('redis')
 
   return function(redis) {

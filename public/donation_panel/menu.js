@@ -31,7 +31,7 @@ define(function() {
     codes: /alsfjdlskfjlkdsjflksajf/
   }
 
-  require(['../public/menu'], function(loadedMenu) {
+  require(['menu'], function(loadedMenu) {
     menu.menu = loadedMenu
 
     loadedMenu.forEach(function(item) {

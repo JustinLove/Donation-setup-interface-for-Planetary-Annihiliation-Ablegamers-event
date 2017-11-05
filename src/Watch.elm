@@ -1,3 +1,5 @@
+module Watch exposing (..)
+
 import Watch.View exposing (view, RoundSelection(..), HighlightColor(..), WVMsg(..))
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation) 

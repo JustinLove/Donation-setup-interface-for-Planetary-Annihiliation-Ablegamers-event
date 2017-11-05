@@ -1,3 +1,5 @@
+module DonationConfig exposing (..)
+
 import View exposing (view)
 import Msg exposing (..)
 import Menu exposing (..)

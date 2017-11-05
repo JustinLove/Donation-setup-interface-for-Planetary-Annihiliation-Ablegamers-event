@@ -1,5 +1,5 @@
 require(["menu", "unit_info", "donate"], function(menu, info, Elm) {
-  var app = Elm.Main.fullscreen({
+  var app = Elm.DonationConfig.fullscreen({
     menu: menu,
     info: info
   })

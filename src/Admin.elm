@@ -1,3 +1,5 @@
+module Admin exposing (..)
+
 import Admin.View exposing (view, DonationEdit(..), AVMsg(..))
 import Config exposing (config) 
 import GameInfo exposing (GameInfo) 

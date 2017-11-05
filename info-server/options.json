@@ -5,15 +5,8 @@
       "id": "match1",
       "discount_level": 0,
       "players": [
-        "ljfed",
-        "cdrkf",
-        "killerkiwijuice",
-        "clopse"
       ],
       "planets": [
-        "Amalgam",
-        "Ascendance",
-        "Gaia Haven"
       ]
     },
     {
@@ -21,15 +14,8 @@
       "id": "match2",
       "discount_level": 0,
       "players": [
-        "elodea",
-        "theiban",
-        "Bobiscool",
-        "Alpha2546"
       ],
       "planets": [
-        "Amalgam",
-        "Ascendance",
-        "Gaia Haven"
       ]
     },
     {
@@ -37,15 +23,8 @@
       "id": "match3",
       "discount_level": 0,
       "players": [
-        "Admiral",
-        "Flubb",
-        "Furballman",
-        "Alfredo"
       ],
       "planets": [
-        "Amalgam",
-        "Ascendance",
-        "Gaia Haven"
       ]
     },
     {
@@ -53,15 +32,8 @@
       "id": "match4",
       "discount_level": 0,
       "players": [
-        "cola_colin",
-        "River",
-        "stuart98",
-        "zaphodx"
       ],
       "planets": [
-        "Amalgam",
-        "Ascendance",
-        "Gaia Haven"
       ]
     },
     {
@@ -69,28 +41,8 @@
       "id": "finals",
       "discount_level": 0,
       "players": [
-        "ljfed",
-        "cdrkf",
-        "killerkiwijuice",
-        "clopse",
-        "elodea",
-        "theiban",
-        "Bobiscool",
-        "Alpha2546",
-        "Admiral",
-        "Flubb",
-        "Furballman",
-        "Alfredo",
-        "cola_colin",
-        "River",
-        "stuart98",
-        "zaphodx"
       ],
       "planets": [
-        "Tomato Soup",
-        "Rusty Barbeque",
-        "Crusty Bread",
-        "Sweet Surprise"
       ]
     }
   ]

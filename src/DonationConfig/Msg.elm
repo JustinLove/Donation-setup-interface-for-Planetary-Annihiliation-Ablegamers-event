@@ -1,4 +1,4 @@
-module Msg exposing (Msg(..))
+module DonationConfig.Msg exposing (Msg(..))
 
 import GameInfo exposing (Options)
 import Http

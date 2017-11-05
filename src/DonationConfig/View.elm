@@ -1,6 +1,6 @@
-module View exposing (view)
+module DonationConfig.View exposing (view)
 
-import Msg exposing (..)
+import DonationConfig.Msg exposing (..)
 import Menu exposing (MenuItem, OrderItem, BuildItem)
 import GameInfo exposing (GameInfo)
 
@@ -32,7 +32,7 @@ view model =
             []
           ]
         ]
-      , Html.form [ onSubmit Msg.None, class "row" ]
+      , Html.form [ onSubmit DonationConfig.Msg.None, class "row" ]
         [ div [ class "targeting-section col" ] <| targetingSection model
         , div [ class "menu-section col" ] <| menuSection model
         , div [ class "bottom-section col" ] <| bottomSection model
@@ -82,7 +82,7 @@ onKey trigger msg keycode =
   if keycode == trigger then
     msg
   else
-    Msg.None
+    DonationConfig.Msg.None
 
 targetingSection model =
   [ div [ class "row" ]

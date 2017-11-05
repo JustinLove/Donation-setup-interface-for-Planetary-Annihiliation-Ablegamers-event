@@ -1,11 +1,11 @@
 module DonationConfig exposing (..)
 
-import View exposing (view)
-import Msg exposing (..)
+import DonationConfig.View exposing (view)
+import DonationConfig.Msg exposing (..)
 import Menu exposing (..)
 import GameInfo exposing (Options, GameInfo) 
 import Config exposing (config) 
-import Harbor exposing (..) 
+import DonationConfig.Harbor exposing (..) 
 
 import Html
 import Http

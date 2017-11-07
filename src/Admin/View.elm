@@ -65,9 +65,14 @@ displayEditing edit =
               text ""
             else
               span [ class "discount_level" ] [ text <| "(" ++ (toString edited.discount_level) ++ ")" ]
-          , span [] (List.map (span [ class "match" ] << List.singleton << text) edited.matchingMatches)
-          , span [ class "comment" ] [ text edited.comment ]
           ]
+        , p []
+            <| List.intersperse (text " ")
+          [ span [] (List.map (span [ class "players" ] << List.singleton << text) edited.matchingPlayers)
+          , span [] (List.map (span [ class "planets" ] << List.singleton << text) edited.matchingPlanets)
+          , span [] (List.map (span [ class "match" ] << List.singleton << text) edited.matchingMatches)
+          ]
+        , p [ class "comment" ] [ text edited.comment ]
         , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text edited.comment ]
         , p []
           [ Html.button [ onClick DoneEditing ] [ text "Done" ]

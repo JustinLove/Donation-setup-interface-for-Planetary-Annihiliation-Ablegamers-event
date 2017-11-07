@@ -8,6 +8,8 @@ type alias Donation =
   , discount_level: Int
   , id: Int
   , matchingMatches: List String
+  , matchingPlayers: List String
+  , matchingPlanets: List String
   , minimum: Float
   , insufficient: Bool
   , unaccounted: Bool

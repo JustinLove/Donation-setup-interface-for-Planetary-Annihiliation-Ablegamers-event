@@ -18,6 +18,8 @@ donation =
     |> set (field "discount_level" int)
     |> set (field "id" int)
     |> set (field "matchingMatches" (list string))
+    |> set (oneOf [ (field "matchingPlayers" (list string)), succeed [] ])
+    |> set (oneOf [ (field "matchingPlanets" (list string)), succeed [] ])
     |> set (field "minimum" float)
     |> set (field "insufficient" bool)
     |> set (field "unaccounted" bool)

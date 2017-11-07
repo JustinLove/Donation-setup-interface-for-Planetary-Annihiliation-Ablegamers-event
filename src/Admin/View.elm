@@ -50,8 +50,8 @@ displayRound round =
       ] []
     ]
 
-displayEditing : DonationEdit -> Html AVMsg
-displayEditing edit =
+displayEditing : Donation -> DonationEdit -> Html AVMsg
+displayEditing original edit =
   case edit of 
     NotEditing -> li [] []
     Editing edited  ->
@@ -72,8 +72,9 @@ displayEditing edit =
           [ tagList "player" edited.matchingPlayers
           , tagList "planet" edited.matchingPlanets
           , tagList "match" edited.matchingMatches
+          , tagList "code-tag" edited.codes
           ]
-        , p [ class "comment" ] [ text edited.comment ]
+        , p [ class "comment" ] [ text original.comment ]
         , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text edited.comment ]
         , p []
           [ Html.button [ onClick DoneEditing ] [ text "Done" ]
@@ -91,7 +92,7 @@ displayDonation edit donation =
     NotEditing -> displayDonationOnly donation
     Editing edited ->
       if donation.id == edited.id then
-        displayEditing edit
+        displayEditing donation edit
       else
         displayDonationOnly donation
 

@@ -46,7 +46,8 @@
     - x watcher
     - x game mods
     - x admin
-    - improved editing experience
+    - x improved editing experience
+    - update discount level?
     - keep original text
 
 - Multiple puppetmasters - coordination? central feed tracking executions?

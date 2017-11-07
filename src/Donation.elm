@@ -10,6 +10,7 @@ type alias Donation =
   , matchingMatches: List String
   , matchingPlayers: List String
   , matchingPlanets: List String
+  , codes: List String
   , minimum: Float
   , insufficient: Bool
   , unaccounted: Bool

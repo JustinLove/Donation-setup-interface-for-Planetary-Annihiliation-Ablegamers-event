@@ -143,6 +143,17 @@ update msg model =
             , donation = edit
             }
           )
+    AdminViewMsg (DiscountLevelChange input) ->
+      case model.editing of
+        NotEditing -> (model, Cmd.none)
+        Editing edited ->
+          let
+            level = parseDiscountLevel input
+            edit = setDonationDiscountLevel level edited
+          in
+          ( { model | editing = Editing edit }
+          , Cmd.none
+          )
     AdminViewMsg (DoneEditing) ->
       case model.editing of
         NotEditing -> (model, Cmd.none)
@@ -220,6 +231,10 @@ updateDonation f id model =
 setDonationComment : String -> Donation -> Donation
 setDonationComment comment donation =
   { donation | comment = comment}
+
+setDonationDiscountLevel : Int -> Donation -> Donation
+setDonationDiscountLevel level donation =
+  { donation | discount_level = level}
 
 updateRound : (GameInfo -> GameInfo) -> String -> Model -> Model
 updateRound f id model =

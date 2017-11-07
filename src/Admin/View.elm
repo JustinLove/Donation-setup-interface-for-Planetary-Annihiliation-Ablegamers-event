@@ -15,6 +15,7 @@ type AVMsg
   | SetDiscountLevel String String
   | EditDonation Donation
   | CommentChange String
+  | DiscountLevelChange String
   | DoneEditing
   | CancelEditing
 
@@ -61,10 +62,13 @@ displayEditing original edit =
           [ span [ class "donor_name" ] [ text edited.donor_name ]
           , span [ class "amount" ] [ text <| "$" ++ (toString edited.amount) ]
           , span [ class "minimum" ] [ text <| "$" ++ (toString edited.minimum) ]
-          , if edited.discount_level == 0 then
-              text ""
-            else
-              span [ class "discount_level" ] [ text <| "(" ++ (toString edited.discount_level) ++ ")" ]
+          , text " discount level: "
+          , input
+            [ type_ "number"
+            , Html.Attributes.min "0"
+            , value (edited.discount_level |> toString)
+            , onInput DiscountLevelChange
+            ] []
           ]
         , p []
           <| List.intersperse (text " ")

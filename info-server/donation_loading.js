@@ -8,9 +8,11 @@ define(['donation_panel/donation'], function (Donation) {
       return {
         amount: dm.amount,
         comment: dm.comment,
+        original_comment: dm.original_comment || dm.comment,
         donor_name: dm.donor_name,
         donor_image: dm.donor_image,
         discount_level: dm.discount_level,
+        original_discount_level: dm.discount_level || 0,
         id: dm.id,
         raw: dm.raw,
       }

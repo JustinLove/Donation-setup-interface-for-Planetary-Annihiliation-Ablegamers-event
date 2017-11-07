@@ -89,6 +89,7 @@ requirejs([
   }
 
   var insertDonation = function(dm) {
+    dm.original_comment = dm.comment
     if (feed[feedName].process.providerId) {
       persistDonation(dm)
     } else {
@@ -113,6 +114,7 @@ requirejs([
           })
           if (game) {
             dm.discount_level = game.discount_level
+            dm.original_discount_level = game.discount_level
           }
         }
         return dm

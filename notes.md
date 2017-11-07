@@ -41,14 +41,15 @@
   - x reduce log spam
   - x better testing for pubsub/websocket events
   - xxx Uber Auth??
-  - Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
+  - other auth?
+  - x Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
     - x pubsub changes, local cached lists on both poll and web
     - x watcher
     - x game mods
     - x admin
     - x improved editing experience
     - x update discount level?
-    - keep original text
+    - x keep original text
 
 - Multiple puppetmasters - coordination? central feed tracking executions?
 

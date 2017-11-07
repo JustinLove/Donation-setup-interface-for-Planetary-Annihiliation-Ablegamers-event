@@ -132,7 +132,7 @@ update msg model =
         }
       )
     AdminViewMsg (CommentChange text) ->
-      let _ = Debug.log "change" text in
+      --let _ = Debug.log "change" text in
       case model.editing of
         NotEditing -> (model, Cmd.none)
         Editing edited ->

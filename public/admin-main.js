@@ -16,7 +16,7 @@ require(["donation_panel/donation", "donation_panel/menu", "admin"], function(Do
     relevant.forEach(function(r) {players = players.concat(r.players)})
     dm.matchPlayers(players)
 
-    console.log(dm)
+    //console.log(dm)
     setTimeout(app.ports.matchedModel.send, 0, dm)
   })
 })

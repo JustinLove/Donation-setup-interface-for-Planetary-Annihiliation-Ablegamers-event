@@ -47,7 +47,7 @@
     - x game mods
     - x admin
     - x improved editing experience
-    - update discount level?
+    - x update discount level?
     - keep original text
 
 - Multiple puppetmasters - coordination? central feed tracking executions?

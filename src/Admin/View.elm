@@ -67,10 +67,11 @@ displayEditing edit =
               span [ class "discount_level" ] [ text <| "(" ++ (toString edited.discount_level) ++ ")" ]
           ]
         , p []
-            <| List.intersperse (text " ")
-          [ span [] (List.map (span [ class "players" ] << List.singleton << text) edited.matchingPlayers)
-          , span [] (List.map (span [ class "planets" ] << List.singleton << text) edited.matchingPlanets)
-          , span [] (List.map (span [ class "match" ] << List.singleton << text) edited.matchingMatches)
+          <| List.intersperse (text " ")
+          <| List.concat
+          [ tagList "player" edited.matchingPlayers
+          , tagList "planet" edited.matchingPlanets
+          , tagList "match" edited.matchingMatches
           ]
         , p [ class "comment" ] [ text edited.comment ]
         , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text edited.comment ]
@@ -79,6 +80,10 @@ displayEditing edit =
           , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
           ]
         ]
+
+tagList : String -> List String -> List (Html AVMsg)
+tagList kind items =
+  List.map (span [ class kind ] << List.singleton << text) <| items
 
 displayDonation : DonationEdit -> Donation -> Html AVMsg
 displayDonation edit donation =

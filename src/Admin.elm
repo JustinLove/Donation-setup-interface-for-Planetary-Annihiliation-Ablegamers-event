@@ -100,7 +100,7 @@ update msg model =
       let _ = Debug.log "raw error" msg in
       (model, Cmd.none)
     MatchedModel (Ok matched) ->
-      --let _ = Debug.log "donation" donation in
+      --let _ = Debug.log "donation" matched in
       case model.editing of
         NotEditing -> (model, Cmd.none)
         Editing edited ->
@@ -126,7 +126,10 @@ update msg model =
       )
     AdminViewMsg (EditDonation donation) ->
       ( { model | editing = Editing donation }
-      , Cmd.none
+      , matchInDonation
+        { rounds = model.rounds
+        , donation = donation
+        }
       )
     AdminViewMsg (CommentChange text) ->
       let _ = Debug.log "change" text in

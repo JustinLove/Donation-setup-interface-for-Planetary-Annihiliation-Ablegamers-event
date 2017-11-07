@@ -17,6 +17,6 @@ require(["donation_panel/donation", "donation_panel/menu", "admin"], function(Do
     dm.matchPlayers(players)
 
     console.log(dm)
-    app.ports.matchedModel.send(dm)
+    setTimeout(app.ports.matchedModel.send, 0, dm)
   })
 })

@@ -38,7 +38,7 @@ var notifySubscribers = function(id) {
 var requirejs = require('requirejs');
 
 requirejs.config({
-    nodeRequire: require
+    nodeRequire: require,
     paths: {
       "donation_panel": "../public/donation_panel",
       "sandbox_unit_menu": "../public/sandbox_unit_menu",

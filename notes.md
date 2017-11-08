@@ -41,7 +41,6 @@
   - x reduce log spam
   - x better testing for pubsub/websocket events
   - xxx Uber Auth??
-  - other auth?
   - x Edit the feed: We had a lot of unspecified donations. Some of them of them got clarified out-of-band,  although outright gifts are possible. Have a way for donators to contact someone for retargeting if time allows.
     - x pubsub changes, local cached lists on both poll and web
     - x watcher
@@ -50,6 +49,8 @@
     - x improved editing experience
     - x update discount level?
     - x keep original text
+  - other auth?
+  - live update admin discounts?
 
 - Multiple puppetmasters - coordination? central feed tracking executions?
 
@@ -57,6 +58,7 @@
 
 - received discount level?
 - x websockets?
+  - reconnect?
 - queuing things up pre-5-minutes.
   - local data?
   - record to central server? localstorage?

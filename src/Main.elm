@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import DonationConfig
 import Watch
+import Main.View exposing (view, Msg(..), State(..))
 
 import Html
 
@@ -19,21 +20,21 @@ main =
 type alias Model =
   { donate : DonationConfig.Model
   , watch : Watch.Model
+  , state : State
   }
 
 init : DonationConfig.Arguments -> (Model, Cmd Msg)
 init args =
   case (DonationConfig.init args, Watch.init) of
     ((donateModel, donateCmd), (watchModel, watchCmd)) ->
-      ( { donate = donateModel, watch = watchModel }
+      ( { donate = donateModel
+        , watch = watchModel
+        , state = StateDonate
+        }
       , Cmd.batch [ Cmd.map DonateMsg donateCmd, Cmd.map WatchMsg watchCmd ]
       )
 
 -- UPDATE
-
-type Msg
-  = DonateMsg DonationConfig.DCMsg
-  | WatchMsg Watch.Msg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -49,19 +50,12 @@ update msg model =
       , Cmd.map WatchMsg wc
       )
 
+-- SUBSCRIPTIONS
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
     [ Sub.map DonateMsg <| DonationConfig.subscriptions model.donate
     , Sub.map WatchMsg <| Watch.subscriptions model.watch
-    ]
-
--- VIEW
-
-view : Model -> Html.Html Msg
-view model =
-  Html.div []
-    [ Html.map DonateMsg (DonationConfig.view model.donate)
-    , Html.map WatchMsg (Watch.view model.watch)
     ]
 

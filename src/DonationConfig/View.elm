@@ -19,20 +19,7 @@ characterLimit = 300
 view model =
   div []
     [ div [ ariaHidden model.instructionsOpen ]
-      [ header [ class "row col" ]
-        [ a
-          [ href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2017"
-          , class "logo"
-          ]
-          [ img
-            [ src "logoHeader.png"
-            , width 242
-            , height 63
-            ]
-            []
-          ]
-        ]
-      , Html.form [ onSubmit DonationConfig.Msg.None, class "row" ]
+      [ Html.form [ onSubmit DonationConfig.Msg.None, class "row" ]
         [ div [ class "targeting-section col" ] <| targetingSection model
         , div [ class "menu-section col" ] <| menuSection model
         , div [ class "bottom-section col" ] <| bottomSection model

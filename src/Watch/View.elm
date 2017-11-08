@@ -43,20 +43,7 @@ type WVMsg
 view model =
   div []
     [ div []
-      [ header [ class "row col" ]
-        [ a
-          [ href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2017"
-          , class "logo"
-          ]
-          [ img
-            [ src "logoHeader.png"
-            , width 242
-            , height 63
-            ]
-            []
-          ]
-        ]
-      , Html.form [ onSubmit None, class "row" ]
+      [ Html.form [ onSubmit None, class "row" ]
         [ div [ class "filtering-section col" ] <| filteringSection model
         , div [ class "highlighting-section col" ] <| highlightingSection model
         ]

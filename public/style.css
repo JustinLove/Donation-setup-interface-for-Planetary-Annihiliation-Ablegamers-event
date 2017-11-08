@@ -24,6 +24,7 @@
 
 @media only screen and (min-width: 34em) {
   .players, .planets { width: 50%; }
+  .state-button { margin-top: 1em; }
 }
 
 @media only screen and (min-width: 54em) {
@@ -118,6 +119,21 @@ body {
 
 .cancel:hover {
   text-decoration: none;
+}
+
+button:disabled {
+  color: #888;
+  background-color: #f8f8f8;
+}
+
+.state-button .button:hover {
+  color: #fff;
+  background-color: #f79521;
+}
+
+.state-button .button:hover:disabled {
+  color: #888;
+  background-color: #f8f8f8;
 }
 
 .menu-section button {

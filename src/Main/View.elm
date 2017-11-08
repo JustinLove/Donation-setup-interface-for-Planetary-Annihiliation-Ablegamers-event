@@ -39,15 +39,19 @@ mainHeader model =
         ]
         []
       ]
-    , stateButton StateDonate "Menu"
-    , stateButton StateWatch "Donations"
+    , stateButton model.state StateDonate "Menu"
+    , stateButton model.state StateWatch "Donations"
     ]
 
-stateButton : State -> String -> Html Msg
-stateButton state title =
+stateButton : State -> State -> String -> Html Msg
+stateButton current state title =
   div [ class "state-button col" ]
     [ button
       [ onClick (ChangeState state)
+      , disabled (current == state)
+      , classList
+        [ ("button", True)
+        ]
       ]
       [ text title]
     ]

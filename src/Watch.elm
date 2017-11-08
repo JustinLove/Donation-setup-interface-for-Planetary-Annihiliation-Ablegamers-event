@@ -1,6 +1,6 @@
 module Watch exposing (..)
 
-import Watch.View exposing (view, RoundSelection(..), HighlightColor(..), WVMsg(..))
+import Watch.View exposing (RoundSelection(..), HighlightColor(..), WVMsg(..))
 import GameInfo exposing (GameInfo) 
 import GameInfo.Decode
 import Donation exposing (Donation) 
@@ -14,11 +14,13 @@ import Time
 import WebSocket
 import Json.Decode
 
+view = \model -> Html.map WatchViewMsg (Watch.View.view model)
+
 main : Program Never Model Msg
 main =
   Html.program
     { init = init
-    , view = \model -> Html.map WatchViewMsg (view model)
+    , view = view
     , update = update
     , subscriptions = subscriptions
     }

@@ -1,6 +1,6 @@
-module DonationConfig exposing (..)
+module DonationConfig exposing (main, init, update, view, subscriptions, DCMsg, Model, Arguments)
 
-import DonationConfig.View exposing (view)
+import DonationConfig.View
 import DonationConfig.Msg exposing (..)
 import Menu exposing (..)
 import GameInfo exposing (Options, GameInfo) 
@@ -15,6 +15,9 @@ import String
 import Array exposing (Array)
 import WebSocket
 import Json.Decode
+
+view = DonationConfig.View.view
+type alias DCMsg = Msg
 
 type alias Arguments =
   { menu: List RawMenuItem
@@ -44,8 +47,8 @@ type alias Model =
   , instructionsOpen: Bool
   }
 
-model : List RawMenuItem -> List UnitInfo -> Model
-model menu info =
+makeModel : List RawMenuItem -> List UnitInfo -> Model
+makeModel menu info =
   let
     m2 = cook 0 info menu
   in
@@ -62,7 +65,7 @@ model menu info =
 
 init : Arguments -> (Model, Cmd Msg)
 init args =
-  ( model args.menu args.info
+  ( makeModel args.menu args.info
   , fetchGame
   )
 

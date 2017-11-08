@@ -49,6 +49,8 @@ update msg model =
       ({ model | watch = wm }
       , Cmd.map WatchMsg wc
       )
+    ChangeState state ->
+      ({ model | state = state }, Cmd.none)
 
 -- SUBSCRIPTIONS
 

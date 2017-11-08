@@ -11,6 +11,7 @@ import Html.Events exposing (onClick)
 type Msg
   = DonateMsg DonationConfig.DCMsg
   | WatchMsg Watch.Msg
+  | ChangeState State
 
 type State
   = StateDonate
@@ -26,10 +27,10 @@ view model =
     ]
 
 mainHeader model =
-  header [ class "row col" ]
+  header [ class "row" ]
     [ a
       [ href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2017"
-      , class "logo"
+      , class "logo col"
       ]
       [ img
         [ src "logoHeader.png"
@@ -38,7 +39,19 @@ mainHeader model =
         ]
         []
       ]
+    , stateButton StateDonate "Menu"
+    , stateButton StateWatch "Donations"
     ]
+
+stateButton : State -> String -> Html Msg
+stateButton state title =
+  div [ class "state-button col" ]
+    [ button
+      [ onClick (ChangeState state)
+      ]
+      [ text title]
+    ]
+
 
 contents model =
   case model.state of

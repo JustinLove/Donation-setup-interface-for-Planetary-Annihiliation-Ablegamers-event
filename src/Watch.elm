@@ -48,6 +48,10 @@ init =
   , Cmd.batch [ fetchGame, fetchDonations AllRounds ]
   )
 
+refresh : Model -> Cmd Msg
+refresh model =
+  Cmd.batch [ fetchGame, fetchDonations model.round ]
+
 fetchGame : Cmd Msg
 fetchGame =
   Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.Decode.rounds)

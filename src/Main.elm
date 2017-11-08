@@ -31,7 +31,7 @@ init args =
         , watch = watchModel
         , state = StateDonate
         }
-      , Cmd.batch [ Cmd.map DonateMsg donateCmd, Cmd.map WatchMsg watchCmd ]
+      , Cmd.map DonateMsg donateCmd
       )
 
 -- UPDATE
@@ -50,14 +50,25 @@ update msg model =
       , Cmd.map WatchMsg wc
       )
     ChangeState state ->
-      ({ model | state = state }, Cmd.none)
+      ({ model | state = state }, initCmd state model)
+
+initCmd : State -> Model -> Cmd Msg
+initCmd state model =
+  case state of
+    StateDonate -> 
+      let
+        (_, cmd) = DonationConfig.init {menu = [], info = []}
+      in Cmd.map DonateMsg cmd
+    StateWatch -> 
+      Cmd.map WatchMsg (Watch.refresh model.watch)
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.batch
-    [ Sub.map DonateMsg <| DonationConfig.subscriptions model.donate
-    , Sub.map WatchMsg <| Watch.subscriptions model.watch
-    ]
+  case model.state of
+    StateDonate -> 
+      Sub.map DonateMsg <| DonationConfig.subscriptions model.donate
+    StateWatch -> 
+      Sub.map WatchMsg <| Watch.subscriptions model.watch
 

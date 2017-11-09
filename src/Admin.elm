@@ -53,7 +53,12 @@ init =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.Decode.rounds)
+  Http.send mapError (Http.get (config.server ++ "options.json") GameInfo.Decode.rounds)
+
+mapError : (Result Http.Error (List GameInfo)) -> Msg
+mapError =
+  Result.mapError toString
+    >> GotGameInfo
 
 fetchDonations : Cmd Msg
 fetchDonations =
@@ -62,7 +67,7 @@ fetchDonations =
 -- UPDATE
 
 type Msg
-  = GotGameInfo (Result Http.Error (List GameInfo))
+  = GotGameInfo (Result String (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
   | GotUpdate (Result String (List Donation))
   | EmptyRequestComplete (Result Http.Error ())
@@ -307,6 +312,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
     [ WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
+    , WebSocket.listen (config.wsserver ++ "options.json") receiveOptions
     , matchSubscription model
     ]
 
@@ -323,3 +329,8 @@ matchSubscription model =
 receiveModel : Json.Decode.Value -> Msg
 receiveModel value =
   MatchedModel <| Json.Decode.decodeValue Donation.Decode.donation value
+
+
+receiveOptions : String -> Msg
+receiveOptions message =
+  GotGameInfo <| Json.Decode.decodeString GameInfo.Decode.rounds message

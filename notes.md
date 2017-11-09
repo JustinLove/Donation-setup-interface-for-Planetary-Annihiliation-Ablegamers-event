@@ -50,7 +50,7 @@
     - x update discount level?
     - x keep original text
   - other auth?
-  - live update admin discounts?
+  - x live update admin discounts?
 
 - Multiple puppetmasters - coordination? central feed tracking executions?
 

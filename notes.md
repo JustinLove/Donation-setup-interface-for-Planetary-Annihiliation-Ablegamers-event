@@ -58,7 +58,7 @@
 
 - received discount level?
 - x websockets?
-  - reconnect?
+  - x reconnect?
 - queuing things up pre-5-minutes.
   - local data?
   - record to central server? localstorage?

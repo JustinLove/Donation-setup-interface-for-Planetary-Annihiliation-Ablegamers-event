@@ -57,6 +57,50 @@ app.use(function(req, res, next) {
 
 app.use(express.static('public'));
 
+var cookieParser = require('cookie-parser');
+app.use(cookieParser())
+
+app.use(function (req, res, next) {
+  console.log(req.cookies)
+  var cookie = req.cookies['auth']
+  if (cookie) {
+    redis.get('session-'+cookie, function(err, reply) {
+      if (reply) {
+        var data = JSON.parse(reply)
+        req.session = data
+      }
+      next()
+    })
+  } else {
+    next()
+  }
+})
+
+app.post('/admin/session', function(req, res) {
+  var id = nacl.to_hex(nacl.crypto_box_random_nonce())
+  var data = {}
+  redis.setex('session-'+id, 60*60*24, JSON.stringify(data), function(err, reply) {
+    if (reply == 'OK') {
+      res.header("Set-Cookie", "auth="+id);
+      res.sendStatus(201)
+    } else {
+      res.sendStatus(500)
+    }
+  })
+})
+
+app.delete('/admin/session', function(req, res) {
+  var id = req.cookies['auth']
+  res.header("Set-Cookie", "auth=; expires=Thu, 01 Jan 1970 00:00:00 GMT");
+  redis.del('session-'+id, function(err, reply) {
+    if (err) {
+      res.sendStatus(507)
+    } else {
+      res.sendStatus(204)
+    }
+  })
+})
+
 app.get('/options.json', function(req, res){
   fetchOptions().then(function(data) {
     res.json(data)

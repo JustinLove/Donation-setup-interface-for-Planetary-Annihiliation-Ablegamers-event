@@ -44,6 +44,15 @@
       ],
       "planets": [
       ]
+    },
+    {
+      "name": "Just Giving, No Requests",
+      "id": "justgiving",
+      "discount_level": 0,
+      "players": [
+      ],
+      "planets": [
+      ]
     }
   ]
 }

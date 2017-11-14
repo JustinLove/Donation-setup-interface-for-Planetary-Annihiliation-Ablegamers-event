@@ -157,7 +157,10 @@ update msg model =
             edit = setDonationDiscountLevel level edited
           in
           ( { model | editing = Editing edit }
-          , Cmd.none
+          , matchInDonation
+            { rounds = model.rounds
+            , donation = edit
+            }
           )
     AdminViewMsg (DoneEditing) ->
       case model.editing of

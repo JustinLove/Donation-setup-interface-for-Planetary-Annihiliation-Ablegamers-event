@@ -89,7 +89,12 @@ menuSection model =
       [ legend [] [ text "Add Items (2017 menu not yet set)" ]
       , ul [ class "menu" ] <| List.map displayMenuItem <| List.filter (not << gameEnder) model.menu
       ]
-    , fieldset []
+    , fieldset
+      [ classList
+        [ ("game-enders", True)
+        , ("game-ender-time", (currentGameTime model) >= 25)
+        ]
+      ]
       [ legend [] [ text "Game Enders for Big Spenders (after 25 min)" ]
       , ul [ class "menu" ] <| List.map displayMenuItem <| List.filter gameEnder model.menu
       ]
@@ -243,6 +248,16 @@ displayOrderItem item =
       [ ul [] <| List.map displayBuild item.build ]
 
     ]
+
+--currentGameTime : Model -> Int
+currentGameTime model =
+  model.rounds
+  |> List.filterMap (\round -> if model.round == round.id then
+                              Just round.gameTime
+                            else
+                              Nothing)
+  |> List.head
+  |> Maybe.withDefault 0
 
 displayMenuItem : MenuItem -> Html Msg
 displayMenuItem item =

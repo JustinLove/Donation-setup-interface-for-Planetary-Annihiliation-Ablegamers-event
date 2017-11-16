@@ -169,6 +169,14 @@ li {
   padding: 0.1em 0.2em;
 }
 
+.game-enders {
+  opacity: 0.5;
+}
+
+.game-enders.game-ender-time {
+  opacity: 1.0;
+}
+
 .menu-item button {
   position: relative;
   font-size: 13px;

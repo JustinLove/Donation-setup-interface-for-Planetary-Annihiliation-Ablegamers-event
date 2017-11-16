@@ -6,6 +6,7 @@ type alias GameInfo =
   , players: List String
   , planets: List String
   , discountLevel : Int
+  , gameTime : Int
   }
 
 type alias Options =

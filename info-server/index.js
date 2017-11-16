@@ -116,6 +116,7 @@ app.put('/games/:id', jsonParser, function(req, res){
   console.log('info', info)
   info.id = req.params.id
   info.discount_level = 0
+  info.game_time = 0
   redis.set(req.params.id, JSON.stringify(info), function(err, reply) {
     if (reply == 'OK') {
       redis.sadd('games', req.params.id, function() {
@@ -128,34 +129,40 @@ app.put('/games/:id', jsonParser, function(req, res){
   })
 });
 
-app.put('/games/:id/discount_level', jsonParser, function(req, res){
-  var sinfo = checkSignature(req, res)
-  if (!sinfo) return
-  var info = JSON.parse(sinfo)
-  console.log('info', info)
-  if (info.id != req.params.id) {
-    console.log('target id mismatch')
-    res.sendStatus(401)
-    return
-  }
-  redis.get(info.id, function(err, reply) {
-    if (reply) {
-      var game = JSON.parse(reply)
-      game.discount_level = info.discount_level
-
-      redis.set(req.params.id, JSON.stringify(game), function(err2, reply2) {
-        if (reply2 == 'OK') {
-          notifySubscribers('options-changed')
-          res.sendStatus(200)
-        } else {
-          res.sendStatus(507)
-        }
-      })
-    } else {
-      res.sendStatus(404)
+var setGameProperty = function(property) {
+  return function(req, res){
+    var sinfo = checkSignature(req, res)
+    if (!sinfo) return
+    var info = JSON.parse(sinfo)
+    console.log('info', info)
+    if (info.id != req.params.id) {
+      console.log('target id mismatch')
+      res.sendStatus(401)
+      return
     }
-  })
-});
+    redis.get(info.id, function(err, reply) {
+      if (reply) {
+        var game = JSON.parse(reply)
+        game[property] = info[property]
+
+        redis.set(req.params.id, JSON.stringify(game), function(err2, reply2) {
+          if (reply2 == 'OK') {
+            notifySubscribers('options-changed')
+            res.sendStatus(200)
+          } else {
+            res.sendStatus(507)
+          }
+        })
+      } else {
+        res.sendStatus(404)
+      }
+    })
+  }
+}
+
+app.put('/games/:id/game_time', jsonParser, setGameProperty('game_time'))
+
+app.put('/games/:id/discount_level', jsonParser, setGameProperty('discount_level'))
 
 app.delete('/games/:id', jsonParser, function(req, res){
   var sid = checkSignature(req, res)

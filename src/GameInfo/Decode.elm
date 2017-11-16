@@ -15,9 +15,10 @@ rounds =
 
 game : Decoder GameInfo
 game =
-  map5 GameInfo
+  map6 GameInfo
     (field "name" string)
     (field "id" string)
     (field "players" (list string))
     (field "planets" (list string))
     (field "discount_level" int)
+    (field "game_time" int)

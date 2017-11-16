@@ -124,8 +124,13 @@ update msg model =
       ( { model | donations = [] }
       , sendClearDonations model.signsk
       )
+    AdminViewMsg (SetGameTime id input) ->
+      let time = parseNumber input in
+      ( updateRound (setRoundGameTime time) id model
+      , sendGameTime model.signsk id time
+      )
     AdminViewMsg (SetDiscountLevel id input) ->
-      let level = parseDiscountLevel input in
+      let level = parseNumber input in
       ( updateRound (setRoundDiscountLevel level) id model
       , sendDiscountLevel model.signsk id level
       )
@@ -153,7 +158,7 @@ update msg model =
         NotEditing -> (model, Cmd.none)
         Editing edited ->
           let
-            level = parseDiscountLevel input
+            level = parseNumber input
             edit = setDonationDiscountLevel level edited
           in
           ( { model | editing = Editing edit }
@@ -200,6 +205,18 @@ sendDiscountLevel key round level =
     , headers = []
     , url = config.server ++ "games/" ++ round ++ "/discount_level"
     , body = discountLevelBody round level |> message key round |> Http.jsonBody
+    , expect = Http.expectStringResponse (\_ -> Ok ())
+    , timeout = Nothing
+    , withCredentials = False
+    }
+
+sendGameTime : String -> String -> Int -> Cmd Msg
+sendGameTime key round time =
+  Http.send EmptyRequestComplete <| Http.request
+    { method = "PUT"
+    , headers = []
+    , url = config.server ++ "games/" ++ round ++ "/game_time"
+    , body = gameTimeBody round time |> message key round |> Http.jsonBody
     , expect = Http.expectStringResponse (\_ -> Ok ())
     , timeout = Nothing
     , withCredentials = False
@@ -255,8 +272,12 @@ setRoundDiscountLevel : Int -> GameInfo -> GameInfo
 setRoundDiscountLevel discountLevel round =
   { round | discountLevel = discountLevel}
 
-parseDiscountLevel : String -> Int
-parseDiscountLevel discountLevel =
+setRoundGameTime : Int -> GameInfo -> GameInfo
+setRoundGameTime gameTime round =
+  { round | gameTime = gameTime}
+
+parseNumber : String -> Int
+parseNumber discountLevel =
   if validNumber discountLevel then
     getNumber discountLevel
   else
@@ -284,6 +305,13 @@ message key id body =
   Json.Encode.object
     [ ("id", Json.Encode.string id)
     , ("data", Json.Encode.string <| signedBody key body)
+    ]
+
+gameTimeBody : String -> Int -> String
+gameTimeBody id game_time =
+  Json.Encode.encode 0 <| Json.Encode.object
+    [ ("id", Json.Encode.string id)
+    , ("game_time", Json.Encode.int game_time)
     ]
 
 discountLevelBody : String -> Int -> String

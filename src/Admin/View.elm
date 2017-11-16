@@ -12,6 +12,7 @@ type AVMsg
   = SetKey String
   | DeleteRound String
   | ClearDonations
+  | SetGameTime String String
   | SetDiscountLevel String String
   | EditDonation Donation
   | CommentChange String
@@ -42,6 +43,13 @@ displayRound round =
       [ text "X "
       , text round.name
       ]
+    , text " game time: "
+    , input
+      [ type_ "number"
+      , Html.Attributes.min "0"
+      , value (round.gameTime |> toString)
+      , onInput (SetGameTime round.id)
+      ] []
     , text " discount level: "
     , input
       [ type_ "number"

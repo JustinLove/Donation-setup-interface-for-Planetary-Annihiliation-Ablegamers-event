@@ -87,7 +87,11 @@ menuSection model =
   [ div [ class "row col" ]
     [ fieldset []
       [ legend [] [ text "Add Items (2017 menu not yet set)" ]
-      , ul [ class "menu" ] <| List.map displayMenuItem model.menu
+      , ul [ class "menu" ] <| List.map displayMenuItem <| List.filter (not << gameEnder) model.menu
+      ]
+    , fieldset []
+      [ legend [] [ text "Game Enders for Big Spenders (after 25 min)" ]
+      , ul [ class "menu" ] <| List.map displayMenuItem <| List.filter gameEnder model.menu
       ]
     ]
   ]
@@ -262,6 +266,10 @@ buildImage build =
       , width 60
       , height 60
       ] []
+
+gameEnder : MenuItem -> Bool
+gameEnder item =
+  (String.left 1 item.code) == "G"
 
 displayBuild : BuildItem -> Html Msg
 displayBuild build =

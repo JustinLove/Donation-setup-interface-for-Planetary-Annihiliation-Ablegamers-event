@@ -77,6 +77,10 @@ return [
     "display_name": "SR-24 -Shield- Missile Defense"
   },
   {
+    "spec": "/pa/units/land/one_shot_anti_nuke_launcher/one_shot_anti_nuke_launcher.json",
+    "display_name": "One Shot Anti-Nuke Launcher"
+  },
+  {
     "spec": "/pa/units/land/artillery_long/artillery_long.json",
     "display_name": "Holkins"
   },
@@ -555,6 +559,10 @@ return [
   {
     "spec": "/pa/units/land/nuke_launcher/nuke_launcher_ammo.json",
     "display_name": "LR-96 -Pacifier- Missile"
+  },
+  {
+    "spec": "/pa/units/land/one_shot_nuke_launcher/one_shot_nuke_launcher.json",
+    "display_name": "One Shot Nuclear Missile Launcher"
   },
   {
     "spec": "/pa/units/land/tank_flak/tank_flak.json",

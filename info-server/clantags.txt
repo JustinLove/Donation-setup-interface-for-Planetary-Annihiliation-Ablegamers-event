@@ -11,7 +11,7 @@
         "[pXs] Skywalker",
         "Thatsonofabroom",
         "[APAA] Nomega",
-        "Big Danny",
+        "[TNC] Big_Danny",
         "[RLM]Mot9001",
         "[BRN]Gandalf"
 

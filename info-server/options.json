@@ -1,11 +1,15 @@
 {
   "games": [
     {
-      "name": "AbleGamers Match 1",
-      "id": "match1",
+      "name": "AbleGamers Yellow",
+      "id": "matchyellow",
       "discount_level": 0,
       "game_time": 0,
       "players": [
+        "flubb",
+        "Sl33p",
+        "Stuart98",
+        "Elite Sardaukar"
       ],
       "planets": [
         "Amalgam",
@@ -14,11 +18,15 @@
       ]
     },
     {
-      "name": "AbleGamers Match 2",
-      "id": "match2",
+      "name": "AbleGamers Green",
+      "id": "matchgreen",
       "discount_level": 0,
       "game_time": 0,
       "players": [
+        "Big_Danny",
+        "Furballman",
+        "CDRKF",
+        "Gandalf"
       ],
       "planets": [
         "Amalgam",
@@ -27,11 +35,15 @@
       ]
     },
     {
-      "name": "AbleGamers Match 3",
-      "id": "match3",
+      "name": "AbleGamers Blue",
+      "id": "matchblue",
       "discount_level": 0,
       "game_time": 0,
       "players": [
+        "Skywalker",
+        "Thatsonofabroom",
+        "theiban",
+        "Mot9001"
       ],
       "planets": [
         "Amalgam",
@@ -40,11 +52,15 @@
       ]
     },
     {
-      "name": "AbleGamers Match 4",
-      "id": "match4",
+      "name": "AbleGamers Red",
+      "id": "matchred",
       "discount_level": 0,
       "game_time": 0,
       "players": [
+        "Nomega",
+        "PAG_Clopsie",
+        "MangoMango",
+        "Lula Mae"
       ],
       "planets": [
         "Amalgam",
@@ -71,7 +87,7 @@
         "Skywalker",
         "Thatsonofabroom",
         "Nomega",
-        "Big Danny",
+        "Big_Danny",
         "Mot9001",
         "Gandalf"
       ],

@@ -1,7 +1,7 @@
         "[BRN]Elite Sardaukar",
         "flubb",
         "Stuart98",
-        "Sl33p",
+        "Sl33p",// Lukasmolleman
         "[pXs] Furballman",
         "PAG_Clopsie",
         "(P)CDRKF",
@@ -10,5 +10,8 @@
         "(P)MangoMango",
         "[pXs] Skywalker",
         "Thatsonofabroom",
-        "NomegaCorgi",
-        "Big Danny"
+        "[APAA] Nomega",
+        "Big Danny",
+        "[RLM]Mot9001",
+        "[BRN]Gandalf"
+

@@ -5,7 +5,7 @@
   "main": "index.js",
   "engines": {
     "node": "~8.4",
-    "npm": "~5.3"
+    "npm": "~5.5"
   },
   "dependencies": {
     "body-parser": "^1.15.2",

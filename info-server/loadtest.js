@@ -1,5 +1,5 @@
 var fs = require('fs')
-var data = fs.readFileSync(__dirname+'/options-2016.json')
+var data = fs.readFileSync(__dirname+'/options-2017.json')
 var json = JSON.parse(data)
 
 var Redis = require('redis')

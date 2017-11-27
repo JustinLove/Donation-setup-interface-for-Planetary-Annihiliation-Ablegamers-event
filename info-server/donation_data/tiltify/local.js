@@ -2,7 +2,7 @@ define(['donation_data/tiltify/parse'], function(parse) {
   var fs = require('fs')
 
   var testSequence = [
-    "info-server/donation_data/tiltify/api_test.json",
+    "info-server/donation_data/tiltify/tiltify2017.json",
   ]
 
   var update = function() {

@@ -1,7 +1,7 @@
 ### Central server(s)
 
 - x dump database level data
-- Test data
+- x Test data
 
 - Timestamp when recevied by our server
 - other auth?

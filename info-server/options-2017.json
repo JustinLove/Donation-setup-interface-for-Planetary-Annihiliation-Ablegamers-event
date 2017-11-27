@@ -1,0 +1,98 @@
+{
+  "games": [
+    {
+      "name": "Ablegamers Finals",
+      "id": "finals",
+      "players": [
+        "(P)MangoMango",
+        "flubb",
+        "[pXs] Furballman",
+        "Thatsonofabroom"
+      ],
+      "planets": [
+        "Tomato Soup",
+        "Rusty Barbeque",
+        "Crusty Bread",
+        "Sweet Surprise"
+      ],
+      "discount_level": 0,
+      "game_time": 26
+    },
+    {
+      "name": "AbleGamers Red",
+      "id": "matchred",
+      "discount_level": 0,
+      "game_time": 26,
+      "players": [
+        "Nomega",
+        "PAG_Clopsie",
+        "MangoMango",
+        "Lula Mae"
+      ],
+      "planets": [
+        "Amalgam",
+        "Ascendance",
+        "Gaia Haven"
+      ]
+    },
+    {
+      "name": "AbleGamers Blue",
+      "id": "matchblue",
+      "discount_level": 0,
+      "game_time": 26,
+      "players": [
+        "Skywalker",
+        "Thatsonofabroom",
+        "theiban",
+        "Mot9001"
+      ],
+      "planets": [
+        "Amalgam",
+        "Ascendance",
+        "Gaia Haven"
+      ]
+    },
+    {
+      "name": "AbleGamers Yellow",
+      "id": "matchyellow",
+      "discount_level": 0,
+      "game_time": 26,
+      "players": [
+        "flubb",
+        "Sl33p",
+        "Stuart98",
+        "Elite Sardaukar"
+      ],
+      "planets": [
+        "Amalgam",
+        "Ascendance",
+        "Gaia Haven"
+      ]
+    },
+    {
+      "name": "Just Giving, No Requests",
+      "id": "justgiving",
+      "discount_level": 0,
+      "game_time": 0,
+      "players": [],
+      "planets": []
+    },
+    {
+      "name": "Ablegamers Green",
+      "id": "matchgreen",
+      "players": [
+        "(P)CDRKF",
+        "[TNC] Big_Danny",
+        "[pXs] Furballman",
+        "AdmiralGeneral"
+      ],
+      "planets": [
+        "Amalgam",
+        "Ascendance",
+        "Gaia Haven"
+      ],
+      "discount_level": 0,
+      "game_time": 26
+    }
+  ]
+}

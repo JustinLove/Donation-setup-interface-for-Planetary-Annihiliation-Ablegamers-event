@@ -186,7 +186,11 @@ app.delete('/games/:id', jsonParser, function(req, res){
 });
 
 app.get('/donations', function(req, res){
-  res.json(filterDonations(donations, req.query))
+  if (req.query['format'] == 'dump') {
+    res.json(dumpDonations(donations))
+  } else {
+    res.json(filterDonations(donations, req.query))
+  }
 });
 
 app.put('/donations/:id', jsonParser, function(req, res){
@@ -299,6 +303,11 @@ var filterDonations = function(dms, query) {
       unaccounted: dm.unaccounted,
     }
   })}
+}
+
+var dumpDonations = function(dms) {
+  var list = dms
+  return {donations: list.map(persistFields)}
 }
 
 var WebSocketServer = require('ws').Server

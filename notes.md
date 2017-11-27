@@ -14,7 +14,7 @@
 ### Ingame Mod
 
 - x test data
-- Hermes were not coming in at orbital
+- Hermes were not coming in at orbital - hermes specific, requires patch mod
 - "nobody" gave units - timing issue?
 - Lobby info streamlining
 - received discount level?

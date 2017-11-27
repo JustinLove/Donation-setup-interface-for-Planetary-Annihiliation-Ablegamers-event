@@ -9,7 +9,7 @@
 
 ### Donation Config UI
 
-- Say starting at 5 minutes
+- x Say starting at 5 minutes
 
 ### Ingame Mod
 

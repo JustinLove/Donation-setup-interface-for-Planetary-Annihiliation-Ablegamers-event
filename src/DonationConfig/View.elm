@@ -86,7 +86,7 @@ targetingSection model =
 menuSection model =
   [ div [ class "row col" ]
     [ fieldset []
-      [ legend [] [ text "Add Items" ]
+      [ legend [] [ text "Add Items (after 5 minutes)" ]
       , ul [ class "menu" ] <| List.map displayMenuItem <| List.filter (not << gameEnder) model.menu
       ]
     , fieldset

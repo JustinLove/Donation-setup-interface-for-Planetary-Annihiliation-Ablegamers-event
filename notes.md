@@ -5,6 +5,7 @@
 
 - original_comment getting overwritten?
 - Timestamp when recevied by our server
+- unit descriptions
 - other auth?
 - Multiple puppetmasters - coordination? central feed tracking executions?
 

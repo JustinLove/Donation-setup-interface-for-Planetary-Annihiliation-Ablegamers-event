@@ -1,7 +1,5 @@
 ### Central server(s)
 
-- unit descriptions
-
 - dump database level data
 - Test data
 - original_comment getting overwritten???
@@ -10,6 +8,7 @@
 
 ### Donation Config UI
 
+- unit descriptions - rollover?
 - ports?
 
 ### Ingame Mod

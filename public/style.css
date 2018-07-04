@@ -245,6 +245,14 @@ li {
   display: inline-block;
 }
 
+.build .build-unit-name {
+  margin: 0;
+}
+
+.build .unit-description {
+  margin: 0;
+}
+
 #not-enough {
   background-color: yellow;
 }

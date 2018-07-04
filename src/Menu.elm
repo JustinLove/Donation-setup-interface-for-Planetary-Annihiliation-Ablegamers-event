@@ -24,6 +24,7 @@ type alias MenuItem =
 type alias BuildItem = 
   { spec: String
   , display_name: String
+  , description: String
   , image: String
   , quantity: Int
   }
@@ -40,6 +41,7 @@ type alias RawBuildItem = (Int, String)
 type alias UnitInfo = 
   { spec: String
   , display_name: String
+  , description: String
   }
 
 makeOrder : MenuItem -> OrderItem
@@ -105,12 +107,14 @@ cookBuildItem info (n, spec) =
     Just unit ->
       { spec = spec
       , display_name = unit.display_name
+      , description = unit.description
       , image = imagePath spec
       , quantity = n
       }
     Nothing ->
       { spec = spec
       , display_name = spec
+      , description = ""
       , image = ""
       , quantity = n
       }
@@ -119,6 +123,7 @@ priorityBuild : BuildItem
 priorityBuild =
   { spec = ""
   , display_name = "Priority"
+  , description = "Move your units up in the queue if donation execution is backlogged."
   , image = ""
   , quantity = 1
   }

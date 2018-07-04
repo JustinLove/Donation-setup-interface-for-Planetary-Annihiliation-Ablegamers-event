@@ -276,8 +276,8 @@ buildImage build =
   else
     img
       [ src build.image
-      , alt <| quantityName build
-      , title <| quantityName build
+      , alt <| quantityNameDescription build
+      , title <| quantityNameDescription build
       , width 60
       , height 60
       ] []
@@ -288,11 +288,18 @@ gameEnder item =
 
 displayBuild : BuildItem -> Html Msg
 displayBuild build =
-  li [ class "build" ] [ text <| quantityName build ]
+  li [ class "build" ]
+    [ p [class "build-unit-name"] [ strong [] [text <| quantityName build ]]
+    , p [class "unit-description"] [ small [] [ text <| build.description ] ]
+    ]
 
 quantityName : BuildItem -> String
 quantityName build =
   (toString build.quantity)++" "++build.display_name
+
+quantityNameDescription : BuildItem -> String
+quantityNameDescription build =
+  (quantityName build) ++ " -- " ++ build.description
 
 donationTotal : List OrderItem -> Float
 donationTotal items =

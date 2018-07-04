@@ -7,7 +7,7 @@ import GameInfo exposing (GameInfo)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
-import Html.Events exposing (onInput, onFocus, onBlur, onCheck, onClick, onSubmit)
+import Html.Events exposing (onInput, onFocus, onBlur, onCheck, onClick, onSubmit, onMouseEnter, onMouseLeave)
 import String
 import Json.Decode
 
@@ -85,7 +85,12 @@ targetingSection model =
 
 menuSection model =
   [ div [ class "row col" ]
-    [ fieldset []
+    [ fieldset [ class "hover-info" ]
+      (model.hover
+        |> Maybe.map (.build >> (List.map (quantityNameDescription >> text)))
+        |> Maybe.withDefault []
+      )
+    , fieldset []
       [ legend [] [ text "Add Items (after 5 minutes)" ]
       , ul [ class "menu" ] <| List.map displayMenuItem <| List.filter (not << gameEnder) model.menu
       ]
@@ -261,7 +266,7 @@ currentGameTime model =
 
 displayMenuItem : MenuItem -> Html Msg
 displayMenuItem item =
-  li [ class "menu-item" ]
+  li [ class "menu-item", onMouseEnter (Hover (Just item)), onMouseLeave (Hover Nothing) ]
     [ button [ onClick (AddOne item.code) ]
       [ span [ class "menu-graphic" ] <| List.map buildImage item.build
       , span [ class "menu-code" ] [ text item.code ]

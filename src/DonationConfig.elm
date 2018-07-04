@@ -44,6 +44,7 @@ type alias Model =
   , player: String
   , planet: String
   , selections : List OrderItem
+  , hover: Maybe MenuItem
   , instructionsOpen: Bool
   }
 
@@ -60,6 +61,7 @@ makeModel menu info =
     , player = ""
     , planet = ""
     , selections = List.map makeOrder m2
+    , hover = Nothing
     , instructionsOpen = False
     }
 
@@ -89,6 +91,8 @@ update msg model =
       (updateOrder updateQuantity code model, Cmd.none)
     AddOne code ->
       (updateOrder addOne code model, Cmd.none)
+    Hover item ->
+      ({ model | hover = item }, Cmd.none)
     SetPlayer name ->
       ({ model | player = name}, Cmd.none)
     SetPlanet name ->

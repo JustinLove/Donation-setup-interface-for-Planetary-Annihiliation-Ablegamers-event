@@ -8,7 +8,6 @@
 
 ### Donation Config UI
 
-- unit descriptions - rollover?
 - ports?
 
 ### Ingame Mod

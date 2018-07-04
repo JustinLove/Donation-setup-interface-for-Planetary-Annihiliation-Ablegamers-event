@@ -15,6 +15,7 @@ define(['donation_panel/donation'], function (Donation) {
         original_discount_level: dm.discount_level || 0,
         id: dm.id,
         raw: dm.raw,
+        received_timestamp: dm.received_timestamp,
       }
     }
 

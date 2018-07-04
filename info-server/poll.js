@@ -90,6 +90,7 @@ requirejs([
 
   var insertDonation = function(dm) {
     dm.original_comment = dm.comment
+    dm.received_timestamp = dm.received_timestamp || Date.now()
     if (feed[feedName].process.providerId) {
       persistDonation(dm)
     } else {

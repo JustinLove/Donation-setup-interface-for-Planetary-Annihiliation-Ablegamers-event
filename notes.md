@@ -1,25 +1,25 @@
 ### Central server(s)
 
-- x dump database level data
-- x Test data
-
-- original_comment getting overwritten?
-- Timestamp when recevied by our server
 - unit descriptions
+
+- dump database level data
+- Test data
+- original_comment getting overwritten???
 - other auth?
 - Multiple puppetmasters - coordination? central feed tracking executions?
 
 ### Donation Config UI
 
-- x Say starting at 5 minutes
+- ports?
 
 ### Ingame Mod
 
-- x test data
 - Hermes were not coming in at orbital - hermes specific, requires patch mod
 - "nobody" gave units - timing issue?
 - Lobby info streamlining
 - received discount level?
+
+- test data
 - queuing things up pre-5-minutes.
   - local data?
   - record to central server? localstorage?

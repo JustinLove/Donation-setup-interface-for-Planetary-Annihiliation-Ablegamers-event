@@ -19,4 +19,15 @@ require(["donation_panel/donation", "donation_panel/menu", "admin"], function(Do
     //console.log(dm)
     setTimeout(app.ports.matchedModel.send, 0, dm)
   })
+
+  nacl_factory.instantiate(function(nacl) {
+    app.ports.signMessage.subscribe(function(args) {
+      var msg = nacl.encode_utf8(args.body)
+      var signsk = nacl.from_hex(args.key)
+      var signed = nacl.crypto_sign(msg, signsk)
+      var response = Object.create(args)
+      response.body = nacl.to_hex(signed)
+      app.ports.signedMessage.send(response)
+    })
+  })
 })

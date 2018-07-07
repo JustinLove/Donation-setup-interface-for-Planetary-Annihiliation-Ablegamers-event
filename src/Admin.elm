@@ -72,6 +72,7 @@ type Msg
   | GotUpdate (Result String (List Donation))
   | EmptyRequestComplete (Result Http.Error ())
   | MatchedModel (Result String Donation)
+  | SignedMessage Nacl.SignArguments
   | AdminViewMsg AVMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -95,7 +96,7 @@ update msg model =
     AdminViewMsg (SetKey signsk) ->
       if (String.length signsk) == 128 then
         ( { model | signsk = signsk }
-        , Cmd.batch [ fetchGame, fetchDonations ]
+        , Cmd.batch [ fetchGame, fetchDonations]
         )
       else
         (model, Cmd.none)
@@ -116,6 +117,9 @@ update msg model =
     MatchedModel (Err msg) ->
       let _ = Debug.log "match error" msg in
       (model, Cmd.none)
+    SignedMessage response ->
+      let _ = Debug.log "signed message" response in
+      (model, sendSignedRequest response)
     AdminViewMsg (DeleteRound round) ->
       ( removeRound round model
       , sendDeleteRound model.signsk round
@@ -186,64 +190,66 @@ removeRound : String -> Model -> Model
 removeRound round model =
   { model | rounds = List.filter (\r -> not (r.id == round)) model.rounds }
 
-sendDeleteRound : String -> String -> Cmd Msg
-sendDeleteRound key round =
+sendSignedRequest : Nacl.SignArguments -> Cmd Msg
+sendSignedRequest {method, url, id, body} =
   Http.send EmptyRequestComplete <| Http.request
-    { method = "DELETE"
+    { method = method
     , headers = []
-    , url = config.server ++ "games/" ++ round
-    , body = message key round round |> Http.jsonBody
+    , url = url
+    , body = message id body |> Http.jsonBody
     , expect = Http.expectStringResponse (\_ -> Ok ())
     , timeout = Nothing
     , withCredentials = False
+    }
+
+sendDeleteRound : String -> String -> Cmd Msg
+sendDeleteRound key round =
+  Nacl.signMessage
+    { key = key
+    , method = "DELETE"
+    , url = config.server ++ "games/" ++ round
+    , id = round
+    , body = round
     }
 
 sendDiscountLevel : String -> String -> Int -> Cmd Msg
 sendDiscountLevel key round level =
-  Http.send EmptyRequestComplete <| Http.request
-    { method = "PUT"
-    , headers = []
+  Nacl.signMessage
+    { key = key
+    , method = "PUT"
     , url = config.server ++ "games/" ++ round ++ "/discount_level"
-    , body = discountLevelBody round level |> message key round |> Http.jsonBody
-    , expect = Http.expectStringResponse (\_ -> Ok ())
-    , timeout = Nothing
-    , withCredentials = False
+    , id = round
+    , body = discountLevelBody round level
     }
 
 sendGameTime : String -> String -> Int -> Cmd Msg
 sendGameTime key round time =
-  Http.send EmptyRequestComplete <| Http.request
-    { method = "PUT"
-    , headers = []
+  Nacl.signMessage
+    { key = key
+    , method = "PUT"
     , url = config.server ++ "games/" ++ round ++ "/game_time"
-    , body = gameTimeBody round time |> message key round |> Http.jsonBody
-    , expect = Http.expectStringResponse (\_ -> Ok ())
-    , timeout = Nothing
-    , withCredentials = False
+    , id = round
+    , body = gameTimeBody round time
     }
 
 sendClearDonations : String -> Cmd Msg
 sendClearDonations key =
-  Http.send EmptyRequestComplete <| Http.request
-    { method = "DELETE"
-    , headers = []
+  Nacl.signMessage
+    { key = key
+    , method = "DELETE"
     , url = config.server ++ "donations"
-    , body = message key "donations" "clear" |> Http.jsonBody
-    , expect = Http.expectStringResponse (\_ -> Ok ())
-    , timeout = Nothing
-    , withCredentials = False
+    , id = "donations"
+    , body = "clear"
     }
 
 sendDonationEdit : String -> Donation -> Cmd Msg
 sendDonationEdit key donation =
-  Http.send EmptyRequestComplete <| Http.request
-    { method = "PUT"
-    , headers = []
+  Nacl.signMessage
+    { key = key
+    , method = "PUT"
     , url = config.server ++ "donations/" ++ (toString donation.id)
-    , body = donationEditBody donation |> message key (toString donation.id) |> Http.jsonBody
-    , expect = Http.expectStringResponse (\_ -> Ok ())
-    , timeout = Nothing
-    , withCredentials = False
+    , id = toString donation.id
+    , body = donationEditBody donation
     }
 
 updateDonation : (Donation -> Donation) -> Int -> Model -> Model
@@ -291,20 +297,11 @@ validNumber : String -> Bool
 validNumber value =
   Regex.contains (regex "^\\d+$") value
 
-signedBody : String -> String -> String
-signedBody key body =
-  let
-    msg = Nacl.encode_utf8 body
-    signsk = Nacl.from_hex key
-    signed = Nacl.crypto_sign msg signsk
-  in
-    Nacl.to_hex signed
-
-message : String -> String -> String -> Json.Encode.Value
-message key id body =
+message : String -> String -> Json.Encode.Value
+message id body =
   Json.Encode.object
     [ ("id", Json.Encode.string id)
-    , ("data", Json.Encode.string <| signedBody key body)
+    , ("data", Json.Encode.string body)
     ]
 
 gameTimeBody : String -> Int -> String
@@ -345,6 +342,7 @@ subscriptions model =
     [ WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
     , WebSocket.listen (config.wsserver ++ "options.json") receiveOptions
     , matchSubscription model
+    , Nacl.signedMessage SignedMessage
     ]
 
 receiveUpdate : String -> Msg

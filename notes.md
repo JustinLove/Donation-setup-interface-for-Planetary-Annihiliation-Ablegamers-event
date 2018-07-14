@@ -8,14 +8,14 @@
 
 ### Donation Config UI
 
-x ports?
+- x ports?
 
 ### Ingame Mod
 
-- Hermes were not coming in at orbital - hermes specific, requires patch mod
-- "nobody" gave units - timing issue?
+- x Hermes were not coming in at orbital - hermes specific, requires patch mod
+- x "nobody" gave units - timing issue? - could not reproduce
 - Lobby info streamlining
-- received discount level?
+- received discount level? - not currently fetching options
 
 - test data
 - queuing things up pre-5-minutes.

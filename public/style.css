@@ -261,6 +261,11 @@ li {
   background-color: yellow;
 }
 
+#demo {
+  text-align: center;
+  background-color: yellow;
+}
+
 .highlighting-header ul {
   display: inline;
 }

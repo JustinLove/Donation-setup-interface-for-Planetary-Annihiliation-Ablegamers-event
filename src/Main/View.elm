@@ -23,6 +23,7 @@ type State
 view model =
   div []
     [ mainHeader model
+    , header [ id "demo" ] [ text "This site is currently running in demo mode with last year's data" ]
     , contents model
     ]
 

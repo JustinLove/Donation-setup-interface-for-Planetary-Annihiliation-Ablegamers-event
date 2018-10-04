@@ -29,7 +29,7 @@ view model =
 mainHeader model =
   header [ class "row" ]
     [ a
-      [ href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2017"
+      [ href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2018"
       , class "logo col"
       ]
       [ img

@@ -1,8 +1,8 @@
-define(['donation_data/tiltify/parse'], function(parse) {
+define(['donation_data/tiltifyv3/parse'], function(parse) {
   var fs = require('fs')
 
   var testSequence = [
-    "info-server/donation_data/tiltify/tiltify2017.json",
+    "info-server/donation_data/tiltifyv3/sample.json",
   ]
 
   var update = function() {

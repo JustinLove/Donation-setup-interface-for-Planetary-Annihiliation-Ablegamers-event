@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "status": 200
+  },
+  "data": [
+    {
+      "id": 21347,
+      "amount": 4.20,
+      "name": "Yoda",
+      "comment": "Judge me by my size, do you?",
+      "completedAt": 1490328000000,
+      "rewardId": 12
+    },
+    {
+      "id": 21342,
+      "amount": 1.00,
+      "name": "Me",
+      "comment": "This is an easy Game",
+      "completedAt": 1490327800000
+    }
+  ],
+  "links": {
+    "prev": "",
+    "next": "",
+    "self": ""
+  }
+}

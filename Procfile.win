@@ -1,3 +1,4 @@
 web: node info-server/index.js 
 poll: node info-server/poll.js 
 simulate: node info-server/poll.js simulate
+once: node info-server/poll.js once

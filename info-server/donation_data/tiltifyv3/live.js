@@ -1,10 +1,16 @@
 define([
-  'donation_data/tiltify/parse',
+  'donation_data/tiltifyv3/parse',
 ], function(parse) {
   var http = require('https')
   var URL = require('url')
 
-  var donations = "https://tiltify.com/api/v2/campaign/donations"
+  //var donations = "https://tiltify.com/api/v3/campaigns/9238/donations" // 2017
+  var donations = "https://tiltify.com/api/v3/campaigns/19351/donations" // 2018
+
+  // undocumented parameters:
+  // count=10
+  // before=donatoinid
+  // aftert=donationid
 
   var api_key = process.env.API_KEY
 
@@ -12,7 +18,7 @@ define([
     return new Promise(function(resolve, reject) {
       var options = URL.parse(url || donations)
       options.headers = {
-        'Authorization': 'Token token="' + api_key + '"',
+        'Authorization': 'Bearer ' + api_key,
       }
 
       http.get(options, function(res) {

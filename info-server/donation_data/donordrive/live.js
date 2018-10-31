@@ -5,9 +5,9 @@ define(['donation_data/donordrive/parse'], function(parse) {
   //var donations = "https://ablegamers.donordrive.com/index.cfm?fuseaction=donorDrive.participantDonations&participantID=1002"
   //var donations = "coui://ui/mods/donation_data/donordrive/sample.htm"
 
-  var update = function(url) {
+  var update = function() {
     return new Promise(function(resolve, reject) {
-      http.get(url || donations, function(res) {
+      http.get(donations, function(res) {
         var error;
         if (res.statusCode !== 200) {
           error = new Error('Request Failed.\n' +

@@ -243,6 +243,8 @@ requirejs([
     } else if (process.argv[2] == 'once') {
       update().then(function() {
         setTimeout(process.exit, 5000)
+      }, function() {
+        setTimeout(process.exit, 5000)
       })
     } else {
       autoUpdate()

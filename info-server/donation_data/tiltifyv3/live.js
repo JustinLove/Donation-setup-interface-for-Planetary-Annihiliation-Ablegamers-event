@@ -4,19 +4,20 @@ define([
   var http = require('https')
   var URL = require('url')
 
-  //var donations = "https://tiltify.com/api/v3/campaigns/9238/donations" // 2017
-  var donations = "https://tiltify.com/api/v3/campaigns/19351/donations" // 2018
+  var root = "https://tiltify.com"
+  //var donations = "/api/v3/campaigns/9238/donations?count=50" // 2017
+  var donations = "/api/v3/campaigns/19351/donations?count=50" // 2018
 
   // undocumented parameters:
   // count=10
-  // before=donatoinid
+  // before=donationid
   // aftert=donationid
 
   var api_key = process.env.API_KEY
 
-  var update = function(url) {
+  var update = function() {
     return new Promise(function(resolve, reject) {
-      var options = URL.parse(url || donations)
+      var options = URL.parse(root + donations)
       options.headers = {
         'Authorization': 'Bearer ' + api_key,
       }
@@ -43,7 +44,11 @@ define([
         res.on('data', (chunk) => { rawData += chunk; });
         res.on('end', () => {
           try {
-            var data = parse.process(JSON.parse(rawData))
+            var json = JSON.parse(rawData)
+            if (json && json.links && json.links.next) {
+              donations = json.links.next
+            }
+            var data = parse.process(json)
             resolve(data)
             return
           } catch (e) {

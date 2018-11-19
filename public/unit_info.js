@@ -48,7 +48,7 @@ return [
   {
     "spec": "/pa/units/air/fighter_adv/fighter_adv.json",
     "display_name": "Phoenix",
-    "description": "Interplanetary Fighter- Stronger fighter. Can move between planets. Can only attack air targets."
+    "description": "Air fighter, able to move between planets"
   },
   {
     "spec": "/pa/units/air/gunship/gunship.json",
@@ -58,7 +58,7 @@ return [
   {
     "spec": "/pa/units/air/transport/transport.json",
     "display_name": "Pelican",
-    "description": "Air Transport- Load a land unit for rapid long distance travel."
+    "description": "Transports ground units"
   },
   {
     "spec": "/pa/units/commanders/avatar/avatar.json",
@@ -148,7 +148,7 @@ return [
   {
     "spec": "/pa/units/land/bot_bomb/bot_bomb.json",
     "display_name": "Boom",
-    "description": "Bomb bot- Self-Destructs to deal very heavy damage over an area. Extremely fast."
+    "description": "Fast Self-destruct bomb"
   },
   {
     "spec": "/pa/units/land/bot_factory/bot_factory.json",
@@ -183,7 +183,7 @@ return [
   {
     "spec": "/pa/units/land/control_module/control_module.json",
     "display_name": "Catalyst",
-    "description": "Super Weapon- Build five on a metal planet to activate the Annihilazer."
+    "description": " 5 Enables a metal planet to become ultimate super-weapons"
   },
   {
     "spec": "/pa/units/land/energy_plant/energy_plant.json",
@@ -268,7 +268,7 @@ return [
   {
     "spec": "/pa/units/land/metal_extractor_adv/metal_extractor_adv.json",
     "display_name": "Advanced Metal Extractor",
-    "description": "Advanced manufacturing- Produces metal, can only be placed on metal deposits."
+    "description": "Economy: Provides metal"
   },
   {
     "spec": "/pa/units/land/metal_storage/metal_storage.json",
@@ -288,7 +288,7 @@ return [
   {
     "spec": "/pa/units/land/one_shot_nuke_launcher/one_shot_nuke_launcher.json",
     "display_name": "One Shot Nuclear Missile Launcher",
-    "description": "Launches a single advanced long range, large area damage, nuclear missile, can not build more missiles."
+    "description": "A single nuclear missile; capable of large damage at interplanetary targets"
   },
   {
     "spec": "/pa/units/land/radar/radar.json",
@@ -313,7 +313,7 @@ return [
   {
     "spec": "/pa/units/land/tank_heavy_armor/tank_heavy_armor.json",
     "display_name": "Vanguard",
-    "description": "Heavy tank- Advanced short range, heavily armored vehicle."
+    "description": "Short range, heavily armored vehicle."
   },
   {
     "spec": "/pa/units/land/tank_heavy_mortar/tank_heavy_mortar.json",
@@ -373,12 +373,12 @@ return [
   {
     "spec": "/pa/units/orbital/delta_v_engine/delta_v_engine.json",
     "display_name": "Halley",
-    "description": "Delta V Engine- Used to move small to medium celestial bodies."
+    "description": "Allows launching certain planets into other planets"
   },
   {
     "spec": "/pa/units/orbital/ion_defense/ion_defense.json",
     "display_name": "Umbrella",
-    "description": "Ion defense platform- Designed to take out orbital units above it."
+    "description": "Anti-orbital defense"
   },
   {
     "spec": "/pa/units/orbital/mining_platform/mining_platform.json",
@@ -568,7 +568,7 @@ return [
   {
     "spec": "/pa/units/air/titan_air/titan_air.json",
     "display_name": "Zeus",
-    "description": "Lightning Titan- Heavy damage over a wide area. Attacks any targets except orbital."
+    "description": "Flying titan which attacks air and land"
   },
   {
     "spec": "/pa/units/air/transport/transport.json",
@@ -633,7 +633,7 @@ return [
   {
     "spec": "/pa/units/land/bot_support_commander/bot_support_commander.json",
     "display_name": "Colonel",
-    "description": "Proxy Commander -- Builds advanced structures. Durable. High damage. Attacks everything but orbital."
+    "description": "Versatile combat capable builder (Base game structures)"
   },
   {
     "spec": "/pa/units/land/bot_tactical_missile/bot_tactical_missile.json",
@@ -728,7 +728,7 @@ return [
   {
     "spec": "/pa/units/land/titan_structure/titan_structure.json",
     "display_name": "Ragnarok",
-    "description": "Doomsday Titan- Destroys the planet it's built on once finished."
+    "description": "Destroys the planet it's built on after a short countdown."
   },
   {
     "spec": "/pa/units/land/titan_vehicle/titan_vehicle.json",
@@ -923,7 +923,7 @@ return [
   {
     "spec": "/pa/units/air/l_air_carrier/l_air_carrier.json",
     "display_name": "Meteor",
-    "description": "Air carrier- Launches fast-flying drones at enemies. Attacks everything except orbital."
+    "description": "Flying carrier of fighter/bomber"
   },
   {
     "spec": "/pa/units/air/l_air_carrier/l_drone/l_drone.json",
@@ -993,7 +993,7 @@ return [
   {
     "spec": "/pa/units/air/l_flying_teleporter/l_flying_teleporter.json",
     "display_name": "Comet",
-    "description": "Interplanetary mobile teleporter- Heavily armored."
+    "description": "Interplanetary mobile teleporter exit."
   },
   {
     "spec": "/pa/units/air/l_gunship/l_gunship.json",
@@ -1143,7 +1143,7 @@ return [
   {
     "spec": "/pa/units/land/l_bot_support_commander/l_bot_support_commander.json",
     "display_name": "Praetorian",
-    "description": "Auxiliary commander- Can build structures. High health and heavily armed."
+    "description": "Versatile combat capable builder (Legion structures)"
   },
   {
     "spec": "/pa/units/land/l_energy_plant/l_energy_plant.json",
@@ -1153,7 +1153,7 @@ return [
   {
     "spec": "/pa/units/land/l_energy_plant_adv/l_energy_plant_adv.json",
     "display_name": "Advanced Power Catalyst",
-    "description": "Advanced power generator- Fabricates black holes and harnesses their energy. Damages allies upon death."
+    "description": "Economy: Provides energy - but explodes when destroyed"
   },
   {
     "spec": "/pa/units/land/l_fabrication_bot/l_fabrication_bot.json",
@@ -1228,7 +1228,7 @@ return [
   {
     "spec": "/pa/units/land/l_necromancer/l_necromancer.json",
     "display_name": "Necromancer",
-    "description": "Mobile siege walker- Summons purgers from the ground below. Massive explosion upon death."
+    "description": "Combat unit with death explosion"
   },
   {
     "spec": "/pa/units/land/l_necromancer/minion/minion_spawner.json",
@@ -1353,12 +1353,12 @@ return [
   {
     "spec": "/pa/units/land/l_teleporter/l_teleporter.json",
     "display_name": "Sky Bridge",
-    "description": "Teleportation device- Teleports units from one to another."
+    "description": "Static teleporter entrance/exit"
   },
   {
     "spec": "/pa/units/land/l_titan_bot/l_titan_bot.json",
     "display_name": "Thor",
-    "description": "Experimental assault titan- Equipped with an arsenal of highly destructive weapons."
+    "description": "Giant mech with multiple weapons"
   },
   {
     "spec": "/pa/units/land/l_titan_structure/l_titan_structure.json",

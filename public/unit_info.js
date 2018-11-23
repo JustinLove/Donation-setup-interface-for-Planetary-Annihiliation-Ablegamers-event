@@ -103,7 +103,7 @@ return [
   {
     "spec": "/pa/units/land/artillery_long/artillery_long.json",
     "display_name": "Holkins",
-    "description": "Advanced Artillery- Extremely long-range heavy damage. Can lay siege from very far away. Attacks land and sea targets."
+    "description": "Long-range artillery."
   },
   {
     "spec": "/pa/units/land/artillery_short/artillery_short.json",
@@ -238,7 +238,7 @@ return [
   {
     "spec": "/pa/units/land/land_mine/land_mine.json",
     "display_name": "Land Mine",
-    "description": "Land mine- Detonates when enemy units are in proximity."
+    "description": "Detonates when enemy units are in proximity."
   },
   {
     "spec": "/pa/units/land/land_scout/land_scout.json",
@@ -1183,7 +1183,7 @@ return [
   {
     "spec": "/pa/units/land/l_flame_turret/l_flame_turret.json",
     "display_name": "Arsonist",
-    "description": "Flame defense turret- Spews high-damage napalm."
+    "description": "Flame defense turret."
   },
   {
     "spec": "/pa/units/land/l_hover_tank/l_hover_tank.json",
@@ -1283,7 +1283,7 @@ return [
   {
     "spec": "/pa/units/land/l_shield_gen/l_shield_gen.json",
     "display_name": "Rampart",
-    "description": "Shield- Absorbs incoming shots. Requires energy. Overlapping ramparts provides little benefit."
+    "description": "Shield generator - absorbs incoming shots."
   },
   {
     "spec": "/pa/units/land/l_shotgun_tank/l_shotgun_tank.json",
@@ -1303,7 +1303,7 @@ return [
   {
     "spec": "/pa/units/land/l_storage/l_storage.json",
     "display_name": "OmniSilo Storage Device",
-    "description": "Storage- Harnesses the power of black holes to compress and store excess metal and energy."
+    "description": "Increases storage of all resources."
   },
   {
     "spec": "/pa/units/land/l_swarm_hive/l_hive_nanoswarm/l_hive_nanoswarm.json",

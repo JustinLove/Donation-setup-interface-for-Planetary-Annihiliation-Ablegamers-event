@@ -9,10 +9,33 @@ define([], function() {
     { code: 'A3', donation: 1, discounts: [1], build: [
       [1, "/pa/units/air/transport/transport.json"],
     ]},
+    { code: 'A4', donation: 1, discounts: [1], build: [
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+      [1, "/pa/units/land/land_mine/land_mine.json"],
+    ]},
     { code: 'B1', donation: 3, discounts: [3,1], build: [
       [1, "/pa/units/land/tank_heavy_armor/tank_heavy_armor.json"],
     ]},
     { code: 'B2', donation: 3, discounts: [3,1], build: [
+      [1, "/pa/units/orbital/ion_defense/ion_defense.json"],
       [1, "/pa/units/orbital/ion_defense/ion_defense.json"],
     ]},
     { code: 'B3', donation: 3, discounts: [3,1], build: [
@@ -20,6 +43,12 @@ define([], function() {
     ]},
     { code: 'B4', donation: 3, discounts: [3,1], build: [
       [1, "/pa/units/land/teleporter/teleporter.json"],
+    ]},
+    { code: 'B5', donation: 3, discounts: [3,1], build: [
+      [1, "/pa/units/land/l_storage/l_storage.json"],
+    ]},
+    { code: 'B6', donation: 3, discounts: [3,1], build: [
+      [1, "/pa/units/land/l_flame_turret/l_flame_turret.json"],
     ]},
     { code: 'C1', donation: 5, discounts: [5,3,1], build: [
       [1, "/pa/units/land/metal_extractor_adv/metal_extractor_adv.json"],
@@ -44,6 +73,12 @@ define([], function() {
     ]},
     { code: 'D3', donation: 10, discounts: [10,5,3,1], build: [
       [10, "/pa/units/air/fighter_adv/fighter_adv.json"],
+    ]},
+    { code: 'E1', donation: 15, discounts: [15,7,3,1], build: [
+      [1, "/pa/units/land/artillery_long/artillery_long.json"],
+    ]},
+    { code: 'E2', donation: 15, discounts: [15,7,3,1], build: [
+      [1, "/pa/units/land/l_shield_gen/l_shield_gen.json"],
     ]},
     { code: 'G1', donation: 10, discounts: [10,5,3,1], build: [
       [1, "/pa/units/orbital/delta_v_engine/delta_v_engine.json"],

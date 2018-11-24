@@ -351,9 +351,9 @@ var notifyClientsDonations = function(dms) {
     var query = websocketQuery(con)
     if (query.pathname == '/donations') {
       var struct = filterDonations(dms, query)
-      if (struct.donations.length > 0) {
+      //if (struct.donations.length > 0) {
         con.send(JSON.stringify(struct))
-      }
+      //}
     }
   })
 }
@@ -368,6 +368,11 @@ var notifyClientsOptionsChanged = function() {
       }
     })
   })
+}
+
+var keepAlive = function() {
+  notifyClientsDonations([])
+  setTimeout(keepAlive, 45000)
 }
 
 var requirejs = require('requirejs');
@@ -468,6 +473,8 @@ requirejs([
   redisSubscriptions.subscribe('donation-update')
   redisSubscriptions.subscribe('clear-donations')
   redisSubscriptions.subscribe('options-changed')
+
+  keepAlive()
 });
 
 app.set('port', (process.env.PORT || 5000));

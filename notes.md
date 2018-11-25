@@ -8,14 +8,23 @@
 
 ### Donation Config UI
 
-- x ports?
+- Elm 0.19
+- Lots of little match changes - interactive editing?
 
 ### Ingame Mod
 
 - x Hermes were not coming in at orbital - hermes specific, requires patch mod
 - x "nobody" gave units - timing issue? - could not reproduce
+  - saw again intermittently
 - Lobby info streamlining
 - received discount level? - not currently fetching options
+- Legion pushing menu queue off bottom of screen
+- Legion blocking chat
+- Donation panel getting confused with planet panel during backlogs
+- Menu design: Menu items with multiples can be auto-combined.
+- Need better integration with bulk paste, current player/unit/quantity summary
+  - colored ghosts?
+  - immedite ghosts?
 
 - test data
 - queuing things up pre-5-minutes.

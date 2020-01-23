@@ -23,14 +23,14 @@ type State
 view model =
   div []
     [ mainHeader model
-    --, header [ id "demo" ] [ text "This site is currently running in demo mode with last year's data" ]
+    , header [ id "demo" ] [ text "This site is currently running in demo mode with prior year's data" ]
     , contents model
     ]
 
 mainHeader model =
   header [ class "row" ]
     [ a
-      [ href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2018"
+      [ href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2020"
       , class "logo col"
       ]
       [ img

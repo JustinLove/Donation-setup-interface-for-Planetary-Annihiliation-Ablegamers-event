@@ -47,7 +47,7 @@ instructions =
       , footer []
         [ a
           [ target "_blank"
-          , href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2018/donate"
+          , href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2020/donate"
           , class "primary button"
           , id "navigate-donation"
           ] [ text "Take Me There" ]
@@ -124,7 +124,7 @@ bottomSection model =
           , text " Units are added based on the "
           , a 
             [ target "_blank"
-            , href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2018/donations"
+            , href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2020/donations"
             ]
             [ text "donation feed at tiltify.com" ]
           , text "."

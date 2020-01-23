@@ -6,7 +6,8 @@ define([
 
   var root = "https://tiltify.com"
   //var donations = "/api/v3/campaigns/9238/donations?count=50" // 2017
-  var donations = "/api/v3/campaigns/19351/donations?count=50" // 2018
+  //var donations = "/api/v3/campaigns/19351/donations?count=50" // 2018
+  var donations = "/api/v3/campaigns/41062/donations?count=50" // 2020
 
   // undocumented parameters:
   // count=10

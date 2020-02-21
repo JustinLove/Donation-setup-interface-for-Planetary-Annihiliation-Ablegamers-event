@@ -1,5 +1,5 @@
-require(["donation_panel/donation", "donation_panel/menu", "admin"], function(Donation, menu, Elm) {
-  var app = Elm.Admin.fullscreen()
+require(["donation_panel/donation", "donation_panel/menu", "admin"], function(Donation, menu) {
+  var app = Elm.Admin.init()
 
   app.ports.matchInDonation.subscribe(function(args) {
     var dm = Donation(args.donation)

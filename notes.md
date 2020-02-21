@@ -12,6 +12,8 @@
   - websockets
   - remove regex
 - Lots of little match changes - interactive editing?
+- oauth?
+- admin streamlining and safety
 
 ### Ingame Mod
 

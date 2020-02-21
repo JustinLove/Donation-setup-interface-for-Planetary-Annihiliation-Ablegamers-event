@@ -1,4 +1,4 @@
-module Admin.View exposing (view, DonationEdit(..), AVMsg(..))
+module Admin.View exposing (document, view, DonationEdit(..), AVMsg(..))
 import Config exposing (config) 
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation)
@@ -25,6 +25,12 @@ type DonationEdit
   | Editing Donation
 
 -- VIEW
+
+--document : (AVMsg -> Msg) -> Model -> Browser.Document Msg
+document tagger model =
+  { title = "Donation Admin"
+  , body = [view model |> Html.map tagger]
+  }
 
 --view : Model -> Html Msg
 view model =
@@ -54,7 +60,7 @@ displayRound round =
     , input
       [ type_ "number"
       , Html.Attributes.min "0"
-      , value (round.discountLevel |> String.toInt)
+      , value (round.discountLevel |> String.fromInt)
       , onInput (SetDiscountLevel round.id)
       ] []
     ]

@@ -13,7 +13,7 @@ donation d =
    , ("donor_image", string d.donor_image)
    , ("discount_level", int d.discount_level)
    , ("id", int d.id)
-   , ("matchingMatches", (list <| List.map string d.matchingMatches))
+   , ("matchingMatches", (list string d.matchingMatches))
    , ("minimum", float d.minimum)
    , ("insufficient", bool d.insufficient)
    , ("unaccounted", bool d.unaccounted)

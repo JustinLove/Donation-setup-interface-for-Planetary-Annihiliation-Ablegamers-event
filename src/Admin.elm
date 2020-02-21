@@ -1,8 +1,8 @@
 module Admin exposing (..)
 
-import Admin.View exposing (view, DonationEdit(..), AVMsg(..))
+import Admin.View exposing (DonationEdit(..), AVMsg(..))
 import Config exposing (config) 
-import GameInfo exposing (GameInfo) 
+import GameInfo exposing (Options, GameInfo)
 import GameInfo.Decode
 import Donation exposing (Donation)
 import Donation.Decode
@@ -10,20 +10,20 @@ import Donation.Encode
 import Admin.Harbor exposing (..)
 import Nacl
 
+import Browser
 import String
-import Html
 import Http
-import WebSocket
+--import WebSocket
 import Task
 import Json.Encode
 import Json.Decode
-import Regex exposing (regex)
+import Regex
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-  Html.program
+  Browser.document
     { init = init
-    , view = \model -> Html.map AdminViewMsg (view model)
+    , view = Admin.View.document AdminViewMsg
     , update = update
     , subscriptions = subscriptions
     }
@@ -45,15 +45,18 @@ makeModel =
   , signsk = ""
   }
 
-init : (Model, Cmd Msg)
-init =
+init : () -> (Model, Cmd Msg)
+init _ =
   ( makeModel
   , Cmd.none
   )
 
 fetchGame : Cmd Msg
 fetchGame =
-  Http.send mapError (Http.get (config.server ++ "options.json") GameInfo.Decode.rounds)
+  Http.get
+    { url = config.server ++ "options.json"
+    , expect = Http.expectJson mapError GameInfo.Decode.rounds
+    }
 
 mapError : (Result Http.Error (List GameInfo)) -> Msg
 mapError =
@@ -62,16 +65,19 @@ mapError =
 
 fetchDonations : Cmd Msg
 fetchDonations =
-  Http.send GotDonations (Http.get (config.server ++ "donations") Donation.Decode.donations)
+  Http.get
+    { url = config.server ++ "donations"
+    , expect = Http.expectJson GotDonations Donation.Decode.donations
+    }
 
 -- UPDATE
 
 type Msg
   = GotGameInfo (Result String (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
-  | GotUpdate (Result String (List Donation))
+  | GotUpdate (Result Json.Decode.Error (List Donation))
   | EmptyRequestComplete (Result Http.Error ())
-  | MatchedModel (Result String Donation)
+  | MatchedModel (Result Json.Decode.Error Donation)
   | SignedMessage Nacl.SignArguments
   | AdminViewMsg AVMsg
 
@@ -80,18 +86,18 @@ update msg model =
   case msg of
     GotGameInfo (Ok rounds) ->
       ({ model | rounds = rounds}, Cmd.none)
-    GotGameInfo (Err msg) ->
-      let _ = Debug.log "error" msg in
+    GotGameInfo (Err err) ->
+      let _ = Debug.log "error" err in
       (model, Cmd.none)
     GotDonations (Ok donations) ->
       ({ model | donations = donations}, Cmd.none)
-    GotDonations (Err msg) ->
-      let _ = Debug.log "donations fetch error" msg in
+    GotDonations (Err err) ->
+      let _ = Debug.log "donations fetch error" err in
       (model, Cmd.none)
     GotUpdate (Ok donations) ->
       ({ model | donations = upsertDonations donations model.donations}, Cmd.none)
-    GotUpdate (Err msg) ->
-      let _ = Debug.log "donations update error" msg in
+    GotUpdate (Err err) ->
+      let _ = Debug.log "donations update error" err in
       (model, Cmd.none)
     AdminViewMsg (SetKey signsk) ->
       if (String.length signsk) == 128 then
@@ -102,8 +108,8 @@ update msg model =
         (model, Cmd.none)
     EmptyRequestComplete (Ok response) ->
       (model, Cmd.none)
-    EmptyRequestComplete (Err msg) ->
-      let _ = Debug.log "raw error" msg in
+    EmptyRequestComplete (Err err) ->
+      let _ = Debug.log "raw error" err in
       (model, Cmd.none)
     MatchedModel (Ok matched) ->
       --let _ = Debug.log "donation" matched in
@@ -114,8 +120,8 @@ update msg model =
           ( { model | editing = Editing merge }
           , Cmd.none
           )
-    MatchedModel (Err msg) ->
-      let _ = Debug.log "match error" msg in
+    MatchedModel (Err err) ->
+      let _ = Debug.log "match error" err in
       (model, Cmd.none)
     SignedMessage response ->
       let _ = Debug.log "signed message" response in
@@ -192,14 +198,14 @@ removeRound round model =
 
 sendSignedRequest : Nacl.SignArguments -> Cmd Msg
 sendSignedRequest {method, url, id, body} =
-  Http.send EmptyRequestComplete <| Http.request
+  Http.request
     { method = method
     , headers = []
     , url = url
     , body = message id body |> Http.jsonBody
-    , expect = Http.expectStringResponse (\_ -> Ok ())
+    , expect = Http.expectWhatever EmptyRequestComplete
     , timeout = Nothing
-    , withCredentials = False
+    , tracker = Nothing
     }
 
 sendDeleteRound : String -> String -> Cmd Msg
@@ -295,7 +301,13 @@ getNumber s =
 
 validNumber : String -> Bool
 validNumber value =
-  Regex.contains (regex "^\\d+$") value
+  Regex.contains onlyNumber value
+
+onlyNumber : Regex.Regex
+onlyNumber =
+  "^\\d+$"
+    |> Regex.fromString
+    |> Maybe.withDefault Regex.never
 
 message : String -> String -> Json.Encode.Value
 message id body =
@@ -323,31 +335,32 @@ donationEditBody donation =
   Json.Encode.encode 0 <| Donation.Encode.donation donation
 
 upsertDonations : List Donation -> List Donation -> List Donation
-upsertDonations updates donations =
-  List.foldr upsertDonation donations updates
+upsertDonations entries donations =
+  List.foldr upsertDonation donations entries
 
 upsertDonation : Donation -> List Donation -> List Donation
-upsertDonation update donations =
-  if List.any (\d -> d.id == update.id) donations then
+upsertDonation entry donations =
+  if List.any (\d -> d.id == entry.id) donations then
     donations
-      |> List.map (\d -> if d.id == update.id then update else d)
+      |> List.map (\d -> if d.id == entry.id then entry else d)
   else
-    donations ++ [update]
+    donations ++ [entry]
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
-    [ WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
-    , WebSocket.listen (config.wsserver ++ "options.json") receiveOptions
-    , matchSubscription model
+    --[ WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
+    --, WebSocket.listen (config.wsserver ++ "options.json") receiveOptions
+    [ matchSubscription model
     , Nacl.signedMessage SignedMessage
     ]
 
 receiveUpdate : String -> Msg
-receiveUpdate message =
-  GotUpdate <| Json.Decode.decodeString Donation.Decode.donations message
+receiveUpdate =
+  Json.Decode.decodeString Donation.Decode.donations
+    >> GotUpdate
 
 matchSubscription : Model -> Sub Msg
 matchSubscription model =
@@ -356,10 +369,12 @@ matchSubscription model =
     Editing _ -> matchedModel receiveModel
 
 receiveModel : Json.Decode.Value -> Msg
-receiveModel value =
-  MatchedModel <| Json.Decode.decodeValue Donation.Decode.donation value
+receiveModel =
+  MatchedModel << Json.Decode.decodeValue Donation.Decode.donation
 
 
 receiveOptions : String -> Msg
-receiveOptions message =
-  GotGameInfo <| Json.Decode.decodeString GameInfo.Decode.rounds message
+receiveOptions =
+  Json.Decode.decodeString GameInfo.Decode.rounds
+    >> Result.mapError Debug.toString
+    >> GotGameInfo

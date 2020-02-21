@@ -9,6 +9,8 @@
 ### Donation Config UI
 
 - Elm 0.19
+  - websockets
+  - remove regex
 - Lots of little match changes - interactive editing?
 
 ### Ingame Mod
@@ -19,12 +21,13 @@
 - Lobby info streamlining
 - received discount level? - not currently fetching options
 - Legion pushing menu queue off bottom of screen
-- Legion blocking chat
-- Donation panel getting confused with planet panel during backlogs
-- Menu design: Menu items with multiples can be auto-combined.
-- Need better integration with bulk paste, current player/unit/quantity summary
-  - colored ghosts?
-  - immedite ghosts?
+- schedule unit paste in sim time
+- x Legion blocking chat
+- x Donation panel getting confused with planet panel during backlogs
+- x Menu design: Menu items with multiples can be auto-combined.
+- x Need better integration with bulk paste, current player/unit/quantity summary
+  - x colored ghosts?
+  - immedite ghosts????
 
 - test data
 - queuing things up pre-5-minutes.

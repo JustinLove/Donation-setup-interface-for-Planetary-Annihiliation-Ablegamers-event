@@ -57,7 +57,7 @@ fetchGame =
 
 mapError : (Result Http.Error (List GameInfo)) -> Msg
 mapError =
-  Result.mapError toString
+  Result.mapError Debug.toString
     >> GotGameInfo
 
 fetchDonations : Cmd Msg
@@ -247,8 +247,8 @@ sendDonationEdit key donation =
   Nacl.signMessage
     { key = key
     , method = "PUT"
-    , url = config.server ++ "donations/" ++ (toString donation.id)
-    , id = toString donation.id
+    , url = config.server ++ "donations/" ++ (String.fromInt donation.id)
+    , id = String.fromInt donation.id
     , body = donationEditBody donation
     }
 
@@ -291,7 +291,7 @@ parseNumber discountLevel =
 
 getNumber : String -> Int
 getNumber s =
-  String.toInt s |> Result.withDefault 0
+  String.toInt s |> Maybe.withDefault 0
 
 validNumber : String -> Bool
 validNumber value =

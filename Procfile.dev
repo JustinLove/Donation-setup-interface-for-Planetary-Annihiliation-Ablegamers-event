@@ -1,8 +1,8 @@
 web: supervisor --no-restart-on error -w info-server info-server/index.js 
 poll: supervisor --no-restart-on error -w info-server info-server/poll.js 
 static: supervisor -w static-server static-server/index.js
-main: watch "elm-make src/Main.elm --output public/main.js" src
-donate: watch "elm-make src/DonationConfig.elm --output public/donate.js" src
-watch: watch "elm-make src/Watch.elm --output public/watch.js" src
-admin: watch "elm-make src/Admin.elm --output public/admin.js" src
+main: watch "elm make src/Main.elm --output public/main.js" src
+donate: watch "elm make src/DonationConfig.elm --output public/donate.js" src
+watch: watch "elm make src/Watch.elm --output public/watch.js" src
+admin: watch "elm make src/Admin.elm --output public/admin.js" src
 db: redis-server info-server/db/dev.conf

@@ -1,6 +1,6 @@
 module Menu exposing (OrderItem, RawMenuItem, RawBuildItem, MenuItem, BuildItem, UnitInfo, cook, makeOrder)
 
-import Regex exposing (regex)
+import Regex
 import String
 import Tuple exposing (first)
 import Array exposing (Array)
@@ -130,5 +130,8 @@ priorityBuild =
 
 imagePath : String -> String
 imagePath s =
-  Regex.replace Regex.All (regex "\\.json") (\_ -> "_icon_buildbar.png") s
-  |> String.dropLeft 1
+  case Regex.fromString "\\.json" of
+    Nothing -> s
+    Just regex ->
+      Regex.replace regex (\_ -> "_icon_buildbar.png") s
+        |> String.dropLeft 1

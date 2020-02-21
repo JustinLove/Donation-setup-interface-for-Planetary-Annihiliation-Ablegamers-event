@@ -2,15 +2,15 @@ module Main exposing (..)
 
 import DonationConfig
 import Watch
-import Main.View exposing (view, Msg(..), State(..))
+import Main.View exposing (document, Msg(..), State(..))
 
-import Html
+import Browser
 
 main : Program DonationConfig.Arguments Model Msg
 main =
-  Html.programWithFlags
+  Browser.document
     { init = init
-    , view = view
+    , view = document identity
     , update = update
     , subscriptions = subscriptions
     }
@@ -25,7 +25,7 @@ type alias Model =
 
 init : DonationConfig.Arguments -> (Model, Cmd Msg)
 init args =
-  case (DonationConfig.init args, Watch.init) of
+  case (DonationConfig.init args, Watch.init ()) of
     ((donateModel, donateCmd), (watchModel, watchCmd)) ->
       ( { donate = donateModel
         , watch = watchModel
@@ -39,13 +39,13 @@ init args =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    DonateMsg msg ->
-      let (dm, dc) = DonationConfig.update msg model.donate in
+    DonateMsg sub ->
+      let (dm, dc) = DonationConfig.update sub model.donate in
       ({ model | donate = dm }
       , Cmd.map DonateMsg dc
       )
-    WatchMsg msg ->
-      let (wm, wc) = Watch.update msg model.watch in
+    WatchMsg sub ->
+      let (wm, wc) = Watch.update sub model.watch in
       ({ model | watch = wm }
       , Cmd.map WatchMsg wc
       )

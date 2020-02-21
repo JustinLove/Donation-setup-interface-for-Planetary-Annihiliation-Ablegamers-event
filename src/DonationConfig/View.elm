@@ -1,4 +1,4 @@
-module DonationConfig.View exposing (view)
+module DonationConfig.View exposing (document, view)
 
 import DonationConfig.Msg exposing (..)
 import Menu exposing (MenuItem, OrderItem, BuildItem)
@@ -15,7 +15,13 @@ import Json.Decode
 
 characterLimit = 300
 
---view : Model -> Html Msg
+--document : (DCMsg -> Msg) -> Model -> Browser.Document Msg
+document tagger model =
+  { title = "Menu"
+  , body = [view model |> Html.map tagger]
+  }
+
+--view : Model -> Html DCMsg
 view model =
   div []
     [ div [ ariaHidden model.instructionsOpen ]
@@ -152,8 +158,8 @@ bottomSection model =
             [text (donationText model)]
           , p []
             [ small []
-              [ donationText model |> String.length |> toString |> text
-              , text (" / " ++ (toString characterLimit) ++ " characters")
+              [ donationText model |> String.length |> String.fromInt |> text
+              , text (" / " ++ (String.fromInt characterLimit) ++ " characters")
               ]
             ]
           , br [] []
@@ -300,7 +306,7 @@ displayBuild build =
 
 quantityName : BuildItem -> String
 quantityName build =
-  (toString build.quantity)++" "++build.display_name
+  (String.fromInt build.quantity)++" "++build.display_name
 
 quantityNameDescription : BuildItem -> String
 quantityNameDescription build =
@@ -336,7 +342,7 @@ itemTextLong item =
   String.join ""
     [ item.code
     , " x"
-    , toString item.quantity
+    , String.fromInt item.quantity
     , " ("
     , List.map (buildText item.quantity) item.build |> String.join ", "
     , ")"
@@ -344,7 +350,7 @@ itemTextLong item =
 
 buildText : Int -> BuildItem -> String
 buildText quantity build =
-  toString (build.quantity * quantity) ++ " " ++ build.display_name
+  String.fromInt (build.quantity * quantity) ++ " " ++ build.display_name
 
 donationTextShort model =
   String.join ""
@@ -362,7 +368,7 @@ itemTextShort item =
   String.join ""
     [ item.code
     , " x"
-    , toString item.quantity
+    , String.fromInt item.quantity
     ]
 
 nonZero : List OrderItem -> List OrderItem
@@ -371,4 +377,4 @@ nonZero =
 
 dollars : Float -> String
 dollars n =
-  "$"++(toString n)
+  "$"++(String.fromFloat n)

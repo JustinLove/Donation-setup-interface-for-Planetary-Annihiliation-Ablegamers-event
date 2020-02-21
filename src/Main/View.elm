@@ -1,4 +1,4 @@
-module Main.View exposing (view, Msg(..), State(..))
+module Main.View exposing (document, view, Msg(..), State(..))
 
 import DonationConfig
 import Watch
@@ -18,6 +18,12 @@ type State
   | StateWatch
 
 -- VIEW
+
+--document : (Msg -> AppMsg) -> Model -> Browser.Document AppMsg
+document tagger model =
+  { title = "Donation Config"
+  , body = [view model |> Html.map tagger]
+  }
 
 --view : Model -> Html.Html Never
 view model =

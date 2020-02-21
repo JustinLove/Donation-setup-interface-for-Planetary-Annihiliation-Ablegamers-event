@@ -1,7 +1,9 @@
-require(["menu", "unit_info", "main"], function(menu, info, Elm) {
-  var app = Elm.Main.fullscreen({
-    menu: menu,
-    info: info
+require(["menu", "unit_info", "main"], function(menu, info) {
+  var app = Elm.Main.init({
+    flags: {
+      menu: menu,
+      info: info
+    }
   })
 
   app.ports.select.subscribe(function(id) {

@@ -7,20 +7,21 @@ import Donation exposing (Donation)
 import Donation.Decode
 import Config exposing (config) 
 
+import Browser
 import Dict
 import Html
 import Http
-import Time
-import WebSocket
+import Time exposing (Posix)
+--import WebSocket
 import Json.Decode
 
-view = \model -> Html.map WatchViewMsg (Watch.View.view model)
+view = Watch.View.view >> Html.map WatchViewMsg
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-  Html.program
+  Browser.document
     { init = init
-    , view = view
+    , view = Watch.View.document WatchViewMsg
     , update = update
     , subscriptions = subscriptions
     }
@@ -42,8 +43,8 @@ makeModel =
   , donations = []
   }
 
-init : (Model, Cmd Msg)
-init =
+init : () -> (Model, Cmd Msg)
+init _ =
   ( makeModel
   , Cmd.batch [ fetchGame, fetchDonations AllRounds ]
   )
@@ -54,11 +55,17 @@ refresh model =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Http.send GotGameInfo (Http.get (config.server ++ "options.json") GameInfo.Decode.rounds)
+  Http.get
+    { url = config.server ++ "options.json"
+    , expect = Http.expectJson GotGameInfo GameInfo.Decode.rounds
+    }
 
 fetchDonations : RoundSelection -> Cmd Msg
 fetchDonations game =
-  Http.send GotDonations (Http.get (config.server ++ (donationsPath game)) Donation.Decode.donations)
+  Http.get
+    { url = config.server ++ (donationsPath game)
+    , expect = Http.expectJson GotDonations Donation.Decode.donations
+    }
 
 donationsPath : RoundSelection -> String
 donationsPath game =
@@ -74,9 +81,9 @@ donationsPath game =
 type Msg
   = GotGameInfo (Result Http.Error (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
-  | GotUpdate (Result String (List Donation))
+  | GotUpdate (Result Json.Decode.Error (List Donation))
   | WatchViewMsg WVMsg
-  | Poll Time.Time
+  | Poll Posix
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -89,40 +96,40 @@ update msg model =
       (model, Cmd.none)
     GotGameInfo (Ok rounds) ->
       ({ model | rounds = rounds}, Cmd.none)
-    GotGameInfo (Err msg) ->
-      let _ = Debug.log "game info error" msg in
+    GotGameInfo (Err err) ->
+      let _ = Debug.log "game info error" err in
       (model, Cmd.none)
     GotDonations (Ok donations) ->
       ({ model | donations = donations}, Cmd.none)
-    GotDonations (Err msg) ->
-      let _ = Debug.log "donations fetch error" msg in
+    GotDonations (Err err) ->
+      let _ = Debug.log "donations fetch error" err in
       (model, Cmd.none)
     GotUpdate (Ok donations) ->
       ({ model | donations = upsertDonations donations model.donations}, Cmd.none)
-    GotUpdate (Err msg) ->
-      let _ = Debug.log "donations update error" msg in
+    GotUpdate (Err err) ->
+      let _ = Debug.log "donations update error" err in
       (model, Cmd.none)
     Poll t ->
       (model, fetchDonations model.round)
 
 upsertDonations : List Donation -> List Donation -> List Donation
-upsertDonations updates donations =
-  List.foldr upsertDonation donations updates
+upsertDonations entries donations =
+  List.foldr upsertDonation donations entries
 
 upsertDonation : Donation -> List Donation -> List Donation
-upsertDonation update donations =
-  if List.any (\d -> d.id == update.id) donations then
+upsertDonation entry donations =
+  if List.any (\d -> d.id == entry.id) donations then
     donations
-      |> List.map (\d -> if d.id == update.id then update else d)
+      |> List.map (\d -> if d.id == entry.id then entry else d)
   else
-    donations ++ [update]
+    donations ++ [entry]
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  --Time.every (Time.second * 10) Poll
-  WebSocket.listen (config.wsserver ++ (donationsPath model.round)) receiveUpdate
+  Time.every (10 * 1000) Poll
+  --WebSocket.listen (config.wsserver ++ (donationsPath model.round)) receiveUpdate
 
 receiveUpdate : String -> Msg
 receiveUpdate message =

@@ -1,4 +1,4 @@
-module Watch.View exposing (view, RoundSelection(..), HighlightColor(..), WVMsg(..))
+module Watch.View exposing (document, view, RoundSelection(..), HighlightColor(..), WVMsg(..))
 
 import GameInfo exposing (GameInfo)
 import Donation exposing (Donation)
@@ -38,6 +38,12 @@ type WVMsg
   | None
 
 -- VIEW
+
+--document : (WVMsg -> Msg) -> Model -> Browser.Document Msg
+document tagger model =
+  { title = "Donations"
+  , body = [view model |> Html.map tagger]
+  }
 
 --view : Model -> Html WVMsg
 view model =
@@ -169,9 +175,9 @@ displayDonation roundColors donation =
      [ p []
        [ span [ class "donor_name" ] [ text donation.donor_name ]
        , text " "
-       , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
+       , span [ class "amount" ] [ text <| "$" ++ (String.fromFloat donation.amount) ]
        , text " "
-       , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
+       , span [ class "minimum" ] [ text <| "$" ++ (String.fromFloat donation.minimum) ]
        ]
      , p [] (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
      , p [ class "comment" ] [ text donation.comment ]

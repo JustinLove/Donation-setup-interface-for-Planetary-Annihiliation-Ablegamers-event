@@ -8,12 +8,12 @@ import GameInfo.Decode
 import Config exposing (config) 
 import DonationConfig.Harbor exposing (..) 
 
-import Html
+import Browser
 import Http
-import Regex exposing (regex)
+import Regex
 import String
 import Array exposing (Array)
-import WebSocket
+--import WebSocket
 import Json.Decode
 
 view = DonationConfig.View.view
@@ -26,9 +26,9 @@ type alias Arguments =
 
 main : Program Arguments Model Msg
 main =
-  Html.programWithFlags
+  Browser.document
     { init = init
-    , view = view
+    , view = DonationConfig.View.document identity
     , update = update
     , subscriptions = subscriptions
     }
@@ -73,11 +73,14 @@ init args =
 
 fetchGame : Cmd Msg
 fetchGame =
-  Http.send mapError (Http.get (config.server ++ "options.json") GameInfo.Decode.options)
+  Http.get
+    { url = config.server ++ "options.json"
+    , expect = Http.expectJson mapError GameInfo.Decode.options
+    }
 
 mapError : (Result Http.Error Options) -> Msg
 mapError =
-  Result.mapError toString
+  Result.mapError Debug.toString
     >> GotGameInfo
 
 -- UPDATE
@@ -101,8 +104,8 @@ update msg model =
       (updateDiscounts { model | round = id}, Cmd.none)
     GotGameInfo (Ok options) ->
       (updateDiscounts { model | rounds = options.games}, Cmd.none)
-    GotGameInfo (Err msg) ->
-      let _ = Debug.log "error" msg in
+    GotGameInfo (Err err) ->
+      let _ = Debug.log "error" err in
       (model, Cmd.none)
     Select id ->
       (model, select id)
@@ -131,15 +134,21 @@ updateQuantity item =
 
 addOne : OrderItem -> OrderItem
 addOne item =
-  { item | quantity = item.quantity + 1, input = toString (item.quantity + 1) }
+  { item | quantity = item.quantity + 1, input = String.fromInt (item.quantity + 1) }
 
 getNumber : String -> Int
 getNumber s =
-  String.toInt s |> Result.withDefault 0
+  String.toInt s |> Maybe.withDefault 0
 
 validNumber : String -> Bool
 validNumber value =
-  Regex.contains (regex "^\\d+$") value
+  Regex.contains onlyNumber value
+
+onlyNumber : Regex.Regex
+onlyNumber =
+  "^\\d+$"
+    |> Regex.fromString
+    |> Maybe.withDefault Regex.never
 
 updateDiscounts : Model -> Model
 updateDiscounts model =
@@ -178,8 +187,11 @@ instructionFocus open =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  WebSocket.listen (config.wsserver ++ "options.json") receiveOptions
+  --WebSocket.listen (config.wsserver ++ "options.json") receiveOptions
+  Sub.none
 
 receiveOptions : String -> Msg
 receiveOptions message =
-  GotGameInfo <| Json.Decode.decodeString GameInfo.Decode.options message
+  Json.Decode.decodeString GameInfo.Decode.options message
+    |> Result.mapError Debug.toString
+    |> GotGameInfo

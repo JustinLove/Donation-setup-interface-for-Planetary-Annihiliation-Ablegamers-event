@@ -47,14 +47,14 @@ displayRound round =
     , input
       [ type_ "number"
       , Html.Attributes.min "0"
-      , value (round.gameTime |> toString)
+      , value (round.gameTime |> String.fromInt)
       , onInput (SetGameTime round.id)
       ] []
     , text " discount level: "
     , input
       [ type_ "number"
       , Html.Attributes.min "0"
-      , value (round.discountLevel |> toString)
+      , value (round.discountLevel |> String.toInt)
       , onInput (SetDiscountLevel round.id)
       ] []
     ]
@@ -68,13 +68,13 @@ displayEditing original edit =
         [ p []
           <| List.intersperse (text " ")
           [ span [ class "donor_name" ] [ text edited.donor_name ]
-          , span [ class "amount" ] [ text <| "$" ++ (toString edited.amount) ]
-          , span [ class "minimum" ] [ text <| "$" ++ (toString edited.minimum) ]
+          , span [ class "amount" ] [ text <| "$" ++ (String.fromFloat edited.amount) ]
+          , span [ class "minimum" ] [ text <| "$" ++ (String.fromFloat edited.minimum) ]
           , text " discount level: "
           , input
             [ type_ "number"
             , Html.Attributes.min "0"
-            , value (edited.discount_level |> toString)
+            , value (edited.discount_level |> String.fromInt)
             , onInput DiscountLevelChange
             ] []
           ]
@@ -122,12 +122,12 @@ displayDonationOnly donation =
 
       [ Html.button [ onClick (EditDonation donation) ] [ text "Edit" ]
       , span [ class "donor_name" ] [ text donation.donor_name ]
-      , span [ class "amount" ] [ text <| "$" ++ (toString donation.amount) ]
-      , span [ class "minimum" ] [ text <| "$" ++ (toString donation.minimum) ]
+      , span [ class "amount" ] [ text <| "$" ++ (String.fromFloat donation.amount) ]
+      , span [ class "minimum" ] [ text <| "$" ++ (String.fromFloat donation.minimum) ]
       , if donation.discount_level == 0 then
           text ""
         else
-          span [ class "discount_level" ] [ text <| "(" ++ (toString donation.discount_level) ++ ")" ]
+          span [ class "discount_level" ] [ text <| "(" ++ (String.fromInt donation.discount_level) ++ ")" ]
       , span [] (List.map (span [ class "match" ] << List.singleton << text) donation.matchingMatches)
       , span [ class "comment" ] [ text donation.comment ]
       ]

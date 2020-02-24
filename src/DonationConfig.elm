@@ -129,7 +129,15 @@ update msg model =
       (model, Cmd.none)
     SocketEvent id (PortSocket.Connecting url) ->
       let _ = Debug.log "websocket connecting" id in
-      (model, Cmd.none)
+      ( { model | optionsConnection = case model.optionsConnection of
+          Connect timeout -> Connecting id timeout
+          Connecting _ timeout -> Connecting id timeout
+          _ -> Connecting id initialReconnectDelay
+        }
+      , currentConnectionId model.optionsConnection
+          |> Maybe.map PortSocket.close
+          |> Maybe.withDefault Cmd.none
+      )
     SocketEvent id (PortSocket.Open url) ->
       let _ = Debug.log "websocket open" id in
       ( {model | optionsConnection = Connected id}
@@ -147,6 +155,7 @@ update msg model =
         Connected wasId ->
           closeIfCurrent model wasId id
     SocketEvent id (PortSocket.Message message) ->
+      let _ = Debug.log "websocket id" id in
       --let _ = Debug.log "websocket message" message in
       case Json.Decode.decodeString GameInfo.Decode.options message of
         Ok options ->
@@ -265,3 +274,15 @@ closeIfCurrent model wasId id =
     )
   else
     (model, Cmd.none)
+
+currentConnectionId : ConnectionStatus -> Maybe PortSocket.Id
+currentConnectionId connection =
+  case connection of
+    Disconnected ->
+      Nothing
+    Connect _ ->
+      Nothing
+    Connecting id _ ->
+      Just id
+    Connected id ->
+      Just id

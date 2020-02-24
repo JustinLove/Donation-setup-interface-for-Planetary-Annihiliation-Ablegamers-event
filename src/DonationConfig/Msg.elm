@@ -5,6 +5,7 @@ import GameInfo exposing (Options)
 import PortSocket
 
 import Http
+import Time exposing (Posix)
 
 type Msg
   = TypeAmount String String
@@ -18,4 +19,5 @@ type Msg
   | Instructions Bool
   | GotGameInfo (Result Http.Error Options)
   | SocketEvent PortSocket.Id PortSocket.Event
+  | Reconnect Posix
   | None

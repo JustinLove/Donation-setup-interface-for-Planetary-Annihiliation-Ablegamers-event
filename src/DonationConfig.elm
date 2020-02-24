@@ -9,12 +9,13 @@ import Config exposing (config)
 import DonationConfig.Harbor exposing (..) 
 import PortSocket
 
+import Array exposing (Array)
 import Browser
 import Http
+import Json.Decode
 import Regex
 import String
-import Array exposing (Array)
-import Json.Decode
+import Time exposing (Posix)
 
 view = DonationConfig.View.view
 type alias DCMsg = Msg
@@ -35,6 +36,8 @@ main =
 
 type ConnectionStatus
   = Disconnected
+  | Connect String Float
+  | Connecting PortSocket.Id Float
   | Connected PortSocket.Id
 
 -- MODEL
@@ -79,10 +82,7 @@ init args =
 
 optionsUrl = config.server ++ "options.json"
 optionsWebsocket = config.wsserver ++ "options.json"
-
-connectGame : Cmd Msg
-connectGame =
-  PortSocket.connect optionsWebsocket
+initialReconnectDelay = 1000
 
 fetchGame : Cmd Msg
 fetchGame =
@@ -115,7 +115,12 @@ update msg model =
     Instructions open ->
       ({model | instructionsOpen = open}, focus <| instructionFocus open)
     GotGameInfo (Ok options) ->
-      (updateDiscounts { model | rounds = options.games}, connectGame)
+      ( { model
+        | rounds = options.games
+        , optionsConnection = Connect optionsWebsocket initialReconnectDelay
+        }
+          |> updateDiscounts
+      , Cmd.none)
     GotGameInfo (Err err) ->
       let _ = Debug.log "error" err in
       (model, Cmd.none)
@@ -135,6 +140,17 @@ update msg model =
       case model.optionsConnection of
         Disconnected ->
           (model, Cmd.none)
+        Connect _ timeout ->
+          (model, Cmd.none)
+        Connecting wasId timeout ->
+          if id == wasId then
+            ( { model
+              | optionsConnection = Connect optionsWebsocket timeout
+              }
+              , Cmd.none
+            )
+          else
+            (model, Cmd.none)
         Connected wasId ->
           closeIfCurrent model wasId id
     SocketEvent id (PortSocket.Message message) ->
@@ -145,6 +161,21 @@ update msg model =
           (updateDiscounts { model | rounds = options.games}, Cmd.none)
         Err err ->
           let _ = Debug.log "decode error" err in
+          (model, Cmd.none)
+    Reconnect time ->
+      case Debug.log "reconnect" model.optionsConnection of
+        Connect url timeout ->
+          ( {model | optionsConnection = Connect url (timeout*2)}
+          , PortSocket.connect url
+          )
+        Connecting id timeout ->
+          ( {model | optionsConnection = Connect optionsWebsocket (timeout*2)}
+          , Cmd.batch
+            [ PortSocket.close id
+            , PortSocket.connect optionsWebsocket
+            ]
+          )
+        _ ->
           (model, Cmd.none)
     None ->
       (model, Cmd.none)
@@ -222,13 +253,19 @@ instructionFocus open =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  PortSocket.receive SocketEvent
+  Sub.batch
+    [ PortSocket.receive SocketEvent
+    , case model.optionsConnection of
+        Connect _ timeout-> Time.every timeout Reconnect
+        Connecting _ timeout-> Time.every timeout Reconnect
+        _ -> Sub.none
+    ]
 
 closeIfCurrent : Model -> PortSocket.Id -> PortSocket.Id -> (Model, Cmd Msg)
 closeIfCurrent model wasId id =
   if id == wasId then
     ( { model
-      | optionsConnection = Disconnected
+      | optionsConnection = Connect optionsWebsocket initialReconnectDelay
       }
       , Cmd.none
     )

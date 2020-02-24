@@ -7,13 +7,13 @@ import GameInfo exposing (Options, GameInfo)
 import GameInfo.Decode
 import Config exposing (config) 
 import DonationConfig.Harbor exposing (..) 
+import PortSocket
 
 import Browser
 import Http
 import Regex
 import String
 import Array exposing (Array)
---import WebSocket
 import Json.Decode
 
 view = DonationConfig.View.view
@@ -33,6 +33,10 @@ main =
     , subscriptions = subscriptions
     }
 
+type ConnectionStatus
+  = Disconnected
+  | Connected PortSocket.Id
+
 -- MODEL
 
 type alias Model =
@@ -46,6 +50,7 @@ type alias Model =
   , selections : List OrderItem
   , hover: Maybe MenuItem
   , instructionsOpen: Bool
+  , optionsConnection : ConnectionStatus
   }
 
 makeModel : List RawMenuItem -> List UnitInfo -> Model
@@ -63,6 +68,7 @@ makeModel menu info =
     , selections = List.map makeOrder m2
     , hover = Nothing
     , instructionsOpen = False
+    , optionsConnection = Disconnected
     }
 
 init : Arguments -> (Model, Cmd Msg)
@@ -71,17 +77,19 @@ init args =
   , fetchGame
   )
 
+optionsUrl = config.server ++ "options.json"
+optionsWebsocket = config.wsserver ++ "options.json"
+
+connectGame : Cmd Msg
+connectGame =
+  PortSocket.connect optionsWebsocket
+
 fetchGame : Cmd Msg
 fetchGame =
   Http.get
-    { url = config.server ++ "options.json"
-    , expect = Http.expectJson mapError GameInfo.Decode.options
+    { url = optionsUrl
+    , expect = Http.expectJson GotGameInfo GameInfo.Decode.options
     }
-
-mapError : (Result Http.Error Options) -> Msg
-mapError =
-  Result.mapError Debug.toString
-    >> GotGameInfo
 
 -- UPDATE
 
@@ -102,15 +110,42 @@ update msg model =
       ({ model | planet = name}, Cmd.none)
     ChooseRound id ->
       (updateDiscounts { model | round = id}, Cmd.none)
-    GotGameInfo (Ok options) ->
-      (updateDiscounts { model | rounds = options.games}, Cmd.none)
-    GotGameInfo (Err err) ->
-      let _ = Debug.log "error" err in
-      (model, Cmd.none)
     Select id ->
       (model, select id)
     Instructions open ->
       ({model | instructionsOpen = open}, focus <| instructionFocus open)
+    GotGameInfo (Ok options) ->
+      (updateDiscounts { model | rounds = options.games}, connectGame)
+    GotGameInfo (Err err) ->
+      let _ = Debug.log "error" err in
+      (model, Cmd.none)
+    SocketEvent id (PortSocket.Error value) ->
+      let _ = Debug.log "websocket error" value in
+      (model, Cmd.none)
+    SocketEvent id (PortSocket.Connecting url) ->
+      let _ = Debug.log "websocket connecting" id in
+      (model, Cmd.none)
+    SocketEvent id (PortSocket.Open url) ->
+      let _ = Debug.log "websocket open" id in
+      ( {model | optionsConnection = Connected id}
+      , Cmd.none
+      )
+    SocketEvent id (PortSocket.Close url) ->
+      let _ = Debug.log "websocket closed" id in
+      case model.optionsConnection of
+        Disconnected ->
+          (model, Cmd.none)
+        Connected wasId ->
+          closeIfCurrent model wasId id
+    SocketEvent id (PortSocket.Message message) ->
+      --let _ = Debug.log "websocket message" message in
+      case Json.Decode.decodeString GameInfo.Decode.options message of
+        Ok options ->
+          --let _ = Debug.log "decode" options in
+          (updateDiscounts { model | rounds = options.games}, Cmd.none)
+        Err err ->
+          let _ = Debug.log "decode error" err in
+          (model, Cmd.none)
     None ->
       (model, Cmd.none)
 
@@ -187,11 +222,15 @@ instructionFocus open =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  --WebSocket.listen (config.wsserver ++ "options.json") receiveOptions
-  Sub.none
+  PortSocket.receive SocketEvent
 
-receiveOptions : String -> Msg
-receiveOptions message =
-  Json.Decode.decodeString GameInfo.Decode.options message
-    |> Result.mapError Debug.toString
-    |> GotGameInfo
+closeIfCurrent : Model -> PortSocket.Id -> PortSocket.Id -> (Model, Cmd Msg)
+closeIfCurrent model wasId id =
+  if id == wasId then
+    ( { model
+      | optionsConnection = Disconnected
+      }
+      , Cmd.none
+    )
+  else
+    (model, Cmd.none)

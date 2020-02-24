@@ -1,7 +1,9 @@
 module DonationConfig.Msg exposing (Msg(..))
-import Menu exposing (MenuItem)
 
+import Menu exposing (MenuItem)
 import GameInfo exposing (Options)
+import PortSocket
+
 import Http
 
 type Msg
@@ -11,8 +13,9 @@ type Msg
   | Hover (Maybe MenuItem)
   | SetPlayer String
   | SetPlanet String
-  | GotGameInfo (Result String Options)
   | ChooseRound String
   | Select String
   | Instructions Bool
+  | GotGameInfo (Result Http.Error Options)
+  | SocketEvent PortSocket.Id PortSocket.Event
   | None

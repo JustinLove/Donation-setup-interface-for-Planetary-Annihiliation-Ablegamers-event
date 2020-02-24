@@ -89,7 +89,7 @@ type Msg
   | MatchedModel (Result Json.Decode.Error Donation)
   | SignedMessage Nacl.SignArguments
   | SocketEvent PortSocket.Id PortSocket.Event
-  | Reconnect Posix
+  | ReconnectOptions Posix
   | AdminViewMsg AVMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -119,14 +119,11 @@ update msg model =
       (model, Cmd.none)
     SocketEvent id (PortSocket.Connecting url) ->
       let _ = Debug.log "websocket connecting" id in
-      ( { model | optionsConnection = case model.optionsConnection of
-          Connect timeout -> Connecting id timeout
-          Connecting _ timeout -> Connecting id timeout
-          _ -> Connecting id initialReconnectDelay
-        }
-      , currentConnectionId model.optionsConnection
-          |> Maybe.map PortSocket.close
-          |> Maybe.withDefault Cmd.none
+      let
+        (optionsConnection, cmd) = socketConnecting id url model.optionsConnection
+      in
+      ( { model | optionsConnection = optionsConnection }
+      , cmd
       )
     SocketEvent id (PortSocket.Open url) ->
       let _ = Debug.log "websocket open" id in
@@ -135,35 +132,16 @@ update msg model =
       )
     SocketEvent id (PortSocket.Close url) ->
       let _ = Debug.log "websocket closed" id in
-      currentConnectionId model.optionsConnection
-        |> Maybe.map (closeIfCurrent model id)
-        |> Maybe.withDefault (model, Cmd.none)
+      ( {model | optionsConnection = socketClosed id model.optionsConnection}, Cmd.none)
     SocketEvent id (PortSocket.Message message) ->
       --let _ = Debug.log "websocket id" id in
       --let _ = Debug.log "websocket message" message in
-      case Json.Decode.decodeString GameInfo.Decode.rounds message of
-        Ok rounds ->
-          let _ = Debug.log "decode" rounds in
-          ({model | rounds = rounds}, Cmd.none)
-        Err err ->
-          let _ = Debug.log "decode error" err in
-          (model, Cmd.none)
-    Reconnect time ->
-      let url = optionsWebsocket in
-      case Debug.log "reconnect" model.optionsConnection of
-        Connect timeout ->
-          ( {model | optionsConnection = Connect (timeout*2)}
-          , PortSocket.connect url
-          )
-        Connecting id timeout ->
-          ( {model | optionsConnection = Connect (timeout*2)}
-          , Cmd.batch
-            [ PortSocket.close id
-            , PortSocket.connect url
-            ]
-          )
-        _ ->
-          (model, Cmd.none)
+      (updateRounds message model, Cmd.none)
+    ReconnectOptions _ ->
+      let
+        (optionsConnection, cmd) = socketReconnect optionsWebsocket model.optionsConnection
+      in
+        ( {model | optionsConnection = optionsConnection}, cmd)
     EmptyRequestComplete (Ok response) ->
       (model, Cmd.none)
     EmptyRequestComplete (Err err) ->
@@ -411,16 +389,12 @@ upsertDonation entry donations =
   else
     donations ++ [entry]
 
-closeIfCurrent : Model -> PortSocket.Id -> PortSocket.Id -> (Model, Cmd Msg)
-closeIfCurrent model id wasId =
+closeIfCurrent : ConnectionStatus -> PortSocket.Id -> PortSocket.Id -> ConnectionStatus
+closeIfCurrent connection id wasId =
   if id == wasId then
-    ( { model
-      | optionsConnection = Connect initialReconnectDelay
-      }
-      , Cmd.none
-    )
+    Connect initialReconnectDelay
   else
-    (model, Cmd.none)
+    connection
 
 currentConnectionId : ConnectionStatus -> Maybe PortSocket.Id
 currentConnectionId connection =
@@ -434,6 +408,51 @@ currentConnectionId connection =
     Connected id ->
       Just id
 
+
+socketConnecting : PortSocket.Id -> String -> ConnectionStatus -> (ConnectionStatus, Cmd msg)
+socketConnecting id url connection =
+  ( case connection of
+      Connect timeout -> Connecting id timeout
+      Connecting _ timeout -> Connecting id timeout
+      _ -> Connecting id initialReconnectDelay
+  , currentConnectionId connection
+      |> Maybe.map PortSocket.close
+      |> Maybe.withDefault Cmd.none
+  )
+
+socketClosed : PortSocket.Id -> ConnectionStatus -> ConnectionStatus
+socketClosed id connection =
+  currentConnectionId connection
+    |> Maybe.map (closeIfCurrent connection id)
+    |> Maybe.withDefault connection
+
+socketReconnect : String -> ConnectionStatus -> (ConnectionStatus, Cmd Msg)
+socketReconnect url connection =
+  case Debug.log "reconnect" connection of
+    Connect timeout ->
+      ( Connect (timeout*2)
+      , PortSocket.connect url
+      )
+    Connecting id timeout ->
+      ( Connect (timeout*2)
+      , Cmd.batch
+        [ PortSocket.close id
+        , PortSocket.connect url
+        ]
+      )
+    _ ->
+      (connection, Cmd.none)
+
+updateRounds : String -> Model -> Model
+updateRounds message model =
+  case Json.Decode.decodeString GameInfo.Decode.rounds message of
+    Ok rounds ->
+      let _ = Debug.log "decode" rounds in
+      {model | rounds = rounds}
+    Err err ->
+      let _ = Debug.log "decode error" err in
+      model
+
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
@@ -442,8 +461,8 @@ subscriptions model =
     --[ WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
     [ PortSocket.receive SocketEvent
     , case model.optionsConnection of
-        Connect timeout-> Time.every timeout Reconnect
-        Connecting _ timeout-> Time.every timeout Reconnect
+        Connect timeout-> Time.every timeout ReconnectOptions
+        Connecting _ timeout-> Time.every timeout ReconnectOptions
         _ -> Sub.none
     , matchSubscription model
     , Nacl.signedMessage SignedMessage

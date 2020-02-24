@@ -36,7 +36,7 @@ main =
 
 type ConnectionStatus
   = Disconnected
-  | Connect String Float
+  | Connect Float
   | Connecting PortSocket.Id Float
   | Connected PortSocket.Id
 
@@ -117,7 +117,7 @@ update msg model =
     GotGameInfo (Ok options) ->
       ( { model
         | rounds = options.games
-        , optionsConnection = Connect optionsWebsocket initialReconnectDelay
+        , optionsConnection = Connect initialReconnectDelay
         }
           |> updateDiscounts
       , Cmd.none)
@@ -140,39 +140,33 @@ update msg model =
       case model.optionsConnection of
         Disconnected ->
           (model, Cmd.none)
-        Connect _ timeout ->
+        Connect timeout ->
           (model, Cmd.none)
         Connecting wasId timeout ->
-          if id == wasId then
-            ( { model
-              | optionsConnection = Connect optionsWebsocket timeout
-              }
-              , Cmd.none
-            )
-          else
-            (model, Cmd.none)
+          closeIfCurrent model wasId id
         Connected wasId ->
           closeIfCurrent model wasId id
     SocketEvent id (PortSocket.Message message) ->
       --let _ = Debug.log "websocket message" message in
       case Json.Decode.decodeString GameInfo.Decode.options message of
         Ok options ->
-          --let _ = Debug.log "decode" options in
+          let _ = Debug.log "decode" options in
           (updateDiscounts { model | rounds = options.games}, Cmd.none)
         Err err ->
           let _ = Debug.log "decode error" err in
           (model, Cmd.none)
     Reconnect time ->
+      let url = optionsWebsocket in
       case Debug.log "reconnect" model.optionsConnection of
-        Connect url timeout ->
-          ( {model | optionsConnection = Connect url (timeout*2)}
+        Connect timeout ->
+          ( {model | optionsConnection = Connect (timeout*2)}
           , PortSocket.connect url
           )
         Connecting id timeout ->
-          ( {model | optionsConnection = Connect optionsWebsocket (timeout*2)}
+          ( {model | optionsConnection = Connect (timeout*2)}
           , Cmd.batch
             [ PortSocket.close id
-            , PortSocket.connect optionsWebsocket
+            , PortSocket.connect url
             ]
           )
         _ ->
@@ -256,7 +250,7 @@ subscriptions model =
   Sub.batch
     [ PortSocket.receive SocketEvent
     , case model.optionsConnection of
-        Connect _ timeout-> Time.every timeout Reconnect
+        Connect timeout-> Time.every timeout Reconnect
         Connecting _ timeout-> Time.every timeout Reconnect
         _ -> Sub.none
     ]
@@ -265,7 +259,7 @@ closeIfCurrent : Model -> PortSocket.Id -> PortSocket.Id -> (Model, Cmd Msg)
 closeIfCurrent model wasId id =
   if id == wasId then
     ( { model
-      | optionsConnection = Connect optionsWebsocket initialReconnectDelay
+      | optionsConnection = Connect initialReconnectDelay
       }
       , Cmd.none
     )

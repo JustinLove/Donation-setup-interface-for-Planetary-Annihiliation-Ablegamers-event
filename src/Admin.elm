@@ -135,15 +135,9 @@ update msg model =
       )
     SocketEvent id (PortSocket.Close url) ->
       let _ = Debug.log "websocket closed" id in
-      case model.optionsConnection of
-        Disconnected ->
-          (model, Cmd.none)
-        Connect timeout ->
-          (model, Cmd.none)
-        Connecting wasId timeout ->
-          closeIfCurrent model wasId id
-        Connected wasId ->
-          closeIfCurrent model wasId id
+      currentConnectionId model.optionsConnection
+        |> Maybe.map (closeIfCurrent model id)
+        |> Maybe.withDefault (model, Cmd.none)
     SocketEvent id (PortSocket.Message message) ->
       --let _ = Debug.log "websocket id" id in
       --let _ = Debug.log "websocket message" message in
@@ -418,7 +412,7 @@ upsertDonation entry donations =
     donations ++ [entry]
 
 closeIfCurrent : Model -> PortSocket.Id -> PortSocket.Id -> (Model, Cmd Msg)
-closeIfCurrent model wasId id =
+closeIfCurrent model id wasId =
   if id == wasId then
     ( { model
       | optionsConnection = Connect initialReconnectDelay

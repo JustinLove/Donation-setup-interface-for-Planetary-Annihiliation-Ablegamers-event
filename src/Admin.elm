@@ -8,16 +8,17 @@ import Donation exposing (Donation)
 import Donation.Decode
 import Donation.Encode
 import Admin.Harbor exposing (..)
+import PortSocket
 import Nacl
 
 import Browser
-import String
 import Http
---import WebSocket
-import Task
 import Json.Encode
 import Json.Decode
 import Regex
+import String
+import Task
+import Time exposing (Posix)
 
 main : Program () Model Msg
 main =
@@ -28,6 +29,12 @@ main =
     , subscriptions = subscriptions
     }
 
+type ConnectionStatus
+  = Disconnected
+  | Connect Float
+  | Connecting PortSocket.Id Float
+  | Connected PortSocket.Id
+
 -- MODEL
 
 type alias Model =
@@ -35,6 +42,7 @@ type alias Model =
   , donations: List Donation
   , editing: DonationEdit
   , signsk: String
+  , optionsConnection : ConnectionStatus
   }
 
 makeModel : Model
@@ -43,25 +51,26 @@ makeModel =
   , donations = []
   , editing = NotEditing
   , signsk = ""
+  , optionsConnection = Disconnected
   }
 
 init : () -> (Model, Cmd Msg)
 init _ =
   ( makeModel
-  , Cmd.none
+  , Cmd.batch [ fetchGame, fetchDonations]
+  --, Cmd.none
   )
+
+optionsUrl = config.server ++ "options.json"
+optionsWebsocket = config.wsserver ++ "options.json"
+initialReconnectDelay = 1000
 
 fetchGame : Cmd Msg
 fetchGame =
   Http.get
-    { url = config.server ++ "options.json"
-    , expect = Http.expectJson mapError GameInfo.Decode.rounds
+    { url = optionsUrl
+    , expect = Http.expectJson GotGameInfo GameInfo.Decode.rounds
     }
-
-mapError : (Result Http.Error (List GameInfo)) -> Msg
-mapError =
-  Result.mapError Debug.toString
-    >> GotGameInfo
 
 fetchDonations : Cmd Msg
 fetchDonations =
@@ -73,19 +82,25 @@ fetchDonations =
 -- UPDATE
 
 type Msg
-  = GotGameInfo (Result String (List GameInfo))
+  = GotGameInfo (Result Http.Error (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
   | GotUpdate (Result Json.Decode.Error (List Donation))
   | EmptyRequestComplete (Result Http.Error ())
   | MatchedModel (Result Json.Decode.Error Donation)
   | SignedMessage Nacl.SignArguments
+  | SocketEvent PortSocket.Id PortSocket.Event
+  | Reconnect Posix
   | AdminViewMsg AVMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     GotGameInfo (Ok rounds) ->
-      ({ model | rounds = rounds}, Cmd.none)
+      ( { model
+        | rounds = rounds
+        , optionsConnection = Connect initialReconnectDelay
+        }
+      , Cmd.none)
     GotGameInfo (Err err) ->
       let _ = Debug.log "error" err in
       (model, Cmd.none)
@@ -99,13 +114,62 @@ update msg model =
     GotUpdate (Err err) ->
       let _ = Debug.log "donations update error" err in
       (model, Cmd.none)
-    AdminViewMsg (SetKey signsk) ->
-      if (String.length signsk) == 128 then
-        ( { model | signsk = signsk }
-        , Cmd.batch [ fetchGame, fetchDonations]
-        )
-      else
-        (model, Cmd.none)
+    SocketEvent id (PortSocket.Error value) ->
+      let _ = Debug.log "websocket error" value in
+      (model, Cmd.none)
+    SocketEvent id (PortSocket.Connecting url) ->
+      let _ = Debug.log "websocket connecting" id in
+      ( { model | optionsConnection = case model.optionsConnection of
+          Connect timeout -> Connecting id timeout
+          Connecting _ timeout -> Connecting id timeout
+          _ -> Connecting id initialReconnectDelay
+        }
+      , currentConnectionId model.optionsConnection
+          |> Maybe.map PortSocket.close
+          |> Maybe.withDefault Cmd.none
+      )
+    SocketEvent id (PortSocket.Open url) ->
+      let _ = Debug.log "websocket open" id in
+      ( {model | optionsConnection = Connected id}
+      , Cmd.none
+      )
+    SocketEvent id (PortSocket.Close url) ->
+      let _ = Debug.log "websocket closed" id in
+      case model.optionsConnection of
+        Disconnected ->
+          (model, Cmd.none)
+        Connect timeout ->
+          (model, Cmd.none)
+        Connecting wasId timeout ->
+          closeIfCurrent model wasId id
+        Connected wasId ->
+          closeIfCurrent model wasId id
+    SocketEvent id (PortSocket.Message message) ->
+      --let _ = Debug.log "websocket id" id in
+      --let _ = Debug.log "websocket message" message in
+      case Json.Decode.decodeString GameInfo.Decode.rounds message of
+        Ok rounds ->
+          let _ = Debug.log "decode" rounds in
+          ({model | rounds = rounds}, Cmd.none)
+        Err err ->
+          let _ = Debug.log "decode error" err in
+          (model, Cmd.none)
+    Reconnect time ->
+      let url = optionsWebsocket in
+      case Debug.log "reconnect" model.optionsConnection of
+        Connect timeout ->
+          ( {model | optionsConnection = Connect (timeout*2)}
+          , PortSocket.connect url
+          )
+        Connecting id timeout ->
+          ( {model | optionsConnection = Connect (timeout*2)}
+          , Cmd.batch
+            [ PortSocket.close id
+            , PortSocket.connect url
+            ]
+          )
+        _ ->
+          (model, Cmd.none)
     EmptyRequestComplete (Ok response) ->
       (model, Cmd.none)
     EmptyRequestComplete (Err err) ->
@@ -126,6 +190,13 @@ update msg model =
     SignedMessage response ->
       let _ = Debug.log "signed message" response in
       (model, sendSignedRequest response)
+    AdminViewMsg (SetKey signsk) ->
+      if (String.length signsk) == 128 then
+        ( { model | signsk = signsk }
+        , Cmd.batch [ fetchGame, fetchDonations]
+        )
+      else
+        (model, Cmd.none)
     AdminViewMsg (DeleteRound round) ->
       ( removeRound round model
       , sendDeleteRound model.signsk round
@@ -202,7 +273,7 @@ sendSignedRequest {method, url, id, body} =
     { method = method
     , headers = []
     , url = url
-    , body = message id body |> Http.jsonBody
+    , body = signedRequest id body |> Http.jsonBody
     , expect = Http.expectWhatever EmptyRequestComplete
     , timeout = Nothing
     , tracker = Nothing
@@ -309,8 +380,8 @@ onlyNumber =
     |> Regex.fromString
     |> Maybe.withDefault Regex.never
 
-message : String -> String -> Json.Encode.Value
-message id body =
+signedRequest : String -> String -> Json.Encode.Value
+signedRequest id body =
   Json.Encode.object
     [ ("id", Json.Encode.string id)
     , ("data", Json.Encode.string body)
@@ -346,14 +417,41 @@ upsertDonation entry donations =
   else
     donations ++ [entry]
 
+closeIfCurrent : Model -> PortSocket.Id -> PortSocket.Id -> (Model, Cmd Msg)
+closeIfCurrent model wasId id =
+  if id == wasId then
+    ( { model
+      | optionsConnection = Connect initialReconnectDelay
+      }
+      , Cmd.none
+    )
+  else
+    (model, Cmd.none)
+
+currentConnectionId : ConnectionStatus -> Maybe PortSocket.Id
+currentConnectionId connection =
+  case connection of
+    Disconnected ->
+      Nothing
+    Connect _ ->
+      Nothing
+    Connecting id _ ->
+      Just id
+    Connected id ->
+      Just id
+
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
     --[ WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
-    --, WebSocket.listen (config.wsserver ++ "options.json") receiveOptions
-    [ matchSubscription model
+    [ PortSocket.receive SocketEvent
+    , case model.optionsConnection of
+        Connect timeout-> Time.every timeout Reconnect
+        Connecting _ timeout-> Time.every timeout Reconnect
+        _ -> Sub.none
+    , matchSubscription model
     , Nacl.signedMessage SignedMessage
     ]
 
@@ -371,10 +469,3 @@ matchSubscription model =
 receiveModel : Json.Decode.Value -> Msg
 receiveModel =
   MatchedModel << Json.Decode.decodeValue Donation.Decode.donation
-
-
-receiveOptions : String -> Msg
-receiveOptions =
-  Json.Decode.decodeString GameInfo.Decode.rounds
-    >> Result.mapError Debug.toString
-    >> GotGameInfo

@@ -155,11 +155,11 @@ update msg model =
         Connected wasId ->
           closeIfCurrent model wasId id
     SocketEvent id (PortSocket.Message message) ->
-      let _ = Debug.log "websocket id" id in
+      --let _ = Debug.log "websocket id" id in
       --let _ = Debug.log "websocket message" message in
       case Json.Decode.decodeString GameInfo.Decode.options message of
         Ok options ->
-          let _ = Debug.log "decode" options in
+          --let _ = Debug.log "decode" options in
           (updateDiscounts { model | rounds = options.games}, Cmd.none)
         Err err ->
           let _ = Debug.log "decode error" err in

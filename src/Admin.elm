@@ -86,8 +86,7 @@ type Msg
   | MatchedModel (Result Json.Decode.Error Donation)
   | SignedMessage Nacl.SignArguments
   | SocketEvent PortSocket.Id PortSocket.Event
-  | ReconnectOptions Posix
-  | ReconnectDonations Posix
+  | Reconnect String Posix
   | AdminViewMsg AVMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -122,16 +121,8 @@ update msg model =
         (model, Cmd.none)
     SocketEvent id event ->
       Connection.update id event updateConnection model
-    ReconnectOptions _ ->
-      let
-        (optionsConnection, cmd) = Connection.socketReconnect optionsWebsocket model.optionsConnection
-      in
-        ( {model | optionsConnection = optionsConnection}, cmd)
-    ReconnectDonations _ ->
-      let
-        (donationsConnection, cmd) = Connection.socketReconnect donationsWebsocket model.donationsConnection
-      in
-        ( {model | donationsConnection = donationsConnection}, cmd)
+    Reconnect url _ ->
+      updateConnection url (Connection.socketReconnect url) model
     EmptyRequestComplete (Ok response) ->
       (model, Cmd.none)
     EmptyRequestComplete (Err err) ->
@@ -424,14 +415,8 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
     [ PortSocket.receive SocketEvent
-    , case model.optionsConnection of
-        Connect timeout-> Time.every timeout ReconnectOptions
-        Connecting _ timeout-> Time.every timeout ReconnectOptions
-        _ -> Sub.none
-    , case model.donationsConnection of
-        Connect timeout-> Time.every timeout ReconnectDonations
-        Connecting _ timeout-> Time.every timeout ReconnectDonations
-        _ -> Sub.none
+    , Connection.reconnect (Reconnect optionsWebsocket) model.optionsConnection
+    , Connection.reconnect (Reconnect donationsWebsocket) model.donationsConnection
     , matchSubscription model
     , Nacl.signedMessage SignedMessage
     ]

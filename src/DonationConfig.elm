@@ -77,7 +77,6 @@ init args =
 
 optionsUrl = config.server ++ "options.json"
 optionsWebsocket = config.wsserver ++ "options.json"
-initialReconnectDelay = 1000
 
 fetchGame : Cmd Msg
 fetchGame =
@@ -112,7 +111,7 @@ update msg model =
     GotGameInfo (Ok options) ->
       ( { model
         | rounds = options.games
-        , optionsConnection = Connect initialReconnectDelay
+        , optionsConnection = Connection.connect
         }
           |> updateDiscounts
       , Cmd.none)
@@ -128,11 +127,8 @@ update msg model =
         (model, Cmd.none)
     SocketEvent id event ->
       Connection.update id event updateConnection model
-    Reconnect time ->
-      let
-        (optionsConnection, cmd) = Connection.socketReconnect optionsWebsocket model.optionsConnection
-      in
-        ( {model | optionsConnection = optionsConnection}, cmd)
+    Reconnect url _ ->
+      updateConnection url (Connection.socketReconnect url) model
     None ->
       (model, Cmd.none)
 
@@ -233,8 +229,5 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
     [ PortSocket.receive SocketEvent
-    , case model.optionsConnection of
-        Connect timeout-> Time.every timeout Reconnect
-        Connecting _ timeout-> Time.every timeout Reconnect
-        _ -> Sub.none
+    , Connection.reconnect (Reconnect optionsWebsocket) model.optionsConnection
     ]

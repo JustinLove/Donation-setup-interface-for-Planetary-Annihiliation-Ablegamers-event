@@ -19,5 +19,5 @@ type Msg
   | Instructions Bool
   | GotGameInfo (Result Http.Error Options)
   | SocketEvent PortSocket.Id PortSocket.Event
-  | Reconnect Posix
+  | Reconnect String Posix
   | None

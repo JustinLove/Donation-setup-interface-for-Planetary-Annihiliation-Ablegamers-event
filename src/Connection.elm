@@ -1,6 +1,8 @@
-module Connection exposing (Status(..), connect, currentId, socketConnecting, socketClosed, socketReconnect, update)
+module Connection exposing (Status(..), connect, currentId, socketConnecting, socketClosed, socketReconnect, update, reconnect)
 
 import PortSocket
+
+import Time exposing (Posix)
 
 type Status
   = Disconnected
@@ -91,3 +93,10 @@ update id event updateConnection model =
       let _ = Debug.log "websocket id" id in
       let _ = Debug.log "websocket message" message in
       (model, Cmd.none)
+
+reconnect : (Posix -> msg) -> Status -> Sub msg
+reconnect tagger connection =
+  case connection of
+    Connect timeout-> Time.every timeout tagger
+    Connecting _ timeout-> Time.every timeout tagger
+    _ -> Sub.none

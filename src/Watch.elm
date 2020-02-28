@@ -88,7 +88,7 @@ type Msg
   = GotGameInfo (Result Http.Error (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
   | SocketEvent PortSocket.Id PortSocket.Event
-  | Reconnect Posix
+  | Reconnect String Posix
   | WatchViewMsg WVMsg
   | Poll Posix
 
@@ -139,11 +139,8 @@ update msg model =
         (model, Cmd.none)
     SocketEvent id event ->
       Connection.update id event updateConnection model
-    Reconnect _ ->
-      let
-        (donationsConnection, cmd) = Connection.socketReconnect (donationsWebsocket model.round) model.donationsConnection
-      in
-        ( {model | donationsConnection = donationsConnection}, cmd)
+    Reconnect url _ ->
+      updateConnection url (Connection.socketReconnect url) model
     Poll t ->
       (model, fetchDonations model.round)
 
@@ -188,8 +185,5 @@ subscriptions model =
   --Time.every (10 * 1000) Poll
   Sub.batch
     [ PortSocket.receive SocketEvent
-    , case model.donationsConnection of
-        Connect timeout-> Time.every timeout Reconnect
-        Connecting _ timeout-> Time.every timeout Reconnect
-        _ -> Sub.none
+    , Connection.reconnect (Reconnect (donationsWebsocket model.round)) model.donationsConnection
     ]

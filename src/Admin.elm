@@ -119,24 +119,20 @@ update msg model =
       (model, Cmd.none)
     SocketEvent id (PortSocket.Connecting url) ->
       let _ = Debug.log "websocket connecting" id in
-      let
-        (optionsConnection, cmd) = socketConnecting id url model.optionsConnection
-      in
-      ( { model | optionsConnection = optionsConnection }
-      , cmd
-      )
+      updateConnection url (socketConnecting id url) model
     SocketEvent id (PortSocket.Open url) ->
       let _ = Debug.log "websocket open" id in
-      ( {model | optionsConnection = Connected id}
-      , Cmd.none
-      )
+      updateConnection url (always (Connected id, Cmd.none)) model
     SocketEvent id (PortSocket.Close url) ->
       let _ = Debug.log "websocket closed" id in
-      ( {model | optionsConnection = socketClosed id model.optionsConnection}, Cmd.none)
+      updateConnection url (\m -> (socketClosed id m, Cmd.none)) model
     SocketEvent id (PortSocket.Message message) ->
       --let _ = Debug.log "websocket id" id in
       --let _ = Debug.log "websocket message" message in
-      (updateRounds message model, Cmd.none)
+      if Just id == (currentConnectionId model.optionsConnection) then
+        (updateRounds message model, Cmd.none)
+      else
+        (model, Cmd.none)
     ReconnectOptions _ ->
       let
         (optionsConnection, cmd) = socketReconnect optionsWebsocket model.optionsConnection
@@ -388,6 +384,18 @@ upsertDonation entry donations =
       |> List.map (\d -> if d.id == entry.id then entry else d)
   else
     donations ++ [entry]
+
+updateConnection : String -> (ConnectionStatus -> (ConnectionStatus, Cmd Msg)) -> Model -> (Model, Cmd Msg)
+updateConnection url f model =
+  if url == optionsWebsocket then
+    let
+      (optionsConnection, cmd) = f model.optionsConnection
+    in
+      ( { model | optionsConnection = optionsConnection }
+      , cmd
+      )
+  else
+    (model, Cmd.none)
 
 closeIfCurrent : ConnectionStatus -> PortSocket.Id -> PortSocket.Id -> ConnectionStatus
 closeIfCurrent connection id wasId =

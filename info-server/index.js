@@ -326,6 +326,7 @@ wss.on('connection', function connection(con) {
   var query = websocketQuery(con)
   console.log('connection', query)
   notifyClientsOptionsChanged()
+  notifyClientsDonations(donations)
   con.on('message', function incoming(message) {
     console.log('received: %s', wss.clients.length, message);
   });

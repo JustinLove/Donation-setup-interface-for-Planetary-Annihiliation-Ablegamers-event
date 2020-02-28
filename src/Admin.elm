@@ -43,6 +43,7 @@ type alias Model =
   , editing: DonationEdit
   , signsk: String
   , optionsConnection : ConnectionStatus
+  , donationsConnection : ConnectionStatus
   }
 
 makeModel : Model
@@ -52,6 +53,7 @@ makeModel =
   , editing = NotEditing
   , signsk = ""
   , optionsConnection = Disconnected
+  , donationsConnection = Disconnected
   }
 
 init : () -> (Model, Cmd Msg)
@@ -63,6 +65,8 @@ init _ =
 
 optionsUrl = config.server ++ "options.json"
 optionsWebsocket = config.wsserver ++ "options.json"
+donationsUrl =  config.server ++ "donations"
+donationsWebsocket =  config.wsserver ++ "donations"
 initialReconnectDelay = 1000
 
 fetchGame : Cmd Msg
@@ -75,7 +79,7 @@ fetchGame =
 fetchDonations : Cmd Msg
 fetchDonations =
   Http.get
-    { url = config.server ++ "donations"
+    { url = donationsUrl
     , expect = Http.expectJson GotDonations Donation.Decode.donations
     }
 
@@ -84,12 +88,12 @@ fetchDonations =
 type Msg
   = GotGameInfo (Result Http.Error (List GameInfo))
   | GotDonations (Result Http.Error (List Donation))
-  | GotUpdate (Result Json.Decode.Error (List Donation))
   | EmptyRequestComplete (Result Http.Error ())
   | MatchedModel (Result Json.Decode.Error Donation)
   | SignedMessage Nacl.SignArguments
   | SocketEvent PortSocket.Id PortSocket.Event
   | ReconnectOptions Posix
+  | ReconnectDonations Posix
   | AdminViewMsg AVMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -105,14 +109,13 @@ update msg model =
       let _ = Debug.log "error" err in
       (model, Cmd.none)
     GotDonations (Ok donations) ->
-      ({ model | donations = donations}, Cmd.none)
+      ( { model
+        | donations = upsertDonations donations model.donations
+        , donationsConnection = Connect initialReconnectDelay
+        }
+      , Cmd.none)
     GotDonations (Err err) ->
       let _ = Debug.log "donations fetch error" err in
-      (model, Cmd.none)
-    GotUpdate (Ok donations) ->
-      ({ model | donations = upsertDonations donations model.donations}, Cmd.none)
-    GotUpdate (Err err) ->
-      let _ = Debug.log "donations update error" err in
       (model, Cmd.none)
     SocketEvent id (PortSocket.Error value) ->
       let _ = Debug.log "websocket error" value in
@@ -131,6 +134,8 @@ update msg model =
       --let _ = Debug.log "websocket message" message in
       if Just id == (currentConnectionId model.optionsConnection) then
         (updateRounds message model, Cmd.none)
+      else if Just id == (currentConnectionId model.donationsConnection) then
+        (updateDonations message model, Cmd.none)
       else
         (model, Cmd.none)
     ReconnectOptions _ ->
@@ -138,6 +143,11 @@ update msg model =
         (optionsConnection, cmd) = socketReconnect optionsWebsocket model.optionsConnection
       in
         ( {model | optionsConnection = optionsConnection}, cmd)
+    ReconnectDonations _ ->
+      let
+        (donationsConnection, cmd) = socketReconnect donationsWebsocket model.donationsConnection
+      in
+        ( {model | donationsConnection = donationsConnection}, cmd)
     EmptyRequestComplete (Ok response) ->
       (model, Cmd.none)
     EmptyRequestComplete (Err err) ->
@@ -394,6 +404,13 @@ updateConnection url f model =
       ( { model | optionsConnection = optionsConnection }
       , cmd
       )
+  else if url == donationsWebsocket then
+    let
+      (donationsConnection, cmd) = f model.donationsConnection
+    in
+      ( { model | donationsConnection = donationsConnection }
+      , cmd
+      )
   else
     (model, Cmd.none)
 
@@ -461,25 +478,33 @@ updateRounds message model =
       let _ = Debug.log "decode error" err in
       model
 
+updateDonations : String -> Model -> Model
+updateDonations message model =
+  case Json.Decode.decodeString Donation.Decode.donations message of
+    Ok donations ->
+      let _ = Debug.log "decode" donations in
+      { model | donations = upsertDonations donations model.donations}
+    Err err ->
+      let _ = Debug.log "decode error" err in
+      model
+
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
-    --[ WebSocket.listen (config.wsserver ++ "donations") receiveUpdate
     [ PortSocket.receive SocketEvent
     , case model.optionsConnection of
         Connect timeout-> Time.every timeout ReconnectOptions
         Connecting _ timeout-> Time.every timeout ReconnectOptions
         _ -> Sub.none
+    , case model.donationsConnection of
+        Connect timeout-> Time.every timeout ReconnectDonations
+        Connecting _ timeout-> Time.every timeout ReconnectDonations
+        _ -> Sub.none
     , matchSubscription model
     , Nacl.signedMessage SignedMessage
     ]
-
-receiveUpdate : String -> Msg
-receiveUpdate =
-  Json.Decode.decodeString Donation.Decode.donations
-    >> GotUpdate
 
 matchSubscription : Model -> Sub Msg
 matchSubscription model =

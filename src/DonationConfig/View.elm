@@ -53,7 +53,8 @@ instructions =
       , footer []
         [ a
           [ target "_blank"
-          , href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2020/donate"
+          --, href "https://tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2020/donate"
+          , href "https://donate.tiltify.com/@wondible/planetary-annihilation-ablegamers-tournament-2020"
           , class "primary button"
           , id "navigate-donation"
           ] [ text "Take Me There" ]

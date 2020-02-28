@@ -9,7 +9,6 @@
 ### Donation Config UI
 
 - Elm 0.19
-  - websockets
   - remove regex
 - Lots of little match changes - interactive editing?
 - oauth?

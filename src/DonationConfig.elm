@@ -119,18 +119,6 @@ update msg model =
     GotGameInfo (Err err) ->
       let _ = Debug.log "error" err in
       (model, Cmd.none)
-    SocketEvent id (PortSocket.Error value) ->
-      let _ = Debug.log "websocket error" value in
-      (model, Cmd.none)
-    SocketEvent id (PortSocket.Connecting url) ->
-      let _ = Debug.log "websocket connecting" id in
-      updateConnection url (Connection.socketConnecting id url) model
-    SocketEvent id (PortSocket.Open url) ->
-      let _ = Debug.log "websocket open" id in
-      updateConnection url (always (Connected id, Cmd.none)) model
-    SocketEvent id (PortSocket.Close url) ->
-      let _ = Debug.log "websocket closed" id in
-      updateConnection url (\m -> (Connection.socketClosed id m, Cmd.none)) model
     SocketEvent id (PortSocket.Message message) ->
       --let _ = Debug.log "websocket id" id in
       --let _ = Debug.log "websocket message" message in
@@ -138,6 +126,8 @@ update msg model =
         (updateRounds message model, Cmd.none)
       else
         (model, Cmd.none)
+    SocketEvent id event ->
+      Connection.update id event updateConnection model
     Reconnect time ->
       let
         (optionsConnection, cmd) = Connection.socketReconnect optionsWebsocket model.optionsConnection

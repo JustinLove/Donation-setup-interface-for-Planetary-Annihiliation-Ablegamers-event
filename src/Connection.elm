@@ -1,4 +1,4 @@
-module Connection exposing (Status(..), connect, currentId, socketConnecting, socketClosed, socketReconnect)
+module Connection exposing (Status(..), connect, currentId, socketConnecting, socketClosed, socketReconnect, update)
 
 import PortSocket
 
@@ -67,3 +67,27 @@ socketReconnect url connection =
     _ ->
       (connection, Cmd.none)
 
+update
+  :  PortSocket.Id
+  -> PortSocket.Event
+  -> (String -> (Status -> (Status, Cmd msg)) -> model -> (model, Cmd msg))
+  -> model
+  -> (model, Cmd msg)
+update id event updateConnection model =
+  case event of
+    (PortSocket.Error value) ->
+      let _ = Debug.log "websocket error" value in
+      (model, Cmd.none)
+    (PortSocket.Connecting url) ->
+      let _ = Debug.log "websocket connecting" id in
+      updateConnection url (socketConnecting id url) model
+    (PortSocket.Open url) ->
+      let _ = Debug.log "websocket open" id in
+      updateConnection url (always (Connected id, Cmd.none)) model
+    (PortSocket.Close url) ->
+      let _ = Debug.log "websocket closed" id in
+      updateConnection url (\m -> (socketClosed id m, Cmd.none)) model
+    (PortSocket.Message message) ->
+      let _ = Debug.log "websocket id" id in
+      let _ = Debug.log "websocket message" message in
+      (model, Cmd.none)

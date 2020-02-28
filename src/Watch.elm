@@ -96,7 +96,17 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     WatchViewMsg (FilterRound id) ->
-      ({ model | round = id}, fetchDonations id)
+      ( { model
+        | round = id
+        , donationsConnection = Connection.connect
+        }
+      , Cmd.batch
+        [ fetchDonations id
+        , Connection.currentId model.donationsConnection
+          |> Maybe.map PortSocket.close
+          |> Maybe.withDefault Cmd.none
+        ]
+      )
     WatchViewMsg (HighlightRound id color) ->
       ({ model | roundColors = Dict.insert id color model.roundColors}, Cmd.none)
     WatchViewMsg None ->
@@ -109,7 +119,12 @@ update msg model =
     GotDonations (Ok donations) ->
       ( { model
         | donations = upsertDonations donations model.donations
-        , donationsConnection = Connection.connect
+        , donationsConnection =
+          if model.donationsConnection == Disconnected then
+            Connection.connect
+          else
+            model.donationsConnection
+
         }
       , Cmd.none)
     GotDonations (Err err) ->

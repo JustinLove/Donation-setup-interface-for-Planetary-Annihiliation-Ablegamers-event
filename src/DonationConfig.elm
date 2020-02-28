@@ -1,5 +1,6 @@
 module DonationConfig exposing (main, init, update, view, subscriptions, DCMsg, Model, Arguments)
 
+import Connection exposing (Status(..))
 import DonationConfig.View
 import DonationConfig.Msg exposing (..)
 import Menu exposing (..)
@@ -34,12 +35,6 @@ main =
     , subscriptions = subscriptions
     }
 
-type ConnectionStatus
-  = Disconnected
-  | Connect Float
-  | Connecting PortSocket.Id Float
-  | Connected PortSocket.Id
-
 -- MODEL
 
 type alias Model =
@@ -53,7 +48,7 @@ type alias Model =
   , selections : List OrderItem
   , hover: Maybe MenuItem
   , instructionsOpen: Bool
-  , optionsConnection : ConnectionStatus
+  , optionsConnection : Connection.Status
   }
 
 makeModel : List RawMenuItem -> List UnitInfo -> Model
@@ -129,57 +124,25 @@ update msg model =
       (model, Cmd.none)
     SocketEvent id (PortSocket.Connecting url) ->
       let _ = Debug.log "websocket connecting" id in
-      ( { model | optionsConnection = case model.optionsConnection of
-          Connect timeout -> Connecting id timeout
-          Connecting _ timeout -> Connecting id timeout
-          _ -> Connecting id initialReconnectDelay
-        }
-      , currentConnectionId model.optionsConnection
-          |> Maybe.map PortSocket.close
-          |> Maybe.withDefault Cmd.none
-      )
+      updateConnection url (Connection.socketConnecting id url) model
     SocketEvent id (PortSocket.Open url) ->
       let _ = Debug.log "websocket open" id in
-      ( {model | optionsConnection = Connected id}
-      , Cmd.none
-      )
+      updateConnection url (always (Connected id, Cmd.none)) model
     SocketEvent id (PortSocket.Close url) ->
       let _ = Debug.log "websocket closed" id in
-      case model.optionsConnection of
-        Disconnected ->
-          (model, Cmd.none)
-        Connect timeout ->
-          (model, Cmd.none)
-        Connecting wasId timeout ->
-          closeIfCurrent model wasId id
-        Connected wasId ->
-          closeIfCurrent model wasId id
+      updateConnection url (\m -> (Connection.socketClosed id m, Cmd.none)) model
     SocketEvent id (PortSocket.Message message) ->
       --let _ = Debug.log "websocket id" id in
       --let _ = Debug.log "websocket message" message in
-      case Json.Decode.decodeString GameInfo.Decode.options message of
-        Ok options ->
-          --let _ = Debug.log "decode" options in
-          (updateDiscounts { model | rounds = options.games}, Cmd.none)
-        Err err ->
-          let _ = Debug.log "decode error" err in
-          (model, Cmd.none)
+      if Just id == (Connection.currentId model.optionsConnection) then
+        (updateRounds message model, Cmd.none)
+      else
+        (model, Cmd.none)
     Reconnect time ->
-      let url = optionsWebsocket in
-      case Debug.log "reconnect" model.optionsConnection of
-        Connect timeout ->
-          ( {model | optionsConnection = Connect (timeout*2)}
-          , PortSocket.connect url
-          )
-        Connecting id timeout ->
-          ( {model | optionsConnection = Connect (timeout*2)}
-          , Cmd.batch
-            [ PortSocket.close id
-            , PortSocket.connect url
-            ]
-          )
-        _ ->
-          (model, Cmd.none)
+      let
+        (optionsConnection, cmd) = Connection.socketReconnect optionsWebsocket model.optionsConnection
+      in
+        ( {model | optionsConnection = optionsConnection}, cmd)
     None ->
       (model, Cmd.none)
 
@@ -251,6 +214,28 @@ instructionFocus open =
   else
     "#open-instructions"
 
+updateRounds : String -> Model -> Model
+updateRounds message model =
+  case Json.Decode.decodeString GameInfo.Decode.options message of
+    Ok options ->
+      let _ = Debug.log "decode" options in
+      updateDiscounts { model | rounds = options.games}
+    Err err ->
+      let _ = Debug.log "decode error" err in
+      model
+
+updateConnection : String -> (Connection.Status -> (Connection.Status, Cmd Msg)) -> Model -> (Model, Cmd Msg)
+updateConnection url f model =
+  if url == optionsWebsocket then
+    let
+      (optionsConnection, cmd) = f model.optionsConnection
+    in
+      ( { model | optionsConnection = optionsConnection }
+      , cmd
+      )
+  else
+    (model, Cmd.none)
+
 -- SUBSCRIPTIONS
 
 
@@ -263,26 +248,3 @@ subscriptions model =
         Connecting _ timeout-> Time.every timeout Reconnect
         _ -> Sub.none
     ]
-
-closeIfCurrent : Model -> PortSocket.Id -> PortSocket.Id -> (Model, Cmd Msg)
-closeIfCurrent model wasId id =
-  if id == wasId then
-    ( { model
-      | optionsConnection = Connect initialReconnectDelay
-      }
-      , Cmd.none
-    )
-  else
-    (model, Cmd.none)
-
-currentConnectionId : ConnectionStatus -> Maybe PortSocket.Id
-currentConnectionId connection =
-  case connection of
-    Disconnected ->
-      Nothing
-    Connect _ ->
-      Nothing
-    Connecting id _ ->
-      Just id
-    Connected id ->
-      Just id

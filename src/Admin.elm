@@ -2,6 +2,7 @@ module Admin exposing (..)
 
 import Admin.View exposing (DonationEdit(..), AVMsg(..))
 import Config exposing (config) 
+import Connection exposing (Status(..))
 import GameInfo exposing (Options, GameInfo)
 import GameInfo.Decode
 import Donation exposing (Donation)
@@ -29,12 +30,6 @@ main =
     , subscriptions = subscriptions
     }
 
-type ConnectionStatus
-  = Disconnected
-  | Connect Float
-  | Connecting PortSocket.Id Float
-  | Connected PortSocket.Id
-
 -- MODEL
 
 type alias Model =
@@ -42,8 +37,8 @@ type alias Model =
   , donations: List Donation
   , editing: DonationEdit
   , signsk: String
-  , optionsConnection : ConnectionStatus
-  , donationsConnection : ConnectionStatus
+  , optionsConnection : Connection.Status
+  , donationsConnection : Connection.Status
   }
 
 makeModel : Model
@@ -102,7 +97,7 @@ update msg model =
     GotGameInfo (Ok rounds) ->
       ( { model
         | rounds = rounds
-        , optionsConnection = Connect initialReconnectDelay
+        , optionsConnection = Connection.connect
         }
       , Cmd.none)
     GotGameInfo (Err err) ->
@@ -111,7 +106,7 @@ update msg model =
     GotDonations (Ok donations) ->
       ( { model
         | donations = upsertDonations donations model.donations
-        , donationsConnection = Connect initialReconnectDelay
+        , donationsConnection = Connection.connect
         }
       , Cmd.none)
     GotDonations (Err err) ->
@@ -122,30 +117,30 @@ update msg model =
       (model, Cmd.none)
     SocketEvent id (PortSocket.Connecting url) ->
       let _ = Debug.log "websocket connecting" id in
-      updateConnection url (socketConnecting id url) model
+      updateConnection url (Connection.socketConnecting id url) model
     SocketEvent id (PortSocket.Open url) ->
       let _ = Debug.log "websocket open" id in
       updateConnection url (always (Connected id, Cmd.none)) model
     SocketEvent id (PortSocket.Close url) ->
       let _ = Debug.log "websocket closed" id in
-      updateConnection url (\m -> (socketClosed id m, Cmd.none)) model
+      updateConnection url (\m -> (Connection.socketClosed id m, Cmd.none)) model
     SocketEvent id (PortSocket.Message message) ->
       --let _ = Debug.log "websocket id" id in
       --let _ = Debug.log "websocket message" message in
-      if Just id == (currentConnectionId model.optionsConnection) then
+      if Just id == (Connection.currentId model.optionsConnection) then
         (updateRounds message model, Cmd.none)
-      else if Just id == (currentConnectionId model.donationsConnection) then
+      else if Just id == (Connection.currentId model.donationsConnection) then
         (updateDonations message model, Cmd.none)
       else
         (model, Cmd.none)
     ReconnectOptions _ ->
       let
-        (optionsConnection, cmd) = socketReconnect optionsWebsocket model.optionsConnection
+        (optionsConnection, cmd) = Connection.socketReconnect optionsWebsocket model.optionsConnection
       in
         ( {model | optionsConnection = optionsConnection}, cmd)
     ReconnectDonations _ ->
       let
-        (donationsConnection, cmd) = socketReconnect donationsWebsocket model.donationsConnection
+        (donationsConnection, cmd) = Connection.socketReconnect donationsWebsocket model.donationsConnection
       in
         ( {model | donationsConnection = donationsConnection}, cmd)
     EmptyRequestComplete (Ok response) ->
@@ -395,7 +390,7 @@ upsertDonation entry donations =
   else
     donations ++ [entry]
 
-updateConnection : String -> (ConnectionStatus -> (ConnectionStatus, Cmd Msg)) -> Model -> (Model, Cmd Msg)
+updateConnection : String -> (Connection.Status -> (Connection.Status, Cmd Msg)) -> Model -> (Model, Cmd Msg)
 updateConnection url f model =
   if url == optionsWebsocket then
     let
@@ -413,60 +408,6 @@ updateConnection url f model =
       )
   else
     (model, Cmd.none)
-
-closeIfCurrent : ConnectionStatus -> PortSocket.Id -> PortSocket.Id -> ConnectionStatus
-closeIfCurrent connection id wasId =
-  if id == wasId then
-    Connect initialReconnectDelay
-  else
-    connection
-
-currentConnectionId : ConnectionStatus -> Maybe PortSocket.Id
-currentConnectionId connection =
-  case connection of
-    Disconnected ->
-      Nothing
-    Connect _ ->
-      Nothing
-    Connecting id _ ->
-      Just id
-    Connected id ->
-      Just id
-
-
-socketConnecting : PortSocket.Id -> String -> ConnectionStatus -> (ConnectionStatus, Cmd msg)
-socketConnecting id url connection =
-  ( case connection of
-      Connect timeout -> Connecting id timeout
-      Connecting _ timeout -> Connecting id timeout
-      _ -> Connecting id initialReconnectDelay
-  , currentConnectionId connection
-      |> Maybe.map PortSocket.close
-      |> Maybe.withDefault Cmd.none
-  )
-
-socketClosed : PortSocket.Id -> ConnectionStatus -> ConnectionStatus
-socketClosed id connection =
-  currentConnectionId connection
-    |> Maybe.map (closeIfCurrent connection id)
-    |> Maybe.withDefault connection
-
-socketReconnect : String -> ConnectionStatus -> (ConnectionStatus, Cmd Msg)
-socketReconnect url connection =
-  case Debug.log "reconnect" connection of
-    Connect timeout ->
-      ( Connect (timeout*2)
-      , PortSocket.connect url
-      )
-    Connecting id timeout ->
-      ( Connect (timeout*2)
-      , Cmd.batch
-        [ PortSocket.close id
-        , PortSocket.connect url
-        ]
-      )
-    _ ->
-      (connection, Cmd.none)
 
 updateRounds : String -> Model -> Model
 updateRounds message model =

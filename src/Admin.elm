@@ -62,7 +62,6 @@ optionsUrl = config.server ++ "options.json"
 optionsWebsocket = config.wsserver ++ "options.json"
 donationsUrl =  config.server ++ "donations"
 donationsWebsocket =  config.wsserver ++ "donations"
-initialReconnectDelay = 1000
 
 fetchGame : Cmd Msg
 fetchGame =

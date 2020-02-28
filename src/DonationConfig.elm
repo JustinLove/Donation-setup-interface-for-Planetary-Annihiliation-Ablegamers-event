@@ -111,7 +111,11 @@ update msg model =
     GotGameInfo (Ok options) ->
       ( { model
         | rounds = options.games
-        , optionsConnection = Connection.connect
+        , optionsConnection =
+          if model.optionsConnection == Disconnected then
+            Connection.connect
+          else
+            model.optionsConnection
         }
           |> updateDiscounts
       , Cmd.none)

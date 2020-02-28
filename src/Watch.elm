@@ -124,7 +124,6 @@ update msg model =
             Connection.connect
           else
             model.donationsConnection
-
         }
       , Cmd.none)
     GotDonations (Err err) ->

@@ -8,7 +8,6 @@
 
 ### Donation Config UI
 
-- don't remove item with invalid quantity
 - Lots of little match changes - interactive editing?
 - oauth?
 - admin streamlining and safety

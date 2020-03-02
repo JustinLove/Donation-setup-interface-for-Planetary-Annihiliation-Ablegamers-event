@@ -14,7 +14,7 @@ import Array exposing (Array)
 import Browser
 import Http
 import Json.Decode
-import Parser
+import Parser exposing ((|=), (|.))
 import String
 import Time exposing (Posix)
 
@@ -149,14 +149,16 @@ updateInput number item =
 
 updateQuantity : OrderItem -> OrderItem
 updateQuantity item =
-  if validNumber item.input then
-    { item | quantity = getNumber item.input }
+  if whiteSpace item.input then
+    { item | quantity = 0, input = "", valid = True }
+  else if validNumber item.input then
+    { item | quantity = getNumber item.input, valid = True }
   else
-    { item | quantity = 0, input = "" }
+    { item | quantity = 0, valid = False }
 
 addOne : OrderItem -> OrderItem
 addOne item =
-  { item | quantity = item.quantity + 1, input = String.fromInt (item.quantity + 1) }
+  { item | quantity = item.quantity + 1, input = String.fromInt (item.quantity + 1), valid = True }
 
 getNumber : String -> Int
 getNumber s =
@@ -164,9 +166,27 @@ getNumber s =
 
 validNumber : String -> Bool
 validNumber value =
-  case Parser.run Parser.int value of
+  case Parser.run onlyNumber value of
     Ok _ -> True
     Err _ -> False
+
+onlyNumber : Parser.Parser Int
+onlyNumber =
+  Parser.succeed identity
+    |= Parser.int
+    |. Parser.end
+
+whiteSpace : String -> Bool
+whiteSpace value =
+  case Parser.run onlySpaces value of
+    Ok _ -> True
+    Err _ -> False
+
+onlySpaces : Parser.Parser ()
+onlySpaces =
+  Parser.succeed identity
+    |= Parser.spaces
+    |. Parser.end
 
 updateDiscounts : Model -> Model
 updateDiscounts model =

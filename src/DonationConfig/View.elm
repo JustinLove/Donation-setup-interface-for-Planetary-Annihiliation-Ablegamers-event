@@ -218,7 +218,7 @@ displayPlanet context current name =
 displayOrders : List OrderItem -> Html Msg
 displayOrders selections =
   let
-    visible = nonZero selections
+    visible = nonZeroOrInvalid selections
   in 
     if (List.isEmpty visible) then
       p [] [ text "Make selections above" ]
@@ -331,7 +331,7 @@ donationTextLong model =
   String.join ""
     [ donationHeader model
     , "\n"
-    , orderTextLong <| nonZero model.selections
+    , orderTextLong <| nonZeroValid model.selections
     ]
 
 orderTextLong : List OrderItem -> String
@@ -357,7 +357,7 @@ donationTextShort model =
   String.join ""
     [ donationHeader model
     , "\n"
-    , orderTextShort <| nonZero model.selections
+    , orderTextShort <| nonZeroValid model.selections
     ]
 
 orderTextShort : List OrderItem -> String
@@ -372,9 +372,13 @@ itemTextShort item =
     , String.fromInt item.quantity
     ]
 
-nonZero : List OrderItem -> List OrderItem
-nonZero =
-  List.filter (\i -> i.quantity > 0)
+nonZeroOrInvalid : List OrderItem -> List OrderItem
+nonZeroOrInvalid =
+  List.filter (\i -> i.quantity > 0 || i.valid == False)
+
+nonZeroValid : List OrderItem -> List OrderItem
+nonZeroValid =
+  List.filter (\i -> i.quantity > 0 && i.valid)
 
 dollars : Float -> String
 dollars n =

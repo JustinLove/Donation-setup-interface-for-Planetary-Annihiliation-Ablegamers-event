@@ -11,6 +11,7 @@ type alias OrderItem =
   , build: List BuildItem
   , quantity: Int
   , input: String
+  , valid: Bool
   }
 
 type alias MenuItem =
@@ -51,6 +52,7 @@ makeOrder item =
   , build = item.build
   , quantity = 0
   , input = ""
+  , valid = True
   }
 
 compress : List RawMenuItem -> List RawMenuItem

@@ -16,7 +16,7 @@ import Browser
 import Http
 import Json.Encode
 import Json.Decode
-import Regex
+import Parser
 import String
 import Task
 import Time exposing (Posix)
@@ -325,13 +325,9 @@ getNumber s =
 
 validNumber : String -> Bool
 validNumber value =
-  Regex.contains onlyNumber value
-
-onlyNumber : Regex.Regex
-onlyNumber =
-  "^\\d+$"
-    |> Regex.fromString
-    |> Maybe.withDefault Regex.never
+  case Parser.run Parser.int value of
+    Ok _ -> True
+    Err _ -> False
 
 signedRequest : String -> String -> Json.Encode.Value
 signedRequest id body =

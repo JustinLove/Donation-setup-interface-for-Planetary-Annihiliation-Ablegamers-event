@@ -8,8 +8,8 @@
 
 ### Donation Config UI
 
-- Elm 0.19
-  - remove regex
+- game time update?
+- don't remove item with invalid quantity
 - Lots of little match changes - interactive editing?
 - oauth?
 - admin streamlining and safety
@@ -22,7 +22,7 @@
 - Lobby info streamlining
 - received discount level? - not currently fetching options
 - Legion pushing menu queue off bottom of screen
-- schedule unit paste in sim time
+- x schedule unit paste in sim time
 - x Legion blocking chat
 - x Donation panel getting confused with planet panel during backlogs
 - x Menu design: Menu items with multiples can be auto-combined.

@@ -1,10 +1,11 @@
 module Admin exposing (..)
 
-import Admin.View exposing (DonationEdit(..), AVMsg(..))
+import Admin.View exposing (Editing(..), AVMsg(..))
 import Config exposing (config) 
 import Connection exposing (Status(..))
 import GameInfo exposing (Options, GameInfo)
 import GameInfo.Decode
+import GameInfo.Encode
 import Donation exposing (Donation)
 import Donation.Decode
 import Donation.Encode
@@ -35,7 +36,7 @@ main =
 type alias Model =
   { rounds: List GameInfo
   , donations: List Donation
-  , editing: DonationEdit
+  , editing: Editing
   , signsk: String
   , optionsConnection : Connection.Status
   , donationsConnection : Connection.Status
@@ -132,9 +133,10 @@ update msg model =
       --let _ = Debug.log "donation" matched in
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        Editing edited ->
+        EditingRound _ -> (model, Cmd.none)
+        EditingDonation edited ->
           let merge = setDonationComment edited.comment matched in
-          ( { model | editing = Editing merge }
+          ( { model | editing = EditingDonation merge }
           , Cmd.none
           )
     MatchedModel (Err err) ->
@@ -154,6 +156,10 @@ update msg model =
       ( removeRound round model
       , sendDeleteRound model.signsk round
       )
+    AdminViewMsg (EditRound round) ->
+      ( { model | editing = EditingRound round }
+      , Cmd.none
+      )
     AdminViewMsg (ClearDonations) ->
       ( { model | donations = [] }
       , sendClearDonations model.signsk
@@ -168,8 +174,14 @@ update msg model =
       ( updateRound (setRoundDiscountLevel level) id model
       , sendDiscountLevel model.signsk id level
       )
+    AdminViewMsg (SetRoundName name) ->
+      updateEditingRound (setRoundName name) model
+    AdminViewMsg (SetPlayerName index name) ->
+      updateEditingRound (setRoundPlayerName index name) model
+    AdminViewMsg (SetPlanetName index name) ->
+      updateEditingRound (setRoundPlanetName index name) model
     AdminViewMsg (EditDonation donation) ->
-      ( { model | editing = Editing donation }
+      ( { model | editing = EditingDonation donation }
       , matchInDonation
         { rounds = model.rounds
         , donation = donation
@@ -179,9 +191,10 @@ update msg model =
       --let _ = Debug.log "change" text in
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        Editing edited ->
+        EditingRound _ -> (model, Cmd.none)
+        EditingDonation edited ->
           let edit = setDonationComment text edited in
-          ( { model | editing = Editing edit }
+          ( { model | editing = EditingDonation edit }
           , matchInDonation
             { rounds = model.rounds
             , donation = edit
@@ -190,12 +203,13 @@ update msg model =
     AdminViewMsg (DiscountLevelChange input) ->
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        Editing edited ->
+        EditingRound _ -> (model, Cmd.none)
+        EditingDonation edited ->
           let
             level = parseNumber input
             edit = setDonationDiscountLevel level edited
           in
-          ( { model | editing = Editing edit }
+          ( { model | editing = EditingDonation edit }
           , matchInDonation
             { rounds = model.rounds
             , donation = edit
@@ -204,7 +218,14 @@ update msg model =
     AdminViewMsg (DoneEditing) ->
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        Editing edited ->
+        EditingRound edited ->
+          ( updateRound
+            (always edited)
+            edited.id
+            { model | editing = NotEditing }
+          , sendRoundEdit model.signsk edited
+          )
+        EditingDonation edited ->
           ( updateDonation
             (always edited)
             edited.id
@@ -250,6 +271,16 @@ sendDiscountLevel key round level =
     , url = config.server ++ "games/" ++ round ++ "/discount_level"
     , id = round
     , body = discountLevelBody round level
+    }
+
+sendRoundEdit : String -> GameInfo -> Cmd Msg
+sendRoundEdit key round =
+  Nacl.signMessage
+    { key = key
+    , method = "PUT"
+    , url = config.server ++ "games/" ++ round.id
+    , id = round.id
+    , body = roundEditBody round
     }
 
 sendGameTime : String -> String -> Int -> Cmd Msg
@@ -304,6 +335,16 @@ updateRound f id model =
       model.rounds
   }
 
+updateEditingRound : (GameInfo -> GameInfo) -> Model -> (Model, Cmd Msg)
+updateEditingRound f model =
+  case model.editing of
+    NotEditing -> (model, Cmd.none)
+    EditingDonation _ -> (model, Cmd.none)
+    EditingRound edited ->
+      ( { model | editing = EditingRound (f edited) }
+      , Cmd.none
+      )
+
 setRoundDiscountLevel : Int -> GameInfo -> GameInfo
 setRoundDiscountLevel discountLevel round =
   { round | discountLevel = discountLevel}
@@ -311,6 +352,24 @@ setRoundDiscountLevel discountLevel round =
 setRoundGameTime : Int -> GameInfo -> GameInfo
 setRoundGameTime gameTime round =
   { round | gameTime = gameTime}
+
+setRoundName : String -> GameInfo -> GameInfo
+setRoundName name round =
+  { round | name = name}
+
+setRoundPlayerName : Int -> String -> GameInfo -> GameInfo
+setRoundPlayerName index newName round =
+  { round | players =
+    round.players
+      |> List.indexedMap (\i name -> if i == index then newName else name )
+  }
+
+setRoundPlanetName : Int -> String -> GameInfo -> GameInfo
+setRoundPlanetName index newName round =
+  { round | planets =
+    round.planets
+      |> List.indexedMap (\i name -> if i == index then newName else name )
+  }
 
 parseNumber : String -> Int
 parseNumber discountLevel =
@@ -349,6 +408,10 @@ discountLevelBody id discount_level =
     [ ("id", Json.Encode.string id)
     , ("discount_level", Json.Encode.int discount_level)
     ]
+
+roundEditBody : GameInfo -> String
+roundEditBody round =
+  Json.Encode.encode 0 <| GameInfo.Encode.game round
 
 donationEditBody : Donation -> String
 donationEditBody donation =
@@ -421,7 +484,8 @@ matchSubscription : Model -> Sub Msg
 matchSubscription model =
   case model.editing of
     NotEditing -> Sub.none
-    Editing _ -> matchedModel receiveModel
+    EditingRound _ -> Sub.none
+    EditingDonation _ -> matchedModel receiveModel
 
 receiveModel : Json.Decode.Value -> Msg
 receiveModel =

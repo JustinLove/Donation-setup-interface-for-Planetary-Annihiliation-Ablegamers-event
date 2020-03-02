@@ -1,4 +1,4 @@
-module Admin.View exposing (document, view, DonationEdit(..), AVMsg(..))
+module Admin.View exposing (document, view, Editing(..), AVMsg(..))
 import Config exposing (config) 
 import GameInfo exposing (GameInfo) 
 import Donation exposing (Donation)
@@ -11,18 +11,23 @@ import Html.Events exposing (onClick, onInput)
 type AVMsg
   = SetKey String
   | DeleteRound String
+  | EditRound GameInfo
   | ClearDonations
   | SetGameTime String String
   | SetDiscountLevel String String
+  | SetRoundName String
+  | SetPlayerName Int String
+  | SetPlanetName Int String
   | EditDonation Donation
   | CommentChange String
   | DiscountLevelChange String
   | DoneEditing
   | CancelEditing
 
-type DonationEdit
+type Editing
   = NotEditing
-  | Editing Donation
+  | EditingDonation Donation
+  | EditingRound GameInfo
 
 -- VIEW
 
@@ -37,80 +42,156 @@ view model =
   div []
     [ p [] [ text config.server ]
     , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
-    , ul [] <| List.map displayRound <| (List.sortBy .name) model.rounds
+    , model.rounds
+     |> (List.sortBy .name)
+     |> List.map (displayRound model.editing)
+     |> (::) roundHeader
+     |> table [] 
     , ul [] <| List.map (displayDonation model.editing) <| List.reverse model.donations
     , Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
     ]
 
-displayRound : GameInfo -> Html AVMsg
-displayRound round =
-  li []
-    [ Html.button [ onClick (DeleteRound round.id) ]
-      [ text "X "
-      , text round.name
+roundHeader : Html AVMsg
+roundHeader =
+  tr []
+    [ th [] [ text "Edit" ]
+    , th [] [ text "game time" ]
+    , th [] [ text "discount level" ]
+    ]
+
+displayRound : Editing -> GameInfo -> Html AVMsg
+displayRound edit round =
+  case edit of 
+    NotEditing -> displayRoundOnly round
+    EditingDonation _ -> displayRoundOnly round
+    EditingRound edited ->
+      if round.id == edited.id then
+        displayEditingRound round edited
+      else
+        displayRoundOnly round
+
+displayRoundOnly : GameInfo -> Html AVMsg
+displayRoundOnly round =
+  tr []
+    [ td []
+      [ Html.button [ onClick (EditRound round) ]
+        [ text round.name
+        ]
       ]
-    , text " game time: "
-    , input
-      [ type_ "number"
-      , Html.Attributes.min "0"
-      , value (round.gameTime |> String.fromInt)
-      , onInput (SetGameTime round.id)
-      ] []
-    , text " discount level: "
-    , input
-      [ type_ "number"
-      , Html.Attributes.min "0"
-      , value (round.discountLevel |> String.fromInt)
-      , onInput (SetDiscountLevel round.id)
+    , td []
+      [ input
+        [ type_ "number"
+        , Html.Attributes.min "0"
+        , value (round.gameTime |> String.fromInt)
+        , onInput (SetGameTime round.id)
+        ] []
+      ]
+    , td []
+      [ input
+        [ type_ "number"
+        , Html.Attributes.min "0"
+        , value (round.discountLevel |> String.fromInt)
+        , onInput (SetDiscountLevel round.id)
+        ] []
+      ]
+    ]
+
+displayEditingRound : GameInfo -> GameInfo -> Html AVMsg
+displayEditingRound original edited =
+  tr []
+    [ p []
+      <| List.intersperse (text " ")
+      [ input
+        [ type_ "text"
+        , size 40
+        , value edited.name
+        , onInput SetRoundName
+        ] []
+      ]
+    , div [ class "row" ]
+      [ div [ class "players col" ]
+        [ fieldset []
+          [ legend [] [ text "Players" ]
+          , ul [] <| List.indexedMap displayPlayer edited.players
+          ]
+        ]
+      , div [ class "planets col" ]
+        [ fieldset []
+          [ legend [] [ text "Planets" ]
+          , ul [] <| List.indexedMap displayPlanet edited.planets
+          ]
+        ]
+      ]
+    , p []
+      [ Html.button [ onClick DoneEditing ] [ text "Done" ]
+      , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
+      ]
+    ]
+
+displayPlayer : Int -> String -> Html AVMsg
+displayPlayer index name =
+  textEdit (SetPlayerName index) ((String.fromInt index) ++ "-player") name name
+
+displayPlanet : Int -> String -> Html AVMsg
+displayPlanet index name =
+  textEdit (SetPlanetName index) ((String.fromInt index) ++ "-planet") name name
+
+textEdit : (String -> AVMsg) -> String -> String -> String -> Html AVMsg
+textEdit msg name val lab =
+  li []
+    [ input
+      [ type_ "text"
+      , Html.Attributes.name name
+      , id val
+      , value val
+      , onInput msg
       ] []
     ]
 
-displayEditing : Donation -> DonationEdit -> Html AVMsg
-displayEditing original edit =
-  case edit of 
-    NotEditing -> li [] []
-    Editing edited  ->
-      li []
-        [ p []
-          <| List.intersperse (text " ")
-          [ span [ class "donor_name" ] [ text edited.donor_name ]
-          , span [ class "amount" ] [ text <| "$" ++ (String.fromFloat edited.amount) ]
-          , span [ class "minimum" ] [ text <| "$" ++ (String.fromFloat edited.minimum) ]
-          , text " discount level: "
-          , input
-            [ type_ "number"
-            , Html.Attributes.min "0"
-            , value (edited.discount_level |> String.fromInt)
-            , onInput DiscountLevelChange
-            ] []
-          ]
-        , p []
-          <| List.intersperse (text " ")
-          <| List.concat
-          [ tagList "player" edited.matchingPlayers
-          , tagList "planet" edited.matchingPlanets
-          , tagList "match" edited.matchingMatches
-          , tagList "code-tag" edited.codes
-          ]
-        , p [ class "comment" ] [ text original.comment ]
-        , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text edited.comment ]
-        , p []
-          [ Html.button [ onClick DoneEditing ] [ text "Done" ]
-          , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
-          ]
-        ]
+displayEditingDonation : Donation -> Donation -> Html AVMsg
+displayEditingDonation original edited =
+  li []
+    [ p []
+      <| List.intersperse (text " ")
+      [ span [ class "donor_name" ] [ text edited.donor_name ]
+      , span [ class "amount" ] [ text <| "$" ++ (String.fromFloat edited.amount) ]
+      , span [ class "minimum" ] [ text <| "$" ++ (String.fromFloat edited.minimum) ]
+      , text " discount level: "
+      , input
+        [ type_ "number"
+        , Html.Attributes.min "0"
+        , value (edited.discount_level |> String.fromInt)
+        , onInput DiscountLevelChange
+        ] []
+      ]
+    , p []
+      <| List.intersperse (text " ")
+      <| List.concat
+      [ tagList "player" edited.matchingPlayers
+      , tagList "planet" edited.matchingPlanets
+      , tagList "match" edited.matchingMatches
+      , tagList "code-tag" edited.codes
+      ]
+    , p [ class "comment" ] [ text original.comment ]
+    , textarea [ onInput CommentChange, rows 5, cols 66 ] [ text edited.comment ]
+    , p []
+      [ Html.button [ onClick DoneEditing ] [ text "Done" ]
+      , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
+      ]
+    ]
 
 tagList : String -> List String -> List (Html AVMsg)
 tagList kind items =
   List.map (span [ class kind ] << List.singleton << text) <| items
 
-displayDonation : DonationEdit -> Donation -> Html AVMsg
+displayDonation : Editing -> Donation -> Html AVMsg
 displayDonation edit donation =
   case edit of 
     NotEditing -> displayDonationOnly donation
-    Editing edited ->
+    EditingRound _ -> displayDonationOnly donation
+    EditingDonation edited ->
       if donation.id == edited.id then
-        displayEditing donation edit
+        displayEditingDonation donation edited
       else
         displayDonationOnly donation
 

@@ -180,6 +180,10 @@ update msg model =
       updateEditingRound (setRoundPlayerName index name) model
     AdminViewMsg (SetPlanetName index name) ->
       updateEditingRound (setRoundPlanetName index name) model
+    AdminViewMsg (DeletePlayer index) ->
+      updateEditingRound (deleteRoundPlayer index) model
+    AdminViewMsg (DeletePlanet index) ->
+      updateEditingRound (deleteRoundPlanet index) model
     AdminViewMsg (EditDonation donation) ->
       ( { model | editing = EditingDonation donation }
       , matchInDonation
@@ -239,7 +243,10 @@ update msg model =
 
 removeRound : String -> Model -> Model
 removeRound round model =
-  { model | rounds = List.filter (\r -> not (r.id == round)) model.rounds }
+  { model
+  | rounds = List.filter (\r -> not (r.id == round)) model.rounds
+  , editing = NotEditing
+  }
 
 sendSignedRequest : Nacl.SignArguments -> Cmd Msg
 sendSignedRequest {method, url, id, body} =
@@ -369,6 +376,22 @@ setRoundPlanetName index newName round =
   { round | planets =
     round.planets
       |> List.indexedMap (\i name -> if i == index then newName else name )
+  }
+
+deleteRoundPlayer : Int -> GameInfo -> GameInfo
+deleteRoundPlayer index round =
+  { round | players =
+    List.append
+      (List.take index round.players)
+      (List.drop (index+1) round.players)
+  }
+
+deleteRoundPlanet : Int -> GameInfo -> GameInfo
+deleteRoundPlanet index round =
+  { round | planets =
+    List.append
+      (List.take index round.planets)
+      (List.drop (index+1) round.planets)
   }
 
 parseNumber : String -> Int

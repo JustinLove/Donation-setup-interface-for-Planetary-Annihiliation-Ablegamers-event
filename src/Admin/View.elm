@@ -18,6 +18,8 @@ type AVMsg
   | SetRoundName String
   | SetPlayerName Int String
   | SetPlanetName Int String
+  | DeletePlayer Int
+  | DeletePlanet Int
   | EditDonation Donation
   | CommentChange String
   | DiscountLevelChange String
@@ -99,53 +101,59 @@ displayRoundOnly round =
 displayEditingRound : GameInfo -> GameInfo -> Html AVMsg
 displayEditingRound original edited =
   tr []
-    [ p []
-      <| List.intersperse (text " ")
-      [ input
-        [ type_ "text"
-        , size 40
-        , value edited.name
-        , onInput SetRoundName
-        ] []
-      ]
-    , div [ class "row" ]
-      [ div [ class "players col" ]
-        [ fieldset []
-          [ legend [] [ text "Players" ]
-          , ul [] <| List.indexedMap displayPlayer edited.players
+    [ td [ colspan 3 ]
+      [ p []
+        <| List.intersperse (text " ")
+        [ input
+          [ type_ "text"
+          , size 40
+          , value edited.name
+          , onInput SetRoundName
+          ] []
+        ]
+      , div [ class "row" ]
+        [ div [ class "players col" ]
+          [ fieldset []
+            [ legend [] [ text "Players" ]
+            , ul [] <| List.indexedMap displayPlayer edited.players
+            ]
+          ]
+        , div [ class "planets col" ]
+          [ fieldset []
+            [ legend [] [ text "Planets" ]
+            , ul [] <| List.indexedMap displayPlanet edited.planets
+            ]
           ]
         ]
-      , div [ class "planets col" ]
-        [ fieldset []
-          [ legend [] [ text "Planets" ]
-          , ul [] <| List.indexedMap displayPlanet edited.planets
-          ]
+      , p []
+        [ Html.button [ onClick DoneEditing ] [ text "Done" ]
+        , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
+        , Html.button [ onClick (DeleteRound edited.id) ] [ text "Delete" ]
         ]
-      ]
-    , p []
-      [ Html.button [ onClick DoneEditing ] [ text "Done" ]
-      , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
       ]
     ]
 
 displayPlayer : Int -> String -> Html AVMsg
 displayPlayer index name =
-  textEdit (SetPlayerName index) ((String.fromInt index) ++ "-player") name name
+  textEdit (SetPlayerName index) (DeletePlayer index) ((String.fromInt index) ++ "-player") name name
 
 displayPlanet : Int -> String -> Html AVMsg
 displayPlanet index name =
-  textEdit (SetPlanetName index) ((String.fromInt index) ++ "-planet") name name
+  textEdit (SetPlanetName index) (DeletePlanet index) ((String.fromInt index) ++ "-planet") name name
 
-textEdit : (String -> AVMsg) -> String -> String -> String -> Html AVMsg
-textEdit msg name val lab =
+textEdit : (String -> AVMsg) -> AVMsg -> String -> String -> String -> Html AVMsg
+textEdit edit delete name val lab =
   li []
     [ input
       [ type_ "text"
       , Html.Attributes.name name
       , id val
       , value val
-      , onInput msg
+      , onInput edit
       ] []
+    , Html.button [ onClick delete ]
+      [ text "X"
+      ]
     ]
 
 displayEditingDonation : Donation -> Donation -> Html AVMsg

@@ -204,7 +204,7 @@ updateRounds : String -> Model -> Model
 updateRounds message model =
   case Json.Decode.decodeString GameInfo.Decode.options message of
     Ok options ->
-      let _ = Debug.log "decode" options in
+      --let _ = Debug.log "decode" options in
       updateDiscounts { model | rounds = options.games}
     Err err ->
       let _ = Debug.log "decode error" err in

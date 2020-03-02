@@ -8,7 +8,6 @@
 
 ### Donation Config UI
 
-- game time update?
 - don't remove item with invalid quantity
 - Lots of little match changes - interactive editing?
 - oauth?

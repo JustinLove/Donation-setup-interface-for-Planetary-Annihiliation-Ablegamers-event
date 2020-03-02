@@ -159,7 +159,7 @@ updateDonations : String -> Model -> Model
 updateDonations message model =
   case Json.Decode.decodeString Donation.Decode.donations message of
     Ok donations ->
-      let _ = Debug.log "decode" donations in
+      --let _ = Debug.log "decode" donations in
       { model | donations = upsertDonations donations model.donations}
     Err err ->
       let _ = Debug.log "decode error" err in

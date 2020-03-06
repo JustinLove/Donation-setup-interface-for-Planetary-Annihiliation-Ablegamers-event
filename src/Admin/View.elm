@@ -20,6 +20,8 @@ type AVMsg
   | SetPlanetName Int String
   | DeletePlayer Int
   | DeletePlanet Int
+  | AddPlayer
+  | AddPlanet
   | EditDonation Donation
   | CommentChange String
   | DiscountLevelChange String
@@ -115,13 +117,27 @@ displayEditingRound original edited =
         [ div [ class "players col" ]
           [ fieldset []
             [ legend [] [ text "Players" ]
-            , ul [] <| List.indexedMap displayPlayer edited.players
+            , edited.players 
+              |> List.indexedMap displayPlayer
+              |> listSuffix 
+                  [ Html.button [ onClick AddPlayer ]
+                    [ text "+"
+                    ]
+                  ]
+              |> ul []
             ]
           ]
         , div [ class "planets col" ]
           [ fieldset []
             [ legend [] [ text "Planets" ]
-            , ul [] <| List.indexedMap displayPlanet edited.planets
+            , edited.planets
+              |> List.indexedMap displayPlanet
+              |> listSuffix 
+                  [ Html.button [ onClick AddPlanet ]
+                    [ text "+"
+                    ]
+                  ]
+              |> ul []
             ]
           ]
         ]
@@ -227,3 +243,7 @@ displayDonationOnly donation =
       , span [ class "comment" ] [ text donation.comment ]
       ]
     ]
+
+listSuffix : List a -> List a -> List a
+listSuffix suffix list =
+  List.append list suffix

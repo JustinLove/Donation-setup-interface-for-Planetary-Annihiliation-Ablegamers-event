@@ -9,8 +9,11 @@
 ### Donation Config UI
 
 - Lots of little match changes - interactive editing?
-- oauth?
+  - ids?
+  - known players?
 - admin streamlining and safety
+- system upload
+- xx oauth?
 
 ### Ingame Mod
 

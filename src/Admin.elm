@@ -177,13 +177,17 @@ update msg model =
     AdminViewMsg (SetRoundName name) ->
       updateEditingRound (setRoundName name) model
     AdminViewMsg (SetPlayerName index name) ->
-      updateEditingRound (setRoundPlayerName index name) model
+      updateEditingRound (mapPlayers (setName index name)) model
     AdminViewMsg (SetPlanetName index name) ->
-      updateEditingRound (setRoundPlanetName index name) model
+      updateEditingRound (mapPlanets (setName index name)) model
     AdminViewMsg (DeletePlayer index) ->
-      updateEditingRound (deleteRoundPlayer index) model
+      updateEditingRound (mapPlayers (deleteName index)) model
     AdminViewMsg (DeletePlanet index) ->
-      updateEditingRound (deleteRoundPlanet index) model
+      updateEditingRound (mapPlanets (deleteName index)) model
+    AdminViewMsg (AddPlayer) ->
+      updateEditingRound (mapPlayers (addName)) model
+    AdminViewMsg (AddPlanet) ->
+      updateEditingRound (mapPlanets (addName)) model
     AdminViewMsg (EditDonation donation) ->
       ( { model | editing = EditingDonation donation }
       , matchInDonation
@@ -364,35 +368,27 @@ setRoundName : String -> GameInfo -> GameInfo
 setRoundName name round =
   { round | name = name}
 
-setRoundPlayerName : Int -> String -> GameInfo -> GameInfo
-setRoundPlayerName index newName round =
-  { round | players =
-    round.players
-      |> List.indexedMap (\i name -> if i == index then newName else name )
-  }
+mapPlayers : (List String -> List String) -> GameInfo -> GameInfo
+mapPlayers f round =
+  { round | players = f round.players }
 
-setRoundPlanetName : Int -> String -> GameInfo -> GameInfo
-setRoundPlanetName index newName round =
-  { round | planets =
-    round.planets
-      |> List.indexedMap (\i name -> if i == index then newName else name )
-  }
+mapPlanets : (List String -> List String) -> GameInfo -> GameInfo
+mapPlanets f round =
+  { round | planets = f round.planets }
 
-deleteRoundPlayer : Int -> GameInfo -> GameInfo
-deleteRoundPlayer index round =
-  { round | players =
-    List.append
-      (List.take index round.players)
-      (List.drop (index+1) round.players)
-  }
+setName : Int -> String -> List String -> List String
+setName index newName =
+  List.indexedMap (\i name -> if i == index then newName else name )
 
-deleteRoundPlanet : Int -> GameInfo -> GameInfo
-deleteRoundPlanet index round =
-  { round | planets =
-    List.append
-      (List.take index round.planets)
-      (List.drop (index+1) round.planets)
-  }
+deleteName : Int -> List String -> List String
+deleteName index list =
+  List.append
+    (List.take index list)
+    (List.drop (index+1) list)
+
+addName : List String -> List String
+addName list =
+  List.append list [""]
 
 parseNumber : String -> Int
 parseNumber discountLevel =

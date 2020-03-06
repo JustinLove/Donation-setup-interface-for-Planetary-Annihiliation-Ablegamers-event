@@ -52,9 +52,14 @@ view model =
       , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
       , model.rounds
        |> (List.sortBy .name)
-       |> List.map (displayRound (playerNames model.rounds) model.editing)
+       |> List.map displayRound
        |> (::) roundHeader
        |> table []
+      , case model.editing of 
+        NotEditing -> text ""
+        EditingDonation _ -> text ""
+        EditingRound copyId edited ->
+          displayEditingRound (playerNames model.rounds) copyId edited
       ]
     , div [ class "admin-donations col" ]
       [ ul [] <| List.map (displayDonation model.editing) <| List.reverse model.donations
@@ -70,19 +75,8 @@ roundHeader =
     , th [] [ text "discount level" ]
     ]
 
-displayRound : List String -> Editing -> GameInfo -> Html AVMsg
-displayRound players edit round =
-  case edit of 
-    NotEditing -> displayRoundOnly round
-    EditingDonation _ -> displayRoundOnly round
-    EditingRound copyId edited ->
-      if round.id == edited.id then
-        displayEditingRound players copyId edited
-      else
-        displayRoundOnly round
-
-displayRoundOnly : GameInfo -> Html AVMsg
-displayRoundOnly round =
+displayRound: GameInfo -> Html AVMsg
+displayRound round =
   tr []
     [ td []
       [ Html.button [ onClick (EditRound round) ]
@@ -109,67 +103,65 @@ displayRoundOnly round =
 
 displayEditingRound : List String -> String -> GameInfo -> Html AVMsg
 displayEditingRound players copyId edited =
-  tr []
-    [ td [ colspan 3 ]
-      [ p []
-        <| List.intersperse (text " ")
-        [ input
-          [ type_ "text"
-          , size 40
-          , value edited.name
-          , onInput SetRoundName
-          ] []
+  div []
+    [ p []
+    <| List.intersperse (text " ")
+    [ input
+      [ type_ "text"
+      , size 40
+      , value edited.name
+      , onInput SetRoundName
+      ] []
+    ]
+  , div [ class "row" ]
+    [ div [ class "admin-players col" ]
+      [ fieldset []
+        [ legend [] [ text "Players" ]
+        , edited.players 
+          |> List.indexedMap displayPlayer
+          |> listSuffix 
+              [ players
+                |> List.append ["+"]
+                |> listSuffix ["--"]
+                |> List.map text
+                |> List.map List.singleton
+                |> List.map (option [])
+                |> select [ onInput AddPlayer ]
+              ]
+          |> ul []
         ]
-      , div [ class "row" ]
-        [ div [ class "admin-players col" ]
-          [ fieldset []
-            [ legend [] [ text "Players" ]
-            , edited.players 
-              |> List.indexedMap displayPlayer
-              |> listSuffix 
-                  [ players
-                    |> List.append ["+"]
-                    |> listSuffix ["--"]
-                    |> List.map text
-                    |> List.map List.singleton
-                    |> List.map (option [])
-                    |> select [ onInput AddPlayer ]
-                  ]
-              |> ul []
-            ]
-          ]
-        , div [ class "admin-planets col" ]
-          [ fieldset []
-            [ legend [] [ text "Planets" ]
-            , edited.planets
-              |> List.indexedMap displayPlanet
-              |> listSuffix 
-                  [ Html.button [ onClick AddPlanet ]
-                    [ text "+"
-                    ]
-                  ]
-              |> ul []
-            ]
-          ]
-        ]
-      , div [ class "row" ]
-        [ p [ class "admin-commit col" ]
-          [ Html.button [ onClick DoneEditing ] [ text "Done" ]
-          , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
-          ]
-        , p [ class "admin-extra col" ]
-          [ Html.button [ onClick (DeleteRound edited.id) ] [ text "Delete" ]
-          , Html.button [ onClick CopyRound ] [ text "Copy As" ]
-          , input
-            [ type_ "text"
-            , size 10
-            , value copyId
-            , onInput SetRoundId
-            ] []
-          ]
+      ]
+    , div [ class "admin-planets col" ]
+      [ fieldset []
+        [ legend [] [ text "Planets" ]
+        , edited.planets
+          |> List.indexedMap displayPlanet
+          |> listSuffix 
+              [ Html.button [ onClick AddPlanet ]
+                [ text "+"
+                ]
+              ]
+          |> ul []
         ]
       ]
     ]
+  , div [ class "row" ]
+    [ p [ class "admin-commit col" ]
+      [ Html.button [ onClick DoneEditing ] [ text "Done" ]
+      , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
+      ]
+    , p [ class "admin-extra col" ]
+      [ Html.button [ onClick (DeleteRound edited.id) ] [ text "Delete" ]
+      , Html.button [ onClick CopyRound ] [ text "Copy As" ]
+      , input
+        [ type_ "text"
+        , size 10
+        , value copyId
+        , onInput SetRoundId
+        ] []
+      ]
+    ]
+  ]
 
 displayPlayer : Int -> String -> Html AVMsg
 displayPlayer index name =

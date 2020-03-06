@@ -157,7 +157,15 @@ update msg model =
       , sendDeleteRound model.signsk round
       )
     AdminViewMsg (EditRound round) ->
-      ( { model | editing = EditingRound round.id round }
+      ( { model | editing = case model.editing of
+        NotEditing -> EditingRound round.id round
+        EditingDonation _ -> EditingRound round.id round
+        EditingRound copyId edited ->
+          if edited.id == round.id then
+            NotEditing
+          else
+            EditingRound round.id round
+      }
       , Cmd.none
       )
     AdminViewMsg (ClearDonations) ->

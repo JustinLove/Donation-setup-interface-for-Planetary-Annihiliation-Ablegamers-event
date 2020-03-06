@@ -125,6 +125,7 @@ displayEditingRound players copyId edited =
               |> listSuffix 
                   [ players
                     |> List.append ["+"]
+                    |> listSuffix ["--"]
                     |> List.map text
                     |> List.map List.singleton
                     |> List.map (option [])

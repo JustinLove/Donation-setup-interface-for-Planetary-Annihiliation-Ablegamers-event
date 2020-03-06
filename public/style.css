@@ -47,6 +47,24 @@
   .hover-info { min-height: 4em; }
 }
 
+/* admin */
+
+.admin-commit { min-width: 10em; }
+.admin-extra { min-width: 20em; }
+
+@media only screen and (min-width: 34em) {
+  .admin-players, .admin-planets { width: 50%; }
+  .admin-commit { width: 33%; }
+  .admin-extra { width: 66%; }
+}
+
+@media only screen and (min-width: 54em) {
+}
+
+@media only screen and (min-width: 76em) {
+  .admin-rounds, .admin-donations { width: 50%; }
+}
+
 body {
   color: black;
   background: white;

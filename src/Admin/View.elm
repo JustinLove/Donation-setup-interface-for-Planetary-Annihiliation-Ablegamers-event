@@ -46,16 +46,20 @@ document tagger model =
 
 --view : Model -> Html Msg
 view model =
-  div []
-    [ p [] [ text config.server ]
-    , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
-    , model.rounds
-     |> (List.sortBy .name)
-     |> List.map (displayRound (playerNames model.rounds) model.editing)
-     |> (::) roundHeader
-     |> table [] 
-    , ul [] <| List.map (displayDonation model.editing) <| List.reverse model.donations
-    , Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
+  div [ class "row" ]
+    [ div [ class "admin-rounds col" ]
+      [ p [] [ text config.server ]
+      , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
+      , model.rounds
+       |> (List.sortBy .name)
+       |> List.map (displayRound (playerNames model.rounds) model.editing)
+       |> (::) roundHeader
+       |> table []
+      ]
+    , div [ class "admin-donations col" ]
+      [ ul [] <| List.map (displayDonation model.editing) <| List.reverse model.donations
+      , Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
+      ]
     ]
 
 roundHeader : Html AVMsg
@@ -117,7 +121,7 @@ displayEditingRound players copyId edited =
           ] []
         ]
       , div [ class "row" ]
-        [ div [ class "players col" ]
+        [ div [ class "admin-players col" ]
           [ fieldset []
             [ legend [] [ text "Players" ]
             , edited.players 
@@ -134,7 +138,7 @@ displayEditingRound players copyId edited =
               |> ul []
             ]
           ]
-        , div [ class "planets col" ]
+        , div [ class "admin-planets col" ]
           [ fieldset []
             [ legend [] [ text "Planets" ]
             , edited.planets
@@ -148,17 +152,21 @@ displayEditingRound players copyId edited =
             ]
           ]
         ]
-      , p []
-        [ Html.button [ onClick DoneEditing ] [ text "Done" ]
-        , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
-        , Html.button [ onClick (DeleteRound edited.id) ] [ text "Delete" ]
-        , Html.button [ onClick CopyRound ] [ text "Copy As" ]
-        , input
-          [ type_ "text"
-          , size 10
-          , value copyId
-          , onInput SetRoundId
-          ] []
+      , div [ class "row" ]
+        [ p [ class "admin-commit col" ]
+          [ Html.button [ onClick DoneEditing ] [ text "Done" ]
+          , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
+          ]
+        , p [ class "admin-extra col" ]
+          [ Html.button [ onClick (DeleteRound edited.id) ] [ text "Delete" ]
+          , Html.button [ onClick CopyRound ] [ text "Copy As" ]
+          , input
+            [ type_ "text"
+            , size 10
+            , value copyId
+            , onInput SetRoundId
+            ] []
+          ]
         ]
       ]
     ]

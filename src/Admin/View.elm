@@ -7,6 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Set
 
 type AVMsg
   = SetKey String
@@ -20,18 +21,20 @@ type AVMsg
   | SetPlanetName Int String
   | DeletePlayer Int
   | DeletePlanet Int
-  | AddPlayer
+  | AddPlayer String
   | AddPlanet
   | EditDonation Donation
   | CommentChange String
   | DiscountLevelChange String
   | DoneEditing
   | CancelEditing
+  | SetRoundId String
+  | CopyRound
 
 type Editing
   = NotEditing
   | EditingDonation Donation
-  | EditingRound GameInfo
+  | EditingRound String GameInfo
 
 -- VIEW
 
@@ -48,7 +51,7 @@ view model =
     , textarea [ onInput SetKey, rows 3, cols 66 ] [ text model.signsk ]
     , model.rounds
      |> (List.sortBy .name)
-     |> List.map (displayRound model.editing)
+     |> List.map (displayRound (playerNames model.rounds) model.editing)
      |> (::) roundHeader
      |> table [] 
     , ul [] <| List.map (displayDonation model.editing) <| List.reverse model.donations
@@ -63,14 +66,14 @@ roundHeader =
     , th [] [ text "discount level" ]
     ]
 
-displayRound : Editing -> GameInfo -> Html AVMsg
-displayRound edit round =
+displayRound : List String -> Editing -> GameInfo -> Html AVMsg
+displayRound players edit round =
   case edit of 
     NotEditing -> displayRoundOnly round
     EditingDonation _ -> displayRoundOnly round
-    EditingRound edited ->
+    EditingRound copyId edited ->
       if round.id == edited.id then
-        displayEditingRound round edited
+        displayEditingRound players copyId edited
       else
         displayRoundOnly round
 
@@ -100,8 +103,8 @@ displayRoundOnly round =
       ]
     ]
 
-displayEditingRound : GameInfo -> GameInfo -> Html AVMsg
-displayEditingRound original edited =
+displayEditingRound : List String -> String -> GameInfo -> Html AVMsg
+displayEditingRound players copyId edited =
   tr []
     [ td [ colspan 3 ]
       [ p []
@@ -120,9 +123,12 @@ displayEditingRound original edited =
             , edited.players 
               |> List.indexedMap displayPlayer
               |> listSuffix 
-                  [ Html.button [ onClick AddPlayer ]
-                    [ text "+"
-                    ]
+                  [ players
+                    |> List.append ["+"]
+                    |> List.map text
+                    |> List.map List.singleton
+                    |> List.map (option [])
+                    |> select [ onInput AddPlayer ]
                   ]
               |> ul []
             ]
@@ -145,6 +151,13 @@ displayEditingRound original edited =
         [ Html.button [ onClick DoneEditing ] [ text "Done" ]
         , Html.button [ onClick CancelEditing ] [ text "Cancel" ]
         , Html.button [ onClick (DeleteRound edited.id) ] [ text "Delete" ]
+        , Html.button [ onClick CopyRound ] [ text "Copy As" ]
+        , input
+          [ type_ "text"
+          , size 10
+          , value copyId
+          , onInput SetRoundId
+          ] []
         ]
       ]
     ]
@@ -212,7 +225,7 @@ displayDonation : Editing -> Donation -> Html AVMsg
 displayDonation edit donation =
   case edit of 
     NotEditing -> displayDonationOnly donation
-    EditingRound _ -> displayDonationOnly donation
+    EditingRound _ _ -> displayDonationOnly donation
     EditingDonation edited ->
       if donation.id == edited.id then
         displayEditingDonation donation edited
@@ -247,3 +260,10 @@ displayDonationOnly donation =
 listSuffix : List a -> List a -> List a
 listSuffix suffix list =
   List.append list suffix
+
+playerNames : List GameInfo -> List String
+playerNames rounds =
+  rounds
+    |> List.concatMap .players
+    |> Set.fromList
+    |> Set.toList

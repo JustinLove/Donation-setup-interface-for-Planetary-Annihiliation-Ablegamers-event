@@ -133,7 +133,7 @@ update msg model =
       --let _ = Debug.log "donation" matched in
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        EditingRound _ -> (model, Cmd.none)
+        EditingRound _ _ -> (model, Cmd.none)
         EditingDonation edited ->
           let merge = setDonationComment edited.comment matched in
           ( { model | editing = EditingDonation merge }
@@ -157,7 +157,7 @@ update msg model =
       , sendDeleteRound model.signsk round
       )
     AdminViewMsg (EditRound round) ->
-      ( { model | editing = EditingRound round }
+      ( { model | editing = EditingRound round.id round }
       , Cmd.none
       )
     AdminViewMsg (ClearDonations) ->
@@ -184,10 +184,10 @@ update msg model =
       updateEditingRound (mapPlayers (deleteName index)) model
     AdminViewMsg (DeletePlanet index) ->
       updateEditingRound (mapPlanets (deleteName index)) model
-    AdminViewMsg (AddPlayer) ->
-      updateEditingRound (mapPlayers (addName)) model
+    AdminViewMsg (AddPlayer name) ->
+      updateEditingRound (mapPlayers (addName name)) model
     AdminViewMsg (AddPlanet) ->
-      updateEditingRound (mapPlanets (addName)) model
+      updateEditingRound (mapPlanets (addName "")) model
     AdminViewMsg (EditDonation donation) ->
       ( { model | editing = EditingDonation donation }
       , matchInDonation
@@ -199,7 +199,7 @@ update msg model =
       --let _ = Debug.log "change" text in
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        EditingRound _ -> (model, Cmd.none)
+        EditingRound _ _ -> (model, Cmd.none)
         EditingDonation edited ->
           let edit = setDonationComment text edited in
           ( { model | editing = EditingDonation edit }
@@ -211,7 +211,7 @@ update msg model =
     AdminViewMsg (DiscountLevelChange input) ->
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        EditingRound _ -> (model, Cmd.none)
+        EditingRound _ _ -> (model, Cmd.none)
         EditingDonation edited ->
           let
             level = parseNumber input
@@ -226,7 +226,7 @@ update msg model =
     AdminViewMsg (DoneEditing) ->
       case model.editing of
         NotEditing -> (model, Cmd.none)
-        EditingRound edited ->
+        EditingRound _ edited ->
           ( updateRound
             (always edited)
             edited.id
@@ -244,6 +244,24 @@ update msg model =
       ( { model | editing = NotEditing }
       , Cmd.none
       )
+    AdminViewMsg (SetRoundId id) ->
+      case model.editing of
+        NotEditing -> (model, Cmd.none)
+        EditingDonation _ -> (model, Cmd.none)
+        EditingRound _ edited ->
+          ({ model | editing = EditingRound id edited }, Cmd.none)
+    AdminViewMsg (CopyRound) ->
+      case model.editing of
+        NotEditing -> (model, Cmd.none)
+        EditingDonation _ -> (model, Cmd.none)
+        EditingRound copyId copyFrom ->
+          let edited = { copyFrom | id = copyId } in
+          ( { model
+            | rounds = edited :: model.rounds
+            , editing = NotEditing
+            }
+          , sendRoundEdit model.signsk edited
+          )
 
 removeRound : String -> Model -> Model
 removeRound round model =
@@ -351,8 +369,8 @@ updateEditingRound f model =
   case model.editing of
     NotEditing -> (model, Cmd.none)
     EditingDonation _ -> (model, Cmd.none)
-    EditingRound edited ->
-      ( { model | editing = EditingRound (f edited) }
+    EditingRound copyId edited ->
+      ( { model | editing = EditingRound copyId (f edited) }
       , Cmd.none
       )
 
@@ -367,6 +385,10 @@ setRoundGameTime gameTime round =
 setRoundName : String -> GameInfo -> GameInfo
 setRoundName name round =
   { round | name = name}
+
+setRoundId : String -> GameInfo -> GameInfo
+setRoundId id round =
+  { round | id = id}
 
 mapPlayers : (List String -> List String) -> GameInfo -> GameInfo
 mapPlayers f round =
@@ -386,9 +408,9 @@ deleteName index list =
     (List.take index list)
     (List.drop (index+1) list)
 
-addName : List String -> List String
-addName list =
-  List.append list [""]
+addName : String -> List String -> List String
+addName name list =
+  List.append list [name]
 
 parseNumber : String -> Int
 parseNumber discountLevel =
@@ -503,7 +525,7 @@ matchSubscription : Model -> Sub Msg
 matchSubscription model =
   case model.editing of
     NotEditing -> Sub.none
-    EditingRound _ -> Sub.none
+    EditingRound _ _ -> Sub.none
     EditingDonation _ -> matchedModel receiveModel
 
 receiveModel : Json.Decode.Value -> Msg

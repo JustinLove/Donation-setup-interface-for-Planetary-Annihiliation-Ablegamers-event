@@ -13,6 +13,7 @@ type AVMsg
   = SetKey String
   | DeleteRound String
   | EditRound GameInfo
+  | ToggleDanger
   | ClearDonations
   | SetGameTime String String
   | SetDiscountLevel String String
@@ -63,7 +64,17 @@ view model =
       ]
     , div [ class "admin-donations col" ]
       [ ul [] <| List.map (displayDonation model.editing) <| List.reverse model.donations
-      , Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
+      , input
+        [ type_ "checkbox"
+        , checked model.danger
+        , onInput (\_ -> ToggleDanger)
+        ] []
+      , label [] [ text "Danger" ]
+      , text " "
+      , if model.danger then
+         Html.button [ onClick ClearDonations ] [ text "Clear Donations" ]
+        else
+          text ""
       ]
     ]
 

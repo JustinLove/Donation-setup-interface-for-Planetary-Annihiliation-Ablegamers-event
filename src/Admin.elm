@@ -37,6 +37,7 @@ type alias Model =
   { rounds: List GameInfo
   , donations: List Donation
   , editing: Editing
+  , danger: Bool
   , signsk: String
   , optionsConnection : Connection.Status
   , donationsConnection : Connection.Status
@@ -47,6 +48,7 @@ makeModel =
   { rounds = []
   , donations = []
   , editing = NotEditing
+  , danger = False
   , signsk = ""
   , optionsConnection = Disconnected
   , donationsConnection = Disconnected
@@ -166,6 +168,10 @@ update msg model =
           else
             EditingRound round.id round
       }
+      , Cmd.none
+      )
+    AdminViewMsg (ToggleDanger) ->
+      ( { model | danger = not model.danger }
       , Cmd.none
       )
     AdminViewMsg (ClearDonations) ->

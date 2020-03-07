@@ -135,5 +135,6 @@ imagePath s =
     s
       |> String.dropRight 5
       |> (\x -> String.append x "_icon_buildbar.png")
+      |> String.dropLeft 1
   else
     s

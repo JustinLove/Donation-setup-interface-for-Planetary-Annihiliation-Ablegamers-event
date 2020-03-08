@@ -29,7 +29,7 @@ document tagger model =
 view model =
   div []
     [ mainHeader model
-    , header [ id "demo" ] [ text "This site is currently running in demo mode with prior year's data" ]
+    --, header [ id "demo" ] [ text "This site is currently running in demo mode with prior year's data" ]
     , contents model
     ]
 

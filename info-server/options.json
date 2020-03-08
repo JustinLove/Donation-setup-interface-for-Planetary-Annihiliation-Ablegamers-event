@@ -1,15 +1,15 @@
 {
   "games": [
     {
-      "name": "AbleGamers Red",
-      "id": "matchred",
+      "name": "AbleGamers A",
+      "id": "matcha",
       "discount_level": 0,
       "game_time": 0,
       "players": [
-        "AdmiralGeneral",
-        "Gitaxian",
-        "MangoMango",
-        "Helloz"
+        "Clopse",
+        "FerretMaster",
+        "Anonemous2",
+        "TheIban"
       ],
       "planets": [
         "The Stage",
@@ -19,15 +19,15 @@
       ]
     },
     {
-      "name": "AbleGamers Yellow",
-      "id": "matchyellow",
+      "name": "AbleGamers B",
+      "id": "matchb",
       "discount_level": 0,
       "game_time": 0,
       "players": [
-        "flubb",
-        "Pwn4two",
-        "theiban",
-        "Violet Ania"
+        "NimzoDragonLord",
+        "Quaatal",
+        "Sinoccence",
+        "ThatSonOfABroom"
       ],
       "planets": [
         "The Stage",
@@ -37,33 +37,33 @@
       ]
     },
     {
-      "name": "AbleGamers Blue",
-      "id": "matchblue",
+      "name": "AbleGamers C",
+      "id": "matchc",
+      "discount_level": 0,
+      "game_time": 0,
+      "players": [
+        "KillerKiwi",
+        "Smurf",
+        "MattShadowing",
+        "VioletAnia"
+      ],
+      "planets": [
+        "The Stage",
+        "Diode",
+        "Neutrinos's Garden",
+        "Berry's Allotment"
+      ]
+    },
+    {
+      "name": "AbleGamers D",
+      "id": "matchd",
       "discount_level": 0,
       "game_time": 0,
       "players": [
         "NikolaMX",
-        "Elite Sardaukar",
-        "Nomega Corgi",
-        "Jerle"
-      ],
-      "planets": [
-        "The Stage",
-        "Diode",
-        "Neutrinos's Garden",
-        "Berry's Allotment"
-      ]
-    },
-    {
-      "name": "AbleGamers Green",
-      "id": "matchgreen",
-      "discount_level": 0,
-      "game_time": 0,
-      "players": [
-        "Diskraip",
-        "AAPAA K1NG",
-        "CDRKF",
-        "xankar"
+        "MarechalGryzzely",
+        "N30n",
+        "Diskraip"
       ],
       "planets": [
         "The Stage",
@@ -78,28 +78,28 @@
       "discount_level": 0,
       "game_time": 0,
       "players": [
-        "AdmiralGeneral",
-        "Gitaxian",
-        "MangoMango",
-        "Helloz",
-        "flubb",
-        "Pwn4two",
-        "theiban",
-        "Violet Ania",
+        "Clopse",
+        "FerretMaster",
+        "Anonemous2",
+        "TheIban",
+        "NimzoDragonLord",
+        "Quaatal",
+        "Sinoccence",
+        "ThatSonOfABroom",
+        "KillerKiwi",
+        "Smurf",
+        "MattShadowing",
+        "VioletAnia",
         "NikolaMX",
-        "Elite Sardaukar",
-        "Nomega Corgi",
-        "Jerle",
-        "Diskraip",
-        "AAPAA K1NG",
-        "CDRKF",
-        "xankar"
+        "MarechalGryzzely",
+        "N30n",
+        "Diskraip"
       ],
       "planets": [
-        "The Able Gamer",
-        "Smothered Scone",
-        "WrongCat's Pause",
-        "Wondible's Puppet"
+        "The Stage",
+        "Diode",
+        "Neutrinos's Garden",
+        "Berry's Allotment"
       ]
     },
     {

@@ -1,7 +1,7 @@
 {
   "games": [
     {
-      "name": "AbleGamers A",
+      "name": "AbleGamers A - Red",
       "id": "matcha",
       "discount_level": 0,
       "game_time": 0,
@@ -12,14 +12,14 @@
         "TheIban"
       ],
       "planets": [
-        "The Stage",
-        "Diode",
-        "Neutrinos's Garden",
-        "Berry's Allotment"
+        "Square One",
+        "The One With The Laser",
+        "That's No Moon Moon",
+        "Hell-O Neighbour"
       ]
     },
     {
-      "name": "AbleGamers B",
+      "name": "AbleGamers B - Blue",
       "id": "matchb",
       "discount_level": 0,
       "game_time": 0,
@@ -30,14 +30,14 @@
         "ThatSonOfABroom"
       ],
       "planets": [
-        "The Stage",
-        "Diode",
-        "Neutrinos's Garden",
-        "Berry's Allotment"
+        "Square One",
+        "The One With The Laser",
+        "That's No Moon Moon",
+        "Hell-O Neighbour"
       ]
     },
     {
-      "name": "AbleGamers C",
+      "name": "AbleGamers C - Yellow",
       "id": "matchc",
       "discount_level": 0,
       "game_time": 0,
@@ -48,14 +48,14 @@
         "VioletAnia"
       ],
       "planets": [
-        "The Stage",
-        "Diode",
-        "Neutrinos's Garden",
-        "Berry's Allotment"
+        "Square One",
+        "The One With The Laser",
+        "That's No Moon Moon",
+        "Hell-O Neighbour"
       ]
     },
     {
-      "name": "AbleGamers D",
+      "name": "AbleGamers D - Green",
       "id": "matchd",
       "discount_level": 0,
       "game_time": 0,
@@ -66,10 +66,10 @@
         "Diskraip"
       ],
       "planets": [
-        "The Stage",
-        "Diode",
-        "Neutrinos's Garden",
-        "Berry's Allotment"
+        "Square One",
+        "The One With The Laser",
+        "That's No Moon Moon",
+        "Hell-O Neighbour"
       ]
     },
     {

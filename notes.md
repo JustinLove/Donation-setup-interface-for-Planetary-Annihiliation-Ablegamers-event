@@ -8,7 +8,6 @@
 
 ### Donation Config UI
 
-- clear invalid players/planets when match changed
 - check lobby update websocket
 - menu item delete button
 - linking graphics

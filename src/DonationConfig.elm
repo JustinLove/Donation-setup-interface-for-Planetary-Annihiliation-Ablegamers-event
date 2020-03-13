@@ -103,7 +103,11 @@ update msg model =
     SetPlanet name ->
       ({ model | planet = name}, Cmd.none)
     ChooseRound id ->
-      (updateDiscounts { model | round = id}, Cmd.none)
+      ({ model | round = id}
+        |> updateDiscounts
+        |> clearUnmatchedPlayers
+        |> clearUnmatchedPlanets
+      , Cmd.none)
     Select id ->
       (model, select id)
     Instructions open ->
@@ -212,6 +216,38 @@ currentDiscountLevel model =
                               Nothing)
   |> List.head
   |> Maybe.withDefault 0
+
+clearUnmatchedPlayers : Model -> Model
+clearUnmatchedPlayers model =
+  { model
+  | player = if List.member model.player (currentPlayers model) then model.player else ""
+  }
+
+currentPlayers : Model -> List String
+currentPlayers model =
+  model.rounds
+  |> List.filterMap (\round -> if model.round == round.id then
+                              Just round.players
+                            else
+                              Nothing)
+  |> List.head
+  |> Maybe.withDefault []
+
+clearUnmatchedPlanets : Model -> Model
+clearUnmatchedPlanets model =
+  { model
+  | planet = if List.member model.planet (currentPlanets model) then model.planet else ""
+  }
+
+currentPlanets : Model -> List String
+currentPlanets model =
+  model.rounds
+  |> List.filterMap (\round -> if model.round == round.id then
+                              Just round.planets
+                            else
+                              Nothing)
+  |> List.head
+  |> Maybe.withDefault []
 
 instructionFocus : Bool -> String
 instructionFocus open =

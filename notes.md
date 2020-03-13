@@ -8,6 +8,11 @@
 
 ### Donation Config UI
 
+- clear invalid players/planets when match changed
+- check lobby update websocket
+- menu item delete button
+- linking graphics
+- player profiles
 - admin streamlining and safety
 - system upload
 - xx oauth?
@@ -17,6 +22,7 @@
 - x Hermes were not coming in at orbital - hermes specific, requires patch mod
 - x "nobody" gave units - timing issue? - could not reproduce
   - saw again intermittently
+- include planet in chat message
 - Lobby info streamlining
 - received discount level? - not currently fetching options
 - Legion pushing menu queue off bottom of screen

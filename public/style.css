@@ -22,29 +22,39 @@
 .logo { max-width: 300px; }
 .state-button { max-width: 7em; }
 .hover-info { min-height: 5em; }
+.targeting-section {
+  display: flex;
+  flex-direction: column;
+}
 
 @media only screen and (min-width: 34em) {
-  .players, .planets, .profiles { width: 50%; }
   .state-button { margin-top: 1em; }
   .hover-info { min-height: 4em; }
+  .targeting-section { flex-direction: row; flex-wrap: wrap; }
+  .rounds, .players, .planets, .profiles { width: 50%; }
+  .players { order: 2; }
+  .planets { order: 3; }
+  .profiles { order: 4; }
 }
 
 @media only screen and (min-width: 54em) {
-  .rounds-header { width: 33.33%; }
-  .rounds-body { width: 66.66%; }
   .orders, .results { width: 50%; }
   .hover-info { min-height: 3em; }
+  .targeting-section { flex-direction: row; flex-wrap: wrap; }
+  .rounds, .players, .planets { width: 33%; }
+  .players { order: 2; }
+  .planets { order: 3; }
+  .profiles { order: 4; width: 100%; }
 }
 
 @media only screen and (min-width: 76em) {
   .targeting-section { width: 20%; }
   .menu-section { width: 40%; }
   .bottom-section { width: 40%; }
-  .rounds-header { width: 100%; }
-  .rounds-body { width: 100%; }
-  .players, .planets, .profiles { width: 100%; }
   .orders, .results { width: 100%; }
   .hover-info { min-height: 4em; }
+  .targeting-section { flex-direction: column; flex-wrap: nowrap; }
+  .rounds, .players, .planets, .profiles { width: auto; order: 0; }
 }
 
 /* admin */

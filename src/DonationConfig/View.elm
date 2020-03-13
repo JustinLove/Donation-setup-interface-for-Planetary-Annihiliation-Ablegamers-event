@@ -80,16 +80,15 @@ onKey trigger msg keycode =
     DonationConfig.Msg.None
 
 targetingSection model =
-  [ div [ class "row" ]
-    [ div [ class "rounds-header col" ]
-      [ fieldset []
-        [ legend [] [ text "Games" ]
-        , ul [] <| List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds
-        ]
+  ((div [ class "rounds" ]
+    [ fieldset []
+      [ legend [] [ text "Games" ]
+      , ul [] <| List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds
       ]
-    , div [ class "rounds-body col" ] <| List.map (displayRound model) model.rounds
     ]
-  ]
+  )
+  :: List.concatMap (displayRound model) model.rounds
+  )
 
 menuSection model =
   [ div [ class "row col" ]
@@ -180,27 +179,26 @@ bottomSection model =
 
 displayRound model round =
   if model.round == round.id then
-    div [ class "row" ]
-      [ div [ class "players col" ]
-        [ fieldset []
-          [ legend [] [ text "Players" ]
-          , ul [] <| List.map (displayPlayer round.id model.player) round.players
-          ]
-        ]
-      , div [ class "profiles col" ]
-        [ fieldset []
-          (model.profiles
-            |> List.map (displayProfile model.player))
-        ]
-      , div [ class "planets col" ]
-        [ fieldset []
-          [ legend [] [ text "Planets" ]
-          , ul [] <| List.map (displayPlanet round.id model.planet) ("(main base)" :: round.planets)
-          ]
+    [ div [ class "players" ]
+      [ fieldset []
+        [ legend [] [ text "Players" ]
+        , ul [] <| List.map (displayPlayer round.id model.player) round.players
         ]
       ]
+    , div [ class "profiles" ]
+      [ fieldset []
+        (model.profiles
+          |> List.map (displayProfile model.player))
+      ]
+    , div [ class "planets" ]
+      [ fieldset []
+        [ legend [] [ text "Planets" ]
+        , ul [] <| List.map (displayPlanet round.id model.planet) ("(main base)" :: round.planets)
+        ]
+      ]
+    ]
   else
-    text ""
+    []
 
 radioChoice : (String -> Msg) -> String -> String -> String -> String -> Html Msg
 radioChoice msg name current val lab =

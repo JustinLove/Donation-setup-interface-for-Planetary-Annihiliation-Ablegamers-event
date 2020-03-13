@@ -8,8 +8,9 @@
 
 ### Donation Config UI
 
+- profile editing
 - first click noop???
-- check lobby update websocket
+- check lobby update websocket?
 - admin streamlining and safety
 - system upload
 - xx oauth?

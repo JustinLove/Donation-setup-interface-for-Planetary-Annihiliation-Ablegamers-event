@@ -57,8 +57,8 @@ makeModel =
 init : () -> (Model, Cmd Msg)
 init _ =
   ( makeModel
-  , Cmd.batch [ fetchGame, fetchDonations]
-  --, Cmd.none
+  --, Cmd.batch [ fetchGame, fetchDonations]
+  , Cmd.none
   )
 
 optionsUrl = config.server ++ "options.json"

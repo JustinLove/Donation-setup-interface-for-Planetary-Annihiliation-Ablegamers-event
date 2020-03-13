@@ -209,12 +209,7 @@ updateOrderDiscounts discountLevel item =
 
 currentDiscountLevel : Model -> Int
 currentDiscountLevel model =
-  model.rounds
-  |> List.filterMap (\round -> if model.round == round.id then
-                              Just round.discountLevel
-                            else
-                              Nothing)
-  |> List.head
+  currentRoundProperty .discountLevel model
   |> Maybe.withDefault 0
 
 clearUnmatchedPlayers : Model -> Model
@@ -225,12 +220,7 @@ clearUnmatchedPlayers model =
 
 currentPlayers : Model -> List String
 currentPlayers model =
-  model.rounds
-  |> List.filterMap (\round -> if model.round == round.id then
-                              Just round.players
-                            else
-                              Nothing)
-  |> List.head
+  currentRoundProperty .players model
   |> Maybe.withDefault []
 
 clearUnmatchedPlanets : Model -> Model
@@ -241,13 +231,17 @@ clearUnmatchedPlanets model =
 
 currentPlanets : Model -> List String
 currentPlanets model =
+  currentRoundProperty .planets model
+  |> Maybe.withDefault []
+
+currentRoundProperty : (GameInfo -> a) -> Model -> Maybe a
+currentRoundProperty prop model =
   model.rounds
   |> List.filterMap (\round -> if model.round == round.id then
-                              Just round.planets
+                              Just (prop round)
                             else
                               Nothing)
   |> List.head
-  |> Maybe.withDefault []
 
 instructionFocus : Bool -> String
 instructionFocus open =

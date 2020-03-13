@@ -8,8 +8,6 @@
 
 ### Donation Config UI
 
-- linking graphics
-- player profiles
 - first click noop???
 - check lobby update websocket
 - admin streamlining and safety

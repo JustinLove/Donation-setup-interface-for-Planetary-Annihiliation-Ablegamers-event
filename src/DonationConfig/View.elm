@@ -82,7 +82,15 @@ onKey trigger msg keycode =
 targetingSection model =
   ((div [ class "rounds" ]
     [ fieldset []
-      [ legend [] [ text "Games" ]
+      [ legend []
+        [ text "Games "
+        , a
+          [ href "https://i.imgur.com/BEptedO.jpg"
+          , target "_blank"
+          , class "image-link"
+          ]
+          [ text "image" ]
+        ]
       , ul [] <| List.map (tabHeader model.round) <| (List.sortBy .name) model.rounds
       ]
     ]
@@ -103,7 +111,15 @@ menuSection model =
             |> List.map (displayProfile name))
       )
     , fieldset []
-      [ legend [] [ text "Add Items (after 5 minutes)" ]
+      [ legend []
+        [ text "Add Items (after 5 minutes) "
+        , a
+          [ href "https://i.imgur.com/jdbmuHw.png"
+          , target "_blank"
+          , class "image-link"
+          ]
+          [ text "image" ]
+        ]
       , ul [ class "menu" ] <| List.map displayMenuItem <| List.filter (not << gameEnder) model.menu
       ]
     , fieldset

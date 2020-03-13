@@ -8,10 +8,10 @@
 
 ### Donation Config UI
 
-- check lobby update websocket
-- menu item delete button
 - linking graphics
 - player profiles
+- first click noop???
+- check lobby update websocket
 - admin streamlining and safety
 - system upload
 - xx oauth?

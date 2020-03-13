@@ -3,6 +3,7 @@ module DonationConfig.View exposing (document, view)
 import DonationConfig.Msg exposing (..)
 import Menu exposing (MenuItem, OrderItem, BuildItem)
 import GameInfo exposing (GameInfo)
+import Profile exposing (Profile)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -186,6 +187,11 @@ displayRound model round =
           , ul [] <| List.map (displayPlayer round.id model.player) round.players
           ]
         ]
+      , div [ class "profiles col" ]
+        [ fieldset []
+          (model.profiles
+            |> List.map (displayProfile model.player))
+        ]
       , div [ class "planets col" ]
         [ fieldset []
           [ legend [] [ text "Planets" ]
@@ -198,22 +204,36 @@ displayRound model round =
 
 radioChoice : (String -> Msg) -> String -> String -> String -> String -> Html Msg
 radioChoice msg name current val lab =
-  li []
+  div []
     [ input [type_ "radio", Html.Attributes.name name, id val, value val, onCheck (\_ -> msg val), checked (val == current)] []
     , label [ for val ] [text lab]
     ]
 
 tabHeader : String -> GameInfo -> Html Msg
 tabHeader current round =
-  radioChoice ChooseRound "game" current round.id round.name
+  li [] [ radioChoice ChooseRound "game" current round.id round.name ]
 
 displayPlayer : String -> String -> String -> Html Msg
 displayPlayer context current name =
-  radioChoice SetPlayer (context ++ "-player") current name name
+  li [] [ radioChoice SetPlayer (context ++ "-player") current name name ] 
+
+displayProfile : String -> Profile -> Html Msg
+displayProfile name profile =
+  if name == profile.name then
+    div [ class "profile" ]
+      [ h4 [] [ text profile.name ]
+      , if profile.tagline /= "" then
+          h5 [] [ text profile.tagline ]
+        else
+          text ""
+      , p [] [ text profile.callToAction ]
+      ]
+  else
+    text ""
 
 displayPlanet : String -> String -> String -> Html Msg
 displayPlanet context current name =
-  radioChoice SetPlanet (context ++ "-planet") current name name
+  li [] [ radioChoice SetPlanet (context ++ "-planet") current name name ]
 
 displayOrders : List OrderItem -> Html Msg
 displayOrders selections =
@@ -228,6 +248,7 @@ displayOrders selections =
           [ th [ class "line-total", id "order-line-total" ] [ text "$line" ]
           , th [ class "donation", id "order-donation" ] [ text "$ea" ]
           , th [ class "quantity", id "order-quantity" ] [ text "qty" ]
+          , th [ class "delete", id "order-delete" ] [ text "del" ]
           , th [ class "code", id "order-code" ] [ text "code" ]
           , th [ class "builds", id "order-builds" ] [ text "units each" ]
           ]
@@ -247,12 +268,16 @@ displayOrderItem item =
       [ text <| dollars item.donation ]
     , td [ class "quantity" ]
       [ input
-        [ size 5
+        [ size 4
+        , type_ "number"
         , value (item.input)
         , ariaLabelledby "order-quantity"
         , onInput (TypeAmount item.code)
         , onBlur (FinishAmount item.code)
         ] []
+      ]
+    , td [ class "delete", ariaLabelledby "order-delete" ]
+      [ button [ onClick (RemoveAll item.code) ] [ text "X" ]
       ]
     , td [ class "code", ariaLabelledby "order-code" ]
       [ text item.code ]

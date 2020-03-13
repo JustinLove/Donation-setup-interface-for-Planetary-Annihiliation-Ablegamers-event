@@ -9,6 +9,8 @@ import GameInfo.Decode
 import Config exposing (config) 
 import DonationConfig.Harbor exposing (..) 
 import PortSocket
+import Profile exposing (Profile)
+import Profile.Decode
 
 import Array exposing (Array)
 import Browser
@@ -42,6 +44,7 @@ type alias Model =
   , menu : List MenuItem
   , unitInfo: List UnitInfo
   , rounds: List GameInfo
+  , profiles: List Profile
   , round: String
   , player: String
   , planet: String
@@ -60,6 +63,7 @@ makeModel menu info =
     , menu = m2
     , unitInfo = info
     , rounds = []
+    , profiles = []
     , round = ""
     , player = ""
     , planet = ""
@@ -72,7 +76,10 @@ makeModel menu info =
 init : Arguments -> (Model, Cmd Msg)
 init args =
   ( makeModel args.menu args.info
-  , fetchGame
+  , Cmd.batch
+    [ fetchGame
+    , fetchProfiles
+    ]
   )
 
 optionsUrl = config.server ++ "options.json"
@@ -83,6 +90,13 @@ fetchGame =
   Http.get
     { url = optionsUrl
     , expect = Http.expectJson GotGameInfo GameInfo.Decode.options
+    }
+
+fetchProfiles : Cmd Msg
+fetchProfiles =
+  Http.get
+    { url = "profiles.json"
+    , expect = Http.expectJson GotProfiles Profile.Decode.profiles
     }
 
 -- UPDATE
@@ -96,6 +110,8 @@ update msg model =
       (updateOrder updateQuantity code model, Cmd.none)
     AddOne code ->
       (updateOrder addOne code model, Cmd.none)
+    RemoveAll code ->
+      (updateOrder removeAll code model, Cmd.none)
     Hover item ->
       ({ model | hover = item }, Cmd.none)
     SetPlayer name ->
@@ -124,6 +140,12 @@ update msg model =
           |> updateDiscounts
       , Cmd.none)
     GotGameInfo (Err err) ->
+      let _ = Debug.log "error" err in
+      (model, Cmd.none)
+    GotProfiles (Ok profiles) ->
+      ( { model | profiles = profiles }
+      , Cmd.none)
+    GotProfiles (Err err) ->
       let _ = Debug.log "error" err in
       (model, Cmd.none)
     SocketEvent id (PortSocket.Message message) ->
@@ -163,6 +185,10 @@ updateQuantity item =
 addOne : OrderItem -> OrderItem
 addOne item =
   { item | quantity = item.quantity + 1, input = String.fromInt (item.quantity + 1), valid = True }
+
+removeAll : OrderItem -> OrderItem
+removeAll =
+  (updateInput "0") >> updateQuantity
 
 getNumber : String -> Int
 getNumber s =

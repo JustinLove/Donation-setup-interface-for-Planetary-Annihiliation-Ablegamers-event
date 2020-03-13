@@ -24,7 +24,7 @@
 .hover-info { min-height: 5em; }
 
 @media only screen and (min-width: 34em) {
-  .players, .planets { width: 50%; }
+  .players, .planets, .profiles { width: 50%; }
   .state-button { margin-top: 1em; }
   .hover-info { min-height: 4em; }
 }
@@ -42,7 +42,7 @@
   .bottom-section { width: 40%; }
   .rounds-header { width: 100%; }
   .rounds-body { width: 100%; }
-  .players, .planets { width: 100%; }
+  .players, .planets, .profiles { width: 100%; }
   .orders, .results { width: 100%; }
   .hover-info { min-height: 4em; }
 }
@@ -183,7 +183,10 @@ ul {
 
 li {
   list-style-type: none;
+}
 
+.profile h4, .profile h5 {
+  margin: 0;
 }
 
 .menu li {

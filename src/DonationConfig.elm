@@ -49,7 +49,7 @@ type alias Model =
   , player: String
   , planet: String
   , selections : List OrderItem
-  , hover: Maybe MenuItem
+  , hover: HoverTarget
   , instructionsOpen: Bool
   , optionsConnection : Connection.Status
   }
@@ -68,7 +68,7 @@ makeModel menu info =
     , player = ""
     , planet = ""
     , selections = List.map makeOrder m2
-    , hover = Nothing
+    , hover = HoverNone
     , instructionsOpen = False
     , optionsConnection = Disconnected
     }
@@ -112,8 +112,8 @@ update msg model =
       (updateOrder addOne code model, Cmd.none)
     RemoveAll code ->
       (updateOrder removeAll code model, Cmd.none)
-    Hover item ->
-      ({ model | hover = item }, Cmd.none)
+    Hover target ->
+      ({ model | hover = target }, Cmd.none)
     SetPlayer name ->
       ({ model | player = name}, Cmd.none)
     SetPlanet name ->

@@ -93,9 +93,14 @@ targetingSection model =
 menuSection model =
   [ div [ class "row col" ]
     [ fieldset [ class "hover-info" ]
-      (model.hover
-        |> Maybe.map (.build >> (List.map (quantityNameDescription >> text)))
-        |> Maybe.withDefault []
+      (case model.hover of
+        HoverNone -> []
+        HoverItem item ->
+          item.build
+            |> (List.map (quantityNameDescription >> text))
+        HoverPlayer name ->
+          (model.profiles
+            |> List.map (displayProfile name))
       )
     , fieldset []
       [ legend [] [ text "Add Items (after 5 minutes)" ]
@@ -213,7 +218,8 @@ tabHeader current round =
 
 displayPlayer : String -> String -> String -> Html Msg
 displayPlayer context current name =
-  li [] [ radioChoice SetPlayer (context ++ "-player") current name name ] 
+  li [ onMouseEnter (Hover (HoverPlayer name)), onMouseLeave (Hover HoverNone) ]
+    [ radioChoice SetPlayer (context ++ "-player") current name name ] 
 
 displayProfile : String -> Profile -> Html Msg
 displayProfile name profile =
@@ -296,7 +302,7 @@ currentGameTime model =
 
 displayMenuItem : MenuItem -> Html Msg
 displayMenuItem item =
-  li [ class "menu-item", onMouseEnter (Hover (Just item)), onMouseLeave (Hover Nothing) ]
+  li [ class "menu-item", onMouseEnter (Hover (HoverItem item)), onMouseLeave (Hover HoverNone) ]
     [ button [ onClick (AddOne item.code) ]
       [ span [ class "menu-graphic" ] <| List.map buildImage item.build
       , span [ class "menu-code" ] [ text item.code ]

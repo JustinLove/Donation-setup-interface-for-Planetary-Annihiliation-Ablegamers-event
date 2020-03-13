@@ -22,6 +22,7 @@
 .logo { max-width: 300px; }
 .state-button { max-width: 7em; }
 .hover-info { min-height: 5em; }
+.hover-info .profile { display: none; }
 .targeting-section {
   display: flex;
   flex-direction: column;
@@ -39,7 +40,8 @@
 
 @media only screen and (min-width: 54em) {
   .orders, .results { width: 50%; }
-  .hover-info { min-height: 3em; }
+  .hover-info { min-height: 8em; }
+  .hover-info .profile { display: block; }
   .targeting-section { flex-direction: row; flex-wrap: wrap; }
   .rounds, .players, .planets { width: 33%; }
   .players { order: 2; }
@@ -52,7 +54,8 @@
   .menu-section { width: 40%; }
   .bottom-section { width: 40%; }
   .orders, .results { width: 100%; }
-  .hover-info { min-height: 4em; }
+  .hover-info { min-height: 12em; }
+  .hover-info > * { vertical-align: bottom; }
   .targeting-section { flex-direction: column; flex-wrap: nowrap; }
   .rounds, .players, .planets, .profiles { width: auto; order: 0; }
 }

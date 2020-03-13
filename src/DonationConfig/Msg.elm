@@ -1,4 +1,4 @@
-module DonationConfig.Msg exposing (Msg(..))
+module DonationConfig.Msg exposing (Msg(..), HoverTarget(..))
 
 import Menu exposing (MenuItem)
 import GameInfo exposing (Options)
@@ -13,7 +13,7 @@ type Msg
   | FinishAmount String
   | AddOne String
   | RemoveAll String
-  | Hover (Maybe MenuItem)
+  | Hover HoverTarget
   | SetPlayer String
   | SetPlanet String
   | ChooseRound String
@@ -24,3 +24,8 @@ type Msg
   | SocketEvent PortSocket.Id PortSocket.Event
   | Reconnect String Posix
   | None
+
+type HoverTarget
+  = HoverNone
+  | HoverItem MenuItem
+  | HoverPlayer String

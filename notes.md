@@ -8,6 +8,7 @@
 
 ### Donation Config UI
 
+- (ALL) exclude 'match' from matcha etc
 - profile editing
 - first click noop???
 - check lobby update websocket?

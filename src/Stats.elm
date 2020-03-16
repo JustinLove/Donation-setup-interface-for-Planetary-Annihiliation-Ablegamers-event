@@ -10,6 +10,7 @@ import Menu
 import PortSocket
 import Stats.View exposing (SVMsg(..))
 
+import Array
 import Browser
 import Dict
 import Html
@@ -47,7 +48,7 @@ type alias Model =
 makeModel : List Menu.RawMenuItem -> List Menu.UnitInfo -> Model
 makeModel menu info =
   let
-    m2 = Menu.cook 0 info menu
+    m2 = List.append (Menu.cook 0 info menu) [giftItem]
   in
     { rawMenu = menu
     , menu = m2
@@ -56,6 +57,14 @@ makeModel menu info =
     , donations = []
     , donationsConnection = Disconnected
     }
+
+giftItem : Menu.MenuItem
+giftItem =
+  { donation = 1
+  , discounts = Array.fromList [1]
+  , code = "gift"
+  , build = []
+  }
 
 init : Arguments -> (Model, Cmd Msg)
 init {menu, info} =

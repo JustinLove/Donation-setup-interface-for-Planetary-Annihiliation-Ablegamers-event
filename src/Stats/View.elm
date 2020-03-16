@@ -45,9 +45,19 @@ displayMenuItem : List Donation -> MenuItem -> Html SVMsg
 displayMenuItem allDonations item =
   let 
     ourDonations =
-      allDonations
-        |> List.map (countOfCode item.code)
-        |> List.filter (\x -> x > 0)
+      case item.code of
+        "P1" ->
+          allDonations
+            |> List.map overage
+            |> List.filter (\x -> x > 0)
+        "gift" ->
+          allDonations
+            |> List.map gift
+            |> List.filter (\x -> x > 0)
+        _ -> 
+          allDonations
+            |> List.map (countOfCode item.code)
+            |> List.filter (\x -> x > 0)
     times = List.length ourDonations
     total = List.sum ourDonations
     raised = (toFloat total) * item.donation
@@ -68,6 +78,20 @@ countOfCode code donation =
   donation.codes
     |> List.filter (\c -> c == code)
     |> List.length
+
+overage : Donation -> Int
+overage donation =
+  if List.length donation.codes == 0 then
+    0
+  else
+    round (donation.amount - donation.minimum)
+
+gift : Donation -> Int
+gift donation =
+  if List.length donation.codes == 0 then
+    round donation.amount
+  else
+    0
 
 buildImage : BuildItem -> Html SVMsg
 buildImage build =

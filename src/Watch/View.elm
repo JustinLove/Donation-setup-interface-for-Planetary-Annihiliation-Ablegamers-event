@@ -54,8 +54,17 @@ view model =
         , div [ class "highlighting-section col" ] <| highlightingSection model
         ]
       ]
-      , donationsList model.roundColors <| List.reverse model.donations
+      , model.donations
+        |> List.filter (inMatch model.round)
+        |> List.reverse
+        |> donationsList model.roundColors
     ]
+
+inMatch : RoundSelection -> Donation -> Bool
+inMatch round donation =
+  case round of
+    AllRounds -> True
+    Round id -> List.member id donation.matchingMatches
 
 filteringSection model =
   [ div [ class "row" ]

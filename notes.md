@@ -9,7 +9,6 @@
 
 - (ALL) exclude 'match' from matcha etc
 - match updates not propagating
-- match filter reconnect non working
 - profile editing
 - first click noop???
 - check lobby update websocket?

@@ -267,6 +267,10 @@ li {
   height: 60px;
 }
 
+.stats-header .stats-graphic {
+  height: 1px;
+}
+
 .stats-graphic img {
   background-color: #333;
 }
@@ -281,7 +285,7 @@ li {
 
 .stats-times, .stats-total, .stats-raised {
   display: inline-block;
-  width: 5%;
+  width: 15%;
   text-align: right;
 }
 

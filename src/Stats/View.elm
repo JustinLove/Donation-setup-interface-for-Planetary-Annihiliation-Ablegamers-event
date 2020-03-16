@@ -26,7 +26,19 @@ view model =
   div [ class "row" ]
     [ model.menu
       |> List.map (displayMenuItem model.donations)
+      |> (::) statsHeader
       |> ul [ class "col stats" ]
+    ]
+
+statsHeader : Html SVMsg
+statsHeader =
+  li [ class "row stats-header" ]
+    [ span [ class "col stats-graphic" ] []
+    , span [ class "col stats-donation" ] [ text "dntn" ]
+    , span [ class "col stats-code" ] [ text "code" ]
+    , span [ class "col stats-times" ] [ text "times" ]
+    , span [ class "col stats-total" ] [ text "total" ]
+    , span [ class "col stats-raised" ] [ text "total $" ]
     ]
 
 displayMenuItem : List Donation -> MenuItem -> Html SVMsg

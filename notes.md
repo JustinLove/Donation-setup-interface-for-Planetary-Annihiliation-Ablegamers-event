@@ -4,6 +4,7 @@
 - original_comment getting overwritten???
 - other auth?
 - Multiple puppetmasters - coordination? central feed tracking executions?
+  - execution status communication
 
 ### Donation Config UI
 
@@ -11,13 +12,13 @@
 - match updates not propagating
 - profile editing
 - first click noop???
-- check lobby update websocket?
 - admin streamlining and safety
 - system upload
 - xx oauth?
 
 ### Ingame Mod
 
+- filter by player
 - update sample data
 - x Hermes were not coming in at orbital - hermes specific, requires patch mod
 - x "nobody" gave units - timing issue? - could not reproduce

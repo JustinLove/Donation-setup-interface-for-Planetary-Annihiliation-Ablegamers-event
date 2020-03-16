@@ -2,6 +2,7 @@ module Main.View exposing (document, view, Msg(..), State(..))
 
 import DonationConfig
 import Watch
+import Stats
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -11,11 +12,13 @@ import Html.Events exposing (onClick)
 type Msg
   = DonateMsg DonationConfig.DCMsg
   | WatchMsg Watch.Msg
+  | StatsMsg Stats.Msg
   | ChangeState State
 
 type State
   = StateDonate
   | StateWatch
+  | StateStats
 
 -- VIEW
 
@@ -48,6 +51,7 @@ mainHeader model =
       ]
     , stateButton model.state StateDonate "Menu"
     , stateButton model.state StateWatch "Donations"
+    , stateButton model.state StateStats "Stats"
     ]
 
 stateButton : State -> State -> String -> Html Msg
@@ -70,4 +74,6 @@ contents model =
       Html.map DonateMsg (DonationConfig.view model.donate)
     StateWatch ->
       Html.map WatchMsg (Watch.view model.watch)
+    StateStats ->
+      Html.map StatsMsg (Stats.view model.stats)
 

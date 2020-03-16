@@ -20,7 +20,7 @@
 .filtering-section { max-width: 7em; }
 .highlighting-section { max-width: 35em; }
 .logo { max-width: 300px; }
-.state-button { max-width: 7em; }
+.state-button { width: auto; padding: 0 0.2em; }
 .hover-info { min-height: 5em; }
 .hover-info .profile { display: none; }
 .targeting-section {

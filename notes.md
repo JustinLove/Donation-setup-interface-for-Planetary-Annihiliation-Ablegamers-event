@@ -1,6 +1,7 @@
 ### Central server(s)
 
-- heroku: websocket timeouts https://devcenter.heroku.com/articles/http-routing#timeouts
+- x heroku: websocket timeouts https://devcenter.heroku.com/articles/http-routing#timeouts
+  - timeout implemented. not fully tested
 - original_comment getting overwritten???
 - other auth?
 - Multiple puppetmasters - coordination? central feed tracking executions?
@@ -11,7 +12,10 @@
 - (ALL) exclude 'match' from matcha etc
 - match updates not propagating
 - profile editing
+- shutting down websockets when changing tabs?
+- shutting down websockets on tab close
 - first click noop???
+- stats layout cleanup
 - admin streamlining and safety
 - system upload
 - xx oauth?

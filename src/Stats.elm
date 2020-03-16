@@ -6,7 +6,7 @@ import Donation exposing (Donation)
 import Donation.Decode
 import GameInfo exposing (GameInfo)
 import GameInfo.Decode
-import Menu
+import Menu exposing (MenuItem)
 import PortSocket
 import Stats.View exposing (SVMsg(..))
 
@@ -38,10 +38,11 @@ main =
 
 type alias Model =
   { rawMenu : List Menu.RawMenuItem
-  , menu : List Menu.MenuItem
+  , menu : List MenuItem
   , unitInfo: List Menu.UnitInfo
   , rounds: List GameInfo
   , donations: List Donation
+  , selectedItem: Maybe MenuItem
   , donationsConnection : Connection.Status
   }
 
@@ -55,10 +56,11 @@ makeModel menu info =
     , unitInfo = info
     , rounds = []
     , donations = []
+    , selectedItem = Nothing
     , donationsConnection = Disconnected
     }
 
-giftItem : Menu.MenuItem
+giftItem : MenuItem
 giftItem =
   { donation = 1
   , discounts = Array.fromList [1]
@@ -101,6 +103,7 @@ type Msg
   | GotDonations (Result Http.Error (List Donation))
   | SocketEvent PortSocket.Id PortSocket.Event
   | Reconnect String Posix
+  | KeepAlive PortSocket.Id Posix
   | StatsViewMsg SVMsg
   | Poll Posix
 
@@ -109,6 +112,19 @@ update msg model =
   case msg of
     StatsViewMsg None ->
       (model, Cmd.none)
+    StatsViewMsg (SelectItem item) ->
+      ( {model | selectedItem =
+        case model.selectedItem of
+          Just was ->
+            if was == item then
+              Nothing
+            else
+              Just item
+          Nothing ->
+            Just item
+        }
+      , Cmd.none
+      )
     GotGameInfo (Ok rounds) ->
       ({ model | rounds = rounds}, Cmd.none)
     GotGameInfo (Err err) ->
@@ -138,6 +154,8 @@ update msg model =
       Connection.update id event updateConnection model
     Reconnect url _ ->
       updateConnection url (Connection.socketReconnect url) model
+    KeepAlive id _ ->
+      (model, PortSocket.send id "")
     Poll t ->
       (model, fetchDonations)
 
@@ -183,4 +201,5 @@ subscriptions model =
   Sub.batch
     [ PortSocket.receive SocketEvent
     , Connection.reconnect (Reconnect (donationsWebsocket)) model.donationsConnection
+    , Connection.keepAlive 50000 KeepAlive model.donationsConnection
     ]

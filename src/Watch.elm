@@ -89,6 +89,7 @@ type Msg
   | GotDonations (Result Http.Error (List Donation))
   | SocketEvent PortSocket.Id PortSocket.Event
   | Reconnect String Posix
+  | KeepAlive PortSocket.Id Posix
   | WatchViewMsg WVMsg
   | Poll Posix
 
@@ -140,6 +141,8 @@ update msg model =
       Connection.update id event updateConnection model
     Reconnect url _ ->
       updateConnection url (Connection.socketReconnect url) model
+    KeepAlive id _ ->
+      (model, PortSocket.send id "")
     Poll t ->
       (model, fetchDonations model.round)
 
@@ -185,4 +188,5 @@ subscriptions model =
   Sub.batch
     [ PortSocket.receive SocketEvent
     , Connection.reconnect (Reconnect (donationsWebsocket model.round)) model.donationsConnection
+    , Connection.keepAlive 50000 KeepAlive model.donationsConnection
     ]

@@ -1,4 +1,4 @@
-module Connection exposing (Status(..), connect, currentId, socketConnecting, socketClosed, socketReconnect, update, reconnect)
+module Connection exposing (Status(..), connect, currentId, socketConnecting, socketClosed, socketReconnect, update, reconnect, keepAlive)
 
 import PortSocket
 
@@ -99,4 +99,10 @@ reconnect tagger connection =
   case connection of
     Connect timeout-> Time.every timeout tagger
     Connecting _ timeout-> Time.every timeout tagger
+    _ -> Sub.none
+
+keepAlive : Float -> (PortSocket.Id -> Posix -> msg) -> Status -> Sub msg
+keepAlive timeout tagger connection =
+  case connection of
+    Connected id -> Time.every timeout (tagger id)
     _ -> Sub.none

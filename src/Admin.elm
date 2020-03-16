@@ -90,6 +90,7 @@ type Msg
   | SignedMessage Nacl.SignArguments
   | SocketEvent PortSocket.Id PortSocket.Event
   | Reconnect String Posix
+  | KeepAlive PortSocket.Id Posix
   | AdminViewMsg AVMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -126,6 +127,8 @@ update msg model =
       Connection.update id event updateConnection model
     Reconnect url _ ->
       updateConnection url (Connection.socketReconnect url) model
+    KeepAlive id _ ->
+      (model, PortSocket.send id "")
     EmptyRequestComplete (Ok response) ->
       (model, Cmd.none)
     EmptyRequestComplete (Err err) ->
@@ -530,7 +533,9 @@ subscriptions model =
   Sub.batch
     [ PortSocket.receive SocketEvent
     , Connection.reconnect (Reconnect optionsWebsocket) model.optionsConnection
+    , Connection.keepAlive 50000 KeepAlive model.optionsConnection
     , Connection.reconnect (Reconnect donationsWebsocket) model.donationsConnection
+    , Connection.keepAlive 50000 KeepAlive model.donationsConnection
     , matchSubscription model
     , Nacl.signedMessage SignedMessage
     ]

@@ -328,7 +328,7 @@ wss.on('connection', function connection(con) {
   notifyClientsOptionsChanged()
   notifyClientsDonations(donations)
   con.on('message', function incoming(message) {
-    console.log('received: %s', wss.clients.length, message);
+    console.log('received: %d (%s)', wss.clients.length, message);
   });
 
   con.on('close', function() {

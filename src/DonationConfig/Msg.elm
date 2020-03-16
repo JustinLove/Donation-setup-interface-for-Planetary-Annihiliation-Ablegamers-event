@@ -23,6 +23,7 @@ type Msg
   | GotProfiles (Result Http.Error (List Profile))
   | SocketEvent PortSocket.Id PortSocket.Event
   | Reconnect String Posix
+  | KeepAlive PortSocket.Id Posix
   | None
 
 type HoverTarget

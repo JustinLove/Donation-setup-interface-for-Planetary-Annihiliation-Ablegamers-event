@@ -159,6 +159,8 @@ update msg model =
       Connection.update id event updateConnection model
     Reconnect url _ ->
       updateConnection url (Connection.socketReconnect url) model
+    KeepAlive id _ ->
+      (model, PortSocket.send id "")
     None ->
       (model, Cmd.none)
 
@@ -306,4 +308,5 @@ subscriptions model =
   Sub.batch
     [ PortSocket.receive SocketEvent
     , Connection.reconnect (Reconnect optionsWebsocket) model.optionsConnection
+    , Connection.keepAlive 50000 KeepAlive model.optionsConnection
     ]

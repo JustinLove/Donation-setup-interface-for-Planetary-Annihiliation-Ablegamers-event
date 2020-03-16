@@ -1,7 +1,6 @@
 ### Central server(s)
 
-- dump database level data
-- Test data
+- heroku: websocket timeouts https://devcenter.heroku.com/articles/http-routing#timeouts
 - original_comment getting overwritten???
 - other auth?
 - Multiple puppetmasters - coordination? central feed tracking executions?
@@ -20,6 +19,7 @@
 
 ### Ingame Mod
 
+- update sample data
 - x Hermes were not coming in at orbital - hermes specific, requires patch mod
 - x "nobody" gave units - timing issue? - could not reproduce
   - saw again intermittently

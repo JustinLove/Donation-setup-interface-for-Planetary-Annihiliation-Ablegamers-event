@@ -3,7 +3,7 @@ module DonationConfig exposing (main, init, update, view, subscriptions, DCMsg, 
 import Connection exposing (Status(..))
 import DonationConfig.View
 import DonationConfig.Msg exposing (..)
-import Menu exposing (..)
+import Menu exposing (OrderItem)
 import GameInfo exposing (Options, GameInfo) 
 import GameInfo.Decode
 import Config exposing (config) 
@@ -24,8 +24,8 @@ view = DonationConfig.View.view
 type alias DCMsg = Msg
 
 type alias Arguments =
-  { menu: List RawMenuItem
-  , info: List UnitInfo
+  { menu: List Menu.RawMenuItem
+  , info: List Menu.UnitInfo
   }
 
 main : Program Arguments Model Msg
@@ -40,9 +40,9 @@ main =
 -- MODEL
 
 type alias Model =
-  { rawMenu : List RawMenuItem
-  , menu : List MenuItem
-  , unitInfo: List UnitInfo
+  { rawMenu : List Menu.RawMenuItem
+  , menu : List Menu.MenuItem
+  , unitInfo: List Menu.UnitInfo
   , rounds: List GameInfo
   , profiles: List Profile
   , round: String
@@ -54,10 +54,10 @@ type alias Model =
   , optionsConnection : Connection.Status
   }
 
-makeModel : List RawMenuItem -> List UnitInfo -> Model
+makeModel : List Menu.RawMenuItem -> List Menu.UnitInfo -> Model
 makeModel menu info =
   let
-    m2 = cook 0 info menu
+    m2 = Menu.cook 0 info menu
   in
     { rawMenu = menu
     , menu = m2
@@ -67,7 +67,7 @@ makeModel menu info =
     , round = ""
     , player = ""
     , planet = ""
-    , selections = List.map makeOrder m2
+    , selections = List.map Menu.makeOrder m2
     , hover = HoverNone
     , instructionsOpen = False
     , optionsConnection = Disconnected
@@ -222,7 +222,7 @@ updateDiscounts : Model -> Model
 updateDiscounts model =
   let discountLevel = currentDiscountLevel model in 
     { model
-    | menu = cook discountLevel model.unitInfo model.rawMenu
+    | menu = Menu.cook discountLevel model.unitInfo model.rawMenu
     , selections = List.map (updateOrderDiscounts discountLevel) model.selections
     }
 

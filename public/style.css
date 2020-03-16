@@ -255,6 +255,39 @@ li {
   color: #0FF;
 }
 
+.stats-item button {
+  position: relative;
+  width: 100%;
+}
+
+.stats-graphic {
+  display: block;
+  min-width: 60px;
+  width: 10%;
+  height: 60px;
+}
+
+.stats-graphic img {
+  background-color: #333;
+}
+
+.stats-code {
+  width: 5%;
+}
+
+.stats-donation {
+  width: 5%;
+}
+
+.stats-times, .stats-total, .stats-raised {
+  display: inline-block;
+  width: 5%;
+  text-align: right;
+}
+
+.stats-text {
+}
+
 .order-item ul {
   display: inline-block;
   margin: 0;

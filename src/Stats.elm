@@ -6,6 +6,7 @@ import Donation exposing (Donation)
 import Donation.Decode
 import GameInfo exposing (GameInfo)
 import GameInfo.Decode
+import Menu
 import PortSocket
 import Stats.View exposing (SVMsg(..))
 
@@ -16,9 +17,14 @@ import Http
 import Time exposing (Posix)
 import Json.Decode
 
+type alias Arguments =
+  { menu: List Menu.RawMenuItem
+  , info: List Menu.UnitInfo
+  }
+
 view = Stats.View.view >> Html.map StatsViewMsg
 
-main : Program () Model Msg
+main : Program Arguments Model Msg
 main =
   Browser.document
     { init = init
@@ -30,21 +36,30 @@ main =
 -- MODEL
 
 type alias Model =
-  { rounds: List GameInfo
+  { rawMenu : List Menu.RawMenuItem
+  , menu : List Menu.MenuItem
+  , unitInfo: List Menu.UnitInfo
+  , rounds: List GameInfo
   , donations: List Donation
   , donationsConnection : Connection.Status
   }
 
-makeModel : Model
-makeModel =
-  { rounds = []
-  , donations = []
-  , donationsConnection = Disconnected
-  }
+makeModel : List Menu.RawMenuItem -> List Menu.UnitInfo -> Model
+makeModel menu info =
+  let
+    m2 = Menu.cook 0 info menu
+  in
+    { rawMenu = menu
+    , menu = m2
+    , unitInfo = info
+    , rounds = []
+    , donations = []
+    , donationsConnection = Disconnected
+    }
 
-init : () -> (Model, Cmd Msg)
-init _ =
-  ( makeModel
+init : Arguments -> (Model, Cmd Msg)
+init {menu, info} =
+  ( makeModel menu info
   , Cmd.batch [ fetchGame, fetchDonations ]
   )
 

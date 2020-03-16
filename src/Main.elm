@@ -27,7 +27,7 @@ type alias Model =
 
 init : DonationConfig.Arguments -> (Model, Cmd Msg)
 init args =
-  case (DonationConfig.init args, Watch.init (), Stats.init ()) of
+  case (DonationConfig.init args, Watch.init (), Stats.init args) of
     ((donateModel, donateCmd), (watchModel, watchCmd), (statsModel, statsCmd)) ->
       ( { donate = donateModel
         , watch = watchModel
